@@ -1,0 +1,10 @@
+# Normaliza finales de línea: LF en el repo, sin importar el SO del que se haga commit.
+* text=auto eol=lf
+
+# Archivos que deben quedar exactamente como están.
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary

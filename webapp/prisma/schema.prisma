@@ -1,0 +1,345 @@
+// RxTrack 2026-2s — modelo de datos.
+// Ver ../../CLAUDE.md y la propuesta de arquitectura (secciones 3, 8, 9, 10).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Estado de dominio de un módulo. MANUAL: lo pone la persona, no se deriva.
+enum ModuleStatus {
+  NO_VISTO
+  EN_PROGRESO
+  DOMINADO
+}
+
+/// Estado del informe de la práctica de laboratorio de un módulo.
+enum LabReportStatus {
+  PENDIENTE
+  ENTREGADO
+  CALIFICADO
+}
+
+/// Estado de un proyecto (entregable) de la asignatura.
+enum ProjectStatus {
+  POR_INICIAR
+  EN_CURSO
+  COMPLETADO
+}
+
+/// Asignatura — entidad raíz. id = slug ("aif", "ft2"). code = "AIF".
+/// Los campos de contenido se resincronizan desde content/<code>.ts; el avance
+/// (attendanceMissed, weeklyGoal, y todo lo que cuelga con fromContent=false) no.
+model Subject {
+  id                 String   @id
+  code               String   @unique
+  name               String
+  credits            String?
+  professors         String[]
+  scheduleTheory     String?
+  scheduleLab        String?
+  descriptionSummary String?  @db.Text
+  objectiveGeneral   String?  @db.Text
+  objectivesSpecific String[]
+  hasLab             Boolean  @default(false)
+  totalClasses       Int      @default(32)
+  attendanceMissed   Int      @default(0)
+  weeklyGoal         String?  @db.Text
+  driveUrl           String?
+  order              Int      @unique
+  syncedAt           DateTime?
+  /// Se refresca en cualquier escritura hija -> "hace N días sin tocar esto".
+  lastActivityAt     DateTime?
+
+  modules       Module[]
+  projects      Project[]
+  glossary      GlossaryTerm[]
+  formulas      Formula[]
+  keyDates      KeyDate[]
+  evaluation    EvaluationItem[]
+  bibliography  BibliographyItem[]
+  pastMaterials PastMaterial[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Tema del curso. slug estable dentro de la asignatura, viene de content/<code>.ts.
+model Module {
+  id              String          @id @default(cuid())
+  subjectId       String
+  subject         Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  slug            String
+  title           String
+  description     String          @db.Text
+  hasLab          Boolean         @default(false)
+  status          ModuleStatus    @default(NO_VISTO)
+  order           Int
+  driveUrl        String?
+  notesUrl        String?
+  labProtocol     String?         @db.Text
+  labReportStatus LabReportStatus?
+  /// false = creado dentro de la app; el resync del seed lo ignora.
+  fromContent     Boolean         @default(true)
+
+  sessions       Session[]
+  checklistItems ChecklistItem[]
+  resources      Resource[]
+  labMaterials   LabMaterial[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([subjectId, slug])
+  @@index([subjectId])
+}
+
+/// Sesión de clase = apuntes en formato Cornell (markdown-lite seguro).
+model Session {
+  id        String    @id @default(cuid())
+  moduleId  String
+  module    Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  number    Int?
+  /// Fecha de la clase (no la de guardado).
+  date      DateTime?
+  topic     String
+  content   String    @db.Text
+  /// Snapshot de quién del grupo la subió.
+  author    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([moduleId])
+}
+
+/// Subtarea. Cuelga de un Module (entregables del temario) O de un Project
+/// (exactamente uno de moduleId / projectId). done y order viven aquí y nunca
+/// se resincronizan.
+model ChecklistItem {
+  id        String   @id @default(cuid())
+  moduleId  String?
+  module    Module?  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  text      String   @db.Text
+  done      Boolean  @default(false)
+  order     Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([moduleId])
+  @@index([projectId])
+}
+
+/// Enlace externo asociado a un módulo (video, artículo, guía).
+model Resource {
+  id       String  @id @default(cuid())
+  moduleId String
+  module   Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  name     String
+  url      String
+  order    Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([moduleId])
+}
+
+/// Material / insumo de la práctica de laboratorio de un módulo.
+model LabMaterial {
+  id       String @id @default(cuid())
+  moduleId String
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  text     String
+  done     Boolean @default(false)
+  order    Int     @default(0)
+
+  @@index([moduleId])
+}
+
+/// Proyecto de la asignatura: entregable, informe, parcial a preparar, producto
+/// final. El concepto de "ET en Marcha", ahora con subjectId. Casi siempre isManual.
+model Project {
+  id        String        @id @default(cuid())
+  subjectId String
+  subject   Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  title     String
+  category  String?
+  status    ProjectStatus @default(POR_INICIAR)
+  driveUrl  String?
+  order     Int
+  /// false = sembrado desde content/<code>.ts (arreglo `projects`).
+  isManual  Boolean       @default(true)
+
+  checklistItems ChecklistItem[]
+  notes          ProjectNote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+}
+
+/// Entrada de bitácora de un proyecto — lo que alimenta "Últimas actualizaciones".
+/// Guarda snapshot de autor y rol para que la nota histórica no cambie después.
+model ProjectNote {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  body       String   @db.Text
+  author     String
+  authorRole String?
+
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+/// subjectId siempre; moduleId opcional (cross-link blando, como en el borrador).
+model GlossaryTerm {
+  id          String  @id @default(cuid())
+  subjectId   String
+  subject     Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  moduleId    String?
+  term        String
+  definition  String  @db.Text
+  fromContent Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+}
+
+/// Fórmula con markup propio: _{sub}, ^{sup}, #{numerador|denominador}, \n.
+model Formula {
+  id          String  @id @default(cuid())
+  subjectId   String
+  subject     Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  moduleId    String?
+  name        String
+  expression  String  @db.Text
+  variables   String  @db.Text @default("")
+  description String  @db.Text @default("")
+  derivation  String  @db.Text @default("")
+  fromContent Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+}
+
+/// Parcial / entrega. El nombre y el peso vienen del temario; la fecha la pone
+/// la persona y el seed nunca la toca.
+model KeyDate {
+  id          String    @id @default(cuid())
+  subjectId   String
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  name        String
+  date        DateTime?
+  weight      String?
+  note        String?   @db.Text
+  fromContent Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+}
+
+/// Sistema de evaluación (los pesos suman 100). grade opcional -> proyección de nota.
+model EvaluationItem {
+  id        String  @id @default(cuid())
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  name      String
+  weight    Int
+  grade     Float?
+  order     Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+}
+
+model BibliographyItem {
+  id          String  @id @default(cuid())
+  subjectId   String
+  subject     Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  moduleId    String?
+  kind        String  @default("libro")
+  reference   String  @db.Text
+  url         String?
+  fromContent Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@index([subjectId])
+}
+
+/// Insumos: talleres/simulacros de semestres previos. `patterns` = el campo clave.
+model PastMaterial {
+  id        String  @id @default(cuid())
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  moduleId  String?
+  kind      String  @default("taller")
+  title     String
+  semester  String  @default("")
+  url       String?
+  patterns  String  @db.Text @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+}
+
+/// Estado global del semestre (fila única, id = "singleton").
+/// Incluye lo que sostiene el diseño para TDAH.
+model SemesterMeta {
+  id                String    @id @default("singleton")
+  streakDays        Int       @default(0)
+  streakLastDate    DateTime?
+  /// Racha indulgente: fecha en la que ya se usó el día de gracia.
+  streakGraceUsedOn DateTime?
+  globalGoal        String?   @db.Text
+  theme             String    @default("auto")
+
+  /// "Continuar donde ibas" — un solo punto de retorno activo.
+  resumeRoute String?
+  resumeLabel String?
+  resumeNote  String?
+  resumeAt    DateTime?
+
+  /// Ajustes de enfoque (tunables por la persona).
+  focusItemCount Int     @default(3)
+  showStreak     Boolean @default(true)
+  gentleMotion   Boolean @default(true)
+  dailyReminder  Boolean @default(false)
+
+  updatedAt DateTime @updatedAt
+}
+
+/// Bandeja de captura rápida: descargas una idea sin decidir dónde va; se
+/// clasifica después hacia una asignatura.
+model InboxItem {
+  id        String    @id @default(cuid())
+  text      String    @db.Text
+  url       String?
+  subjectId String?
+  triagedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([triagedAt])
+}

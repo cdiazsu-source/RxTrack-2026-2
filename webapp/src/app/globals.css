@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Paleta institucional Universidad Nacional de Colombia.
+       Verde 7743 C #4A7729 como primario; rojo 187 C #A6192E como destructivo;
+       verde 376 C #84BD00 como éxito. Valores en HSL para hsl(var(--token)). */
+    --background: 200 20% 98%;
+    --foreground: 200 6% 18%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 200 6% 18%;
+
+    --primary: 95 49% 31%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 78 40% 92%;
+    --secondary-foreground: 95 49% 20%;
+
+    --muted: 200 14% 95%;
+    --muted-foreground: 200 5% 40%;
+
+    --accent: 78 50% 90%;
+    --accent-foreground: 95 49% 20%;
+
+    --destructive: 351 74% 37%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 78 90% 33%;
+    --success-foreground: 96 55% 12%;
+
+    --warning: 32 90% 42%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 200 12% 85%;
+    --input: 200 12% 85%;
+    --ring: 95 49% 31%;
+
+    --radius: 0.7rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2 {
+    letter-spacing: -0.018em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .site-nav {
+      background-color: hsl(var(--card)) !important;
+      backdrop-filter: none !important;
+    }
+  }
+}
+
+@layer utilities {
+  .press {
+    @apply transition-transform duration-150 ease-out-strong active:scale-[0.97];
+  }
+
+  /* "Titileo" de la subtarea que sigue. El bloque de prefers-reduced-motion
+     de arriba lo neutraliza (queda solo el color/peso). */
+  @keyframes rx-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.45;
+    }
+  }
+  .animate-rx-blink {
+    animation: rx-blink 1.4s ease-in-out infinite;
+  }
+}
+
+@layer components {
+  /* --- Render de apuntes Cornell (markdown-lite.ts) --- */
+  .cornell :where(.cornell-heading) {
+    @apply mb-1 mt-4 text-sm font-semibold text-foreground first:mt-0;
+  }
+  .cornell :where(.cornell-p) {
+    @apply my-2 text-sm leading-relaxed;
+  }
+  .cornell :where(.cornell-list) {
+    @apply my-2 ml-5 list-outside text-sm leading-relaxed;
+  }
+  .cornell :where(ul.cornell-list) {
+    @apply list-disc;
+  }
+  .cornell :where(ol.cornell-list) {
+    @apply list-decimal;
+  }
+  .cornell :where(.cornell-check) {
+    @apply my-1 flex items-start gap-2 text-sm;
+  }
+  .cornell :where(.cornell-check input) {
+    @apply mt-1;
+  }
+  .cornell :where(.cornell-hr) {
+    @apply my-4 border-border;
+  }
+  .cornell :where(.cornell-table-wrap) {
+    @apply my-3 overflow-x-auto rounded-md border border-border;
+  }
+  .cornell :where(.cornell-table) {
+    @apply w-full border-collapse text-sm;
+  }
+  .cornell :where(.cornell-table th) {
+    @apply bg-muted px-3 py-2 text-left font-semibold;
+  }
+  .cornell :where(.cornell-table td) {
+    @apply border-t border-border px-3 py-2 align-top;
+  }
+  .cornell :where(.cornell-empty) {
+    @apply text-sm text-muted-foreground;
+  }
+
+  /* --- Render de fórmulas (formula-markup.ts) --- */
+  .formula {
+    @apply font-serif text-base leading-relaxed;
+  }
+  .formula .formula-line {
+    @apply block;
+  }
+  .formula .frac {
+    @apply mx-1 inline-flex flex-col text-center align-middle;
+  }
+  .formula .frac-num {
+    @apply border-b border-current px-1;
+  }
+  .formula .frac-den {
+    @apply px-1;
+  }
+  .formula-prose p {
+    @apply my-2 text-sm leading-relaxed;
+  }
+}

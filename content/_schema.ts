@@ -1,0 +1,92 @@
+/**
+ * Tipos de la fuente de verdad del temario.
+ *
+ * Cada asignatura es un archivo `content/<code>.ts` que exporta un objeto
+ * `SubjectContent`. Lo lee `webapp/prisma/seed.ts` y lo sincroniza hacia la base
+ * de datos de forma idempotente: actualiza los campos de contenido y AGREGA lo
+ * que falte, pero nunca borra ni sobrescribe el avance de la persona (estado de
+ * módulo, checklist marcado, sesiones, fechas puestas a mano, notas, notas de
+ * evaluación).
+ *
+ * Los `moduleSlug` son referencias blandas al `slug` de un módulo de la MISMA
+ * asignatura (para el cross-link opcional glosario/fórmula/bibliografía ↔ módulo).
+ */
+
+export interface ModuleContent {
+  /** Identificador estable dentro de la asignatura. No cambiarlo una vez usado. */
+  slug: string;
+  title: string;
+  description: string;
+  hasLab?: boolean;
+  /** Protocolo / práctica asociada, si tiene laboratorio. */
+  labProtocol?: string;
+}
+
+export interface GlossaryContent {
+  term: string;
+  definition: string;
+  moduleSlug?: string | null;
+}
+
+export interface FormulaContent {
+  name: string;
+  /** Markup: `_{sub}`, `^{sup}`, `#{numerador|denominador}`, `\n` = salto de línea. */
+  expression: string;
+  variables?: string;
+  description?: string;
+  /** Desarrollo e interpretación; una línea por idea. Admite `**negrita**` + el markup. */
+  derivation?: string;
+  moduleSlug?: string | null;
+}
+
+export interface KeyDateContent {
+  name: string;
+  /** Peso en la nota, texto libre: "15%". La fecha la pone la persona en la app. */
+  weight?: string | null;
+  note?: string | null;
+}
+
+export interface EvaluationContent {
+  name: string;
+  /** Porcentaje entero. La suma de todos debería dar 100. */
+  weight: number;
+}
+
+export interface BibliographyContent {
+  kind: "libro" | "revista";
+  reference: string;
+  url?: string;
+  moduleSlug?: string | null;
+}
+
+export interface ProjectContent {
+  title: string;
+  category?: string | null;
+}
+
+export interface SubjectContent {
+  /** Código corto en mayúsculas: "AIF", "FT2", … */
+  code: string;
+  /** Slug en minúsculas para la URL: "aif", "ft2", … */
+  slug: string;
+  name: string;
+  credits?: string;
+  professors?: string[];
+  scheduleTheory?: string;
+  scheduleLab?: string;
+  descriptionSummary?: string;
+  objectiveGeneral?: string;
+  objectivesSpecific?: string[];
+  hasLab?: boolean;
+  /** Total de clases del semestre, para el % de asistencia. Default 32. */
+  totalClasses?: number;
+
+  modules?: ModuleContent[];
+  glossary?: GlossaryContent[];
+  formulas?: FormulaContent[];
+  keyDates?: KeyDateContent[];
+  evaluation?: EvaluationContent[];
+  bibliography?: BibliographyContent[];
+  /** Entregables fijos de la asignatura (seminario, producto final, informes…). */
+  projects?: ProjectContent[];
+}
