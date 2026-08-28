@@ -48,7 +48,7 @@ export function ProgressRing({
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={c * (1 - v / 100)}
-          className="transition-[stroke-dashoffset] duration-[400ms] ease-out-strong motion-reduce:transition-none"
+          className="transition-[stroke-dashoffset] [transition-duration:400ms] ease-out-strong motion-reduce:transition-none"
         />
       </svg>
       <div className="absolute inset-0 grid place-items-center text-center leading-none">
