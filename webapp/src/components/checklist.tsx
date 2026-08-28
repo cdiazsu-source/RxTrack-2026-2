@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { ChevronDown, ChevronUp, Pencil, Plus, Trash2 } from "lucide-react";
 
 import {
@@ -33,6 +33,9 @@ function Row({
   const canEdit = useCanEdit();
   const [editing, setEditing] = useState(false);
   const [pending, start] = useTransition();
+  // Optimista: la casilla responde al instante y luego confirma con el servidor.
+  const [done, setDone] = useState(item.done);
+  useEffect(() => setDone(item.done), [item.done]);
 
   if (editing && canEdit) {
     return (
@@ -56,24 +59,25 @@ function Row({
     <li className="group flex items-start gap-3 rounded-md px-2 py-2 hover:bg-muted/50">
       <input
         type="checkbox"
-        checked={item.done}
-        disabled={pending || !canEdit}
+        checked={done}
+        disabled={!canEdit}
         onChange={(e) => {
           if (!canEdit) return;
-          const done = e.target.checked;
+          const next = e.target.checked;
+          setDone(next);
           start(() => {
-            toggleChecklistItem(item.id, done);
+            toggleChecklistItem(item.id, next);
           });
         }}
         className="mt-1 h-4 w-4 rounded border-input accent-[hsl(var(--primary))]"
       />
-      <p className={cn("flex-1 text-sm", item.done && "text-muted-foreground line-through")}>{item.text}</p>
+      <p className={cn("flex-1 text-sm", done && "text-muted-foreground line-through")}>{item.text}</p>
       {canEdit && (
-        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-          <button type="button" disabled={isFirst} onClick={() => start(() => moveChecklistItem(item.id, "up"))} className="rounded p-1 text-muted-foreground hover:bg-accent disabled:opacity-30" aria-label="Subir">
+        <div className="hover-reveal flex gap-1">
+          <button type="button" disabled={isFirst || pending} onClick={() => start(() => moveChecklistItem(item.id, "up"))} className="rounded p-1 text-muted-foreground hover:bg-accent disabled:opacity-30" aria-label="Subir">
             <ChevronUp className="h-3.5 w-3.5" />
           </button>
-          <button type="button" disabled={isLast} onClick={() => start(() => moveChecklistItem(item.id, "down"))} className="rounded p-1 text-muted-foreground hover:bg-accent disabled:opacity-30" aria-label="Bajar">
+          <button type="button" disabled={isLast || pending} onClick={() => start(() => moveChecklistItem(item.id, "down"))} className="rounded p-1 text-muted-foreground hover:bg-accent disabled:opacity-30" aria-label="Bajar">
             <ChevronDown className="h-3.5 w-3.5" />
           </button>
           <button type="button" onClick={() => setEditing(true)} className="rounded p-1 text-muted-foreground hover:bg-accent" aria-label="Editar">

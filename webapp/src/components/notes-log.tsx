@@ -47,7 +47,7 @@ export function NotesLog({ projectId, notes }: { projectId: string; notes: NoteV
                   <button
                     type="button"
                     onClick={() => deleteProjectNote(n.id)}
-                    className="opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                    className="hover-reveal hover:text-destructive"
                     aria-label="Eliminar nota"
                   >
                     <Trash2 className="h-3.5 w-3.5" />

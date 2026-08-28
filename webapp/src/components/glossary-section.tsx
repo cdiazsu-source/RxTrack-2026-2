@@ -74,7 +74,7 @@ export function GlossarySection({
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-semibold">{g.term}</p>
                 {canEdit && (
-                  <button type="button" onClick={() => deleteGlossaryTerm(g.id)} className="opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100" aria-label="Eliminar">
+                  <button type="button" onClick={() => deleteGlossaryTerm(g.id)} className="hover-reveal hover:text-destructive" aria-label="Eliminar">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 )}

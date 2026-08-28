@@ -27,12 +27,13 @@ export const ProgressBar = React.forwardRef<HTMLDivElement, ProgressBarProps>(
         aria-valuemin={0}
         aria-valuemax={100}
       >
+        {/* Se anima con transform (GPU, sin layout) — patrón de Radix Progress. */}
         <div
           className={cn(
-            "h-full rounded-full transition-[width] duration-500 ease-out-strong",
+            "h-full w-full rounded-full transition-transform duration-300 ease-out-strong",
             v >= 100 ? "bg-success" : "bg-primary",
           )}
-          style={{ width: `${v}%` }}
+          style={{ transform: `translateX(-${100 - v}%)` }}
         />
       </div>
     );

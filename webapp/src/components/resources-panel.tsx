@@ -54,7 +54,7 @@ export function ResourcesPanel({ moduleId, resources }: { moduleId: string; reso
                   {r.name}
                 </a>
                 {canEdit && (
-                  <button type="button" onClick={() => deleteResource(r.id)} className="ml-auto text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100" aria-label="Eliminar">
+                  <button type="button" onClick={() => deleteResource(r.id)} className="ml-auto text-muted-foreground hover-reveal hover:text-destructive" aria-label="Eliminar">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 )}

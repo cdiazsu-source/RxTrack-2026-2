@@ -11,9 +11,13 @@ export const ft2: SubjectContent = {
   name: "Farmacotecnia 2",
   credits: "4",
   professors: ["Yolima Baena Aristizábal", "Marcela Aragón Novoa"],
-  scheduleTheory: "Lunes y Martes, 2:00 pm – 4:00 pm",
-  scheduleLab: "Martes y Jueves, 9:00 am – 1:00 pm",
+  scheduleTheory: "Lunes y Martes 14:00–16:00",
+  scheduleLab: "Martes 9:00–13:00, Jueves 9:00–13:00, Viernes 14:00–18:00",
   totalClasses: 32,
+
+  // Asignatura teórico-práctica con laboratorio y componente cuantitativo:
+  // se muestran todas las secciones.
+  sections: ["modulos", "proyectos", "fechas", "glosario", "formulas", "bibliografia", "insumos", "prompt-ia"],
   descriptionSummary:
     "Farmacotecnia II es la asignatura del programa de Farmacia enfocada en el diseño y desarrollo de **productos farmacéuticos heterodispersos** — suspensiones, emulsiones y sistemas semisólidos — desde sus fundamentos fisicoquímicos y biofarmacéuticos hasta su **manufactura a escala de laboratorio**.",
   objectiveGeneral:

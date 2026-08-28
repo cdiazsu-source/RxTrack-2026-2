@@ -80,7 +80,7 @@ export function InsumosSection({ subjectId, items }: { subjectId: string; items:
                   {m.semester && <span className="ml-2 text-xs font-normal text-muted-foreground">{m.semester}</span>}
                 </p>
                 {canEdit && (
-                  <button type="button" onClick={() => deletePastMaterial(m.id)} className="opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100" aria-label="Eliminar">
+                  <button type="button" onClick={() => deletePastMaterial(m.id)} className="hover-reveal hover:text-destructive" aria-label="Eliminar">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 )}

@@ -23,7 +23,7 @@ const STATUS_VARIANT: Record<ProjectCardView["status"], "outline" | "warning" | 
 
 export function ProjectCard({ project, subjectSlug }: { project: ProjectCardView; subjectSlug: string }) {
   return (
-    <Link href={`/${subjectSlug}/proyectos/${project.id}`} className="block">
+    <Link href={`/${subjectSlug}/proyectos/${project.id}`} className="press-card block">
       <Card className="h-full p-4 transition-shadow hover:shadow-card-hover">
         <div className="mb-2 flex flex-wrap items-center gap-1.5">
           {project.category && <Badge variant="outline">{project.category}</Badge>}

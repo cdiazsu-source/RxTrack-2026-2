@@ -72,26 +72,52 @@
       backdrop-filter: none !important;
     }
   }
+
+  /* Foco visible en botones "desnudos" (íconos). ui/button tiene su propio ring
+     con outline-none, así que este solo aplica a los que no lo definen. */
+  button:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
 }
 
 @layer utilities {
   .press {
     @apply transition-transform duration-150 ease-out-strong active:scale-[0.97];
   }
+  /* Feedback de presión sutil para elementos grandes (tarjetas enlazadas). */
+  .press-card {
+    @apply transition-transform duration-150 ease-out-strong active:scale-[0.99];
+  }
 
-  /* "Titileo" de la subtarea que sigue. El bloque de prefers-reduced-motion
-     de arriba lo neutraliza (queda solo el color/peso). */
+  /* Acciones que aparecen al pasar el mouse: en pantallas táctiles (sin hover
+     real) se muestran siempre, para que se puedan usar. */
+  .hover-reveal {
+    @apply opacity-100;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hover-reveal {
+      @apply opacity-0 transition-opacity duration-150 ease-out;
+    }
+    .group:hover .hover-reveal,
+    .group:focus-within .hover-reveal {
+      @apply opacity-100;
+    }
+  }
+
+  /* "Titileo" de la subtarea que sigue. Suave y lento a propósito; el bloque de
+     prefers-reduced-motion de arriba lo neutraliza (queda solo el color/peso). */
   @keyframes rx-blink {
     0%,
     100% {
       opacity: 1;
     }
     50% {
-      opacity: 0.45;
+      opacity: 0.6;
     }
   }
   .animate-rx-blink {
-    animation: rx-blink 1.4s ease-in-out infinite;
+    animation: rx-blink 2s ease-in-out infinite;
   }
 }
 

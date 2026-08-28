@@ -106,7 +106,7 @@ export function DatesSection({ subjectId, items }: { subjectId: string; items: K
                     </button>
                   )}
                   {canEdit && !d.fromContent && (
-                    <button type="button" onClick={() => deleteKeyDate(d.id)} className="text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100" aria-label="Eliminar">
+                    <button type="button" onClick={() => deleteKeyDate(d.id)} className="text-muted-foreground hover-reveal hover:text-destructive" aria-label="Eliminar">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   )}

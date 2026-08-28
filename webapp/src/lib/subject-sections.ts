@@ -14,3 +14,21 @@ export const SUBJECT_SECTIONS = [
 ] as const;
 
 export const SUBJECT_SECTION_SEGMENTS = SUBJECT_SECTIONS.map((s) => s.segment).filter(Boolean) as string[];
+
+/**
+ * Secciones visibles para una asignatura según su naturaleza. `sections` viene
+ * de `Subject.sections` (sembrado desde content/<code>.ts). Vacío = todas.
+ * El "Panel" (segment "") siempre se muestra.
+ */
+export function visibleSubjectSections(sections: readonly string[] | undefined | null) {
+  if (!sections || sections.length === 0) return SUBJECT_SECTIONS;
+  const allowed = new Set(sections);
+  return SUBJECT_SECTIONS.filter((s) => s.segment === "" || allowed.has(s.segment));
+}
+
+/** ¿Está visible esta sección para la asignatura? (para guardas de ruta) */
+export function isSectionVisible(sections: readonly string[] | undefined | null, segment: string): boolean {
+  if (!segment) return true;
+  if (!sections || sections.length === 0) return true;
+  return sections.includes(segment);
+}

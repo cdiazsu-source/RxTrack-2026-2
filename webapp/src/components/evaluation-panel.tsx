@@ -93,7 +93,7 @@ export function EvaluationPanel({ subjectId, items }: { subjectId: string; items
                   <span className="tabular-nums text-sm">{it.grade === null ? "—" : fmt(it.grade)}</span>
                 )}
                 {canEdit && (
-                  <button type="button" onClick={() => deleteEvaluationItem(it.id)} className="text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100" aria-label="Eliminar">
+                  <button type="button" onClick={() => deleteEvaluationItem(it.id)} className="text-muted-foreground hover-reveal hover:text-destructive" aria-label="Eliminar">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 )}

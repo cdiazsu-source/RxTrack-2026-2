@@ -44,7 +44,7 @@ function FormulaRow({ f, moduleTitle, canEdit }: { f: FormulaView; moduleTitle: 
           )}
         </div>
         {canEdit && (
-          <button type="button" onClick={() => deleteFormula(f.id)} className="opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100" aria-label="Eliminar">
+          <button type="button" onClick={() => deleteFormula(f.id)} className="hover-reveal hover:text-destructive" aria-label="Eliminar">
             <Trash2 className="h-3.5 w-3.5" />
           </button>
         )}

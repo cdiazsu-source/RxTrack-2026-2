@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
 import { getSubjectBySlug } from "@/lib/subjects";
+import { isSectionVisible } from "@/lib/subject-sections";
 import { FormulaSection, type FormulaView } from "@/components/formula-section";
 import type { ModuleRef } from "@/components/glossary-section";
 import { HelpHint } from "@/components/help-hint";
@@ -11,6 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function FormulasPage({ params }: { params: { subject: string } }) {
   const subject = await getSubjectBySlug(params.subject);
   if (!subject) notFound();
+  if (!isSectionVisible(subject.sections, "formulas")) notFound();
 
   const [formulas, modules] = await Promise.all([
     prisma.formula.findMany({ where: { subjectId: subject.id }, orderBy: { createdAt: "asc" } }),

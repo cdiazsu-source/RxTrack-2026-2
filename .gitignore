@@ -10,3 +10,7 @@ build/
 webapp/backups/
 .vercel
 .claude/
+.agents/
+
+# skills tooling (npx skills add) — no es código del proyecto
+skills-lock.json

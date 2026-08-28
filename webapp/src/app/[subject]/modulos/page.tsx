@@ -31,7 +31,7 @@ export default async function ModulesPage({ params }: { params: { subject: strin
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {modules.map((m) => (
-            <Link key={m.id} href={`/${subject.id}/modulos/${m.id}`}>
+            <Link key={m.id} href={`/${subject.id}/modulos/${m.id}`} className="press-card block">
               <Card className="h-full p-4 transition-shadow hover:shadow-card-hover">
                 <div className="flex items-start gap-3">
                   <ProgressRing value={pct(m.progress)} size={46} stroke={5} />

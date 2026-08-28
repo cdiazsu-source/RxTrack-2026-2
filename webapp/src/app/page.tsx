@@ -98,7 +98,7 @@ export default async function SemesterPage() {
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Asignaturas</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {subjects.map((s, i) => (
-            <Link key={s.id} href={`/${s.id}`}>
+            <Link key={s.id} href={`/${s.id}`} className="press-card block">
               <Card className="flex h-full items-center gap-4 p-4 transition-shadow hover:shadow-card-hover">
                 <ProgressRing value={pct(progressBySubject[i])} size={52} stroke={5} />
                 <div className="min-w-0">

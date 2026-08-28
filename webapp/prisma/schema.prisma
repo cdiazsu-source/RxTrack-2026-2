@@ -47,6 +47,9 @@ model Subject {
   objectivesSpecific String[]
   hasLab             Boolean  @default(false)
   totalClasses       Int      @default(32)
+  /// Secciones visibles en la sub-nav (según la naturaleza de la asignatura).
+  /// Vacío = todas. Se resincroniza desde content/<code>.ts.
+  sections           String[] @default([])
   attendanceMissed   Int      @default(0)
   weeklyGoal         String?  @db.Text
   driveUrl           String?

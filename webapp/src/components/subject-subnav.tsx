@@ -4,14 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { SUBJECT_SECTIONS } from "@/lib/subject-sections";
+import { visibleSubjectSections } from "@/lib/subject-sections";
 
-export function SubjectSubnav({ slug }: { slug: string }) {
+export function SubjectSubnav({ slug, sections }: { slug: string; sections: string[] }) {
   const pathname = usePathname();
+  const items = visibleSubjectSections(sections);
 
   return (
     <nav className="flex flex-wrap gap-1 overflow-x-auto border-b border-border pb-2">
-      {SUBJECT_SECTIONS.map((s) => {
+      {items.map((s) => {
         const href = s.segment ? `/${slug}/${s.segment}` : `/${slug}`;
         const active = s.segment
           ? pathname.startsWith(`/${slug}/${s.segment}`)

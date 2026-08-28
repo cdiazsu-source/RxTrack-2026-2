@@ -31,6 +31,7 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
     objectivesSpecific: content.objectivesSpecific ?? [],
     hasLab: content.hasLab ?? false,
     totalClasses: content.totalClasses ?? 32,
+    sections: content.sections ?? [],
     order,
     syncedAt: new Date(),
   };

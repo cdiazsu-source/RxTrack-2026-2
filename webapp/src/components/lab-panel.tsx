@@ -109,7 +109,7 @@ export function LabPanel({
                   />
                   <span className={cn(m.done && "text-muted-foreground line-through")}>{m.text}</span>
                   {canEdit && (
-                    <button type="button" onClick={() => start(() => deleteLabMaterial(m.id))} className="ml-auto text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100" aria-label="Eliminar">
+                    <button type="button" onClick={() => start(() => deleteLabMaterial(m.id))} className="ml-auto text-muted-foreground hover-reveal hover:text-destructive" aria-label="Eliminar">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   )}
