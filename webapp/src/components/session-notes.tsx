@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ChevronDown, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 
-import { addSession, deleteSession, updateSession } from "@/lib/actions/sessions";
+import { addSession, deleteSession, setSessionSlidesUrl, updateSession } from "@/lib/actions/sessions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HelpHint } from "@/components/help-hint";
 import { PromptBox } from "@/components/prompt-box";
+import { DriveLinkEditor } from "@/components/drive-link-editor";
 import { useCanEdit } from "@/components/access-context";
 import { renderCornell } from "@/lib/markdown-lite";
 import { cornellPrompt } from "@/lib/prompts";
@@ -22,6 +23,8 @@ export type SessionView = {
   date: string | null; // ISO
   topic: string;
   content: string;
+  transcript: string | null;
+  slidesUrl: string | null;
   author: string | null;
 };
 
@@ -40,6 +43,7 @@ function SessionForm({
 }) {
   const draftKey = session ? `session:${session.id}` : `session:new:${moduleId}`;
   const [content, setContent] = useState(session?.content ?? "");
+  const [transcript, setTranscript] = useState(session?.transcript ?? "");
   const [restored, setRestored] = useState<null | { value: string; savedAt: number }>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [topic, setTopic] = useState(session?.topic ?? "");
@@ -54,6 +58,7 @@ function SessionForm({
     <form
       action={async (fd) => {
         fd.set("content", content);
+        fd.set("transcript", transcript);
         if (session) await updateSession(session.id, fd);
         else await addSession(moduleId, fd);
         clearDraft(draftKey);
@@ -81,7 +86,7 @@ function SessionForm({
       <Input name="topic" placeholder="Tema de la clase" value={topic} onChange={(e) => setTopic(e.target.value)} required />
 
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Apuntes (método Cornell)</label>
+        <label className="text-sm font-medium">Apuntes (método Cornell · Markdown)</label>
         <Button type="button" size="sm" variant="ghost" onClick={() => setShowPrompt((s) => !s)}>
           <Sparkles className="h-3.5 w-3.5" />
           Prompt para IA
@@ -90,7 +95,7 @@ function SessionForm({
       {showPrompt && (
         <PromptBox
           rows={10}
-          text={cornellPrompt({ subjectName, moduleTitle, topic })}
+          text={cornellPrompt({ subjectName, moduleTitle, topic, transcription: transcript })}
         />
       )}
       <Textarea
@@ -101,7 +106,17 @@ function SessionForm({
           saveDraft(draftKey, e.target.value);
         }}
         rows={12}
-        placeholder={"#### 2. Tabla del método Cornell\n\n| Preguntas clave | Notas |\n| --- | --- |\n| ... | ... |"}
+        placeholder={"#### Tabla del método Cornell\n\n| Preguntas clave | Notas |\n| --- | --- |\n| ... | ... |"}
+        className="font-mono text-xs leading-relaxed"
+      />
+
+      <label className="text-sm font-medium">Transcripción de la clase (Markdown, opcional)</label>
+      <Textarea
+        name="transcript-visible"
+        value={transcript}
+        onChange={(e) => setTranscript(e.target.value)}
+        rows={6}
+        placeholder="Pega aquí la transcripción (p. ej. de Buzz/Whisper). Se guarda como texto y alimenta el prompt de apuntes."
         className="font-mono text-xs leading-relaxed"
       />
 
@@ -110,6 +125,65 @@ function SessionForm({
         <Button type="button" variant="ghost" size="sm" onClick={onDone}>Cancelar</Button>
       </div>
     </form>
+  );
+}
+
+function SessionArticle({
+  s,
+  canEdit,
+  onEdit,
+}: {
+  s: SessionView;
+  canEdit: boolean;
+  onEdit: () => void;
+}) {
+  const [showTranscript, setShowTranscript] = useState(false);
+  return (
+    <article className="rounded-md border border-border p-4">
+      <header className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+        <h4 className="text-sm font-semibold">
+          {s.number ? `Sesión ${s.number} — ` : ""}
+          {s.topic}
+        </h4>
+        <span className="text-xs text-muted-foreground">
+          {[s.date ? formatDate(s.date) : null, s.author].filter(Boolean).join(" · ")}
+        </span>
+      </header>
+
+      <div className="cornell text-sm" dangerouslySetInnerHTML={{ __html: renderCornell(s.content) }} />
+
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <DriveLinkEditor url={s.slidesUrl} action={setSessionSlidesUrl.bind(null, s.id)} label="Diapositivas" />
+        {s.transcript && (
+          <button
+            type="button"
+            onClick={() => setShowTranscript((v) => !v)}
+            className="inline-flex items-center gap-1 text-xs text-primary"
+          >
+            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showTranscript ? "rotate-180" : ""}`} />
+            {showTranscript ? "Ocultar transcripción" : "Ver transcripción"}
+          </button>
+        )}
+      </div>
+
+      {showTranscript && s.transcript && (
+        <div
+          className="cornell mt-2 border-t border-border pt-2 text-sm text-muted-foreground"
+          dangerouslySetInnerHTML={{ __html: renderCornell(s.transcript) }}
+        />
+      )}
+
+      {canEdit && (
+        <div className="mt-3 flex gap-1">
+          <button type="button" onClick={onEdit} className="rounded p-1 text-muted-foreground hover:bg-accent" aria-label="Editar sesión">
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button type="button" onClick={() => deleteSession(s.id)} className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label="Eliminar sesión">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+    </article>
   );
 }
 
@@ -171,31 +245,7 @@ export function SessionNotes({
               onDone={() => setEditingId(null)}
             />
           ) : (
-            <article key={s.id} className="rounded-md border border-border p-4">
-              <header className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-                <h4 className="text-sm font-semibold">
-                  {s.number ? `Sesión ${s.number} — ` : ""}
-                  {s.topic}
-                </h4>
-                <span className="text-xs text-muted-foreground">
-                  {[s.date ? formatDate(s.date) : null, s.author].filter(Boolean).join(" · ")}
-                </span>
-              </header>
-              <div
-                className="cornell text-sm"
-                dangerouslySetInnerHTML={{ __html: renderCornell(s.content) }}
-              />
-              {canEdit && (
-                <div className="mt-3 flex gap-1">
-                  <button type="button" onClick={() => setEditingId(s.id)} className="rounded p-1 text-muted-foreground hover:bg-accent" aria-label="Editar sesión">
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-                  <button type="button" onClick={() => deleteSession(s.id)} className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label="Eliminar sesión">
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              )}
-            </article>
+            <SessionArticle key={s.id} s={s} canEdit={canEdit} onEdit={() => setEditingId(s.id)} />
           ),
         )}
       </CardContent>

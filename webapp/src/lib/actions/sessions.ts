@@ -11,25 +11,26 @@ async function subjectIdOfModule(moduleId: string) {
   return m?.subjectId ?? null;
 }
 
-export async function addSession(moduleId: string, formData: FormData) {
-  if (await blockedForRead()) return;
-  const topic = String(formData.get("topic") ?? "").trim();
-  const content = String(formData.get("content") ?? "").trim();
-  if (!topic && !content) return;
-
+function readSession(formData: FormData) {
   const numRaw = String(formData.get("number") ?? "").trim();
   const number = numRaw ? Math.max(1, Math.round(Number(numRaw))) : null;
-  const author = String(formData.get("author") ?? "").trim() || null;
+  return {
+    topic: String(formData.get("topic") ?? "").trim(),
+    content: String(formData.get("content") ?? ""),
+    transcript: String(formData.get("transcript") ?? "").trim() || null,
+    number: Number.isFinite(number as number) ? number : null,
+    date: parseDateInput(formData.get("date")),
+    author: String(formData.get("author") ?? "").trim() || null,
+  };
+}
+
+export async function addSession(moduleId: string, formData: FormData) {
+  if (await blockedForRead()) return;
+  const d = readSession(formData);
+  if (!d.topic && !d.content && !d.transcript) return;
 
   await prisma.session.create({
-    data: {
-      moduleId,
-      topic: topic || "Sesión sin título",
-      content,
-      number: Number.isFinite(number as number) ? number : null,
-      date: parseDateInput(formData.get("date")),
-      author,
-    },
+    data: { moduleId, ...d, topic: d.topic || "Sesión sin título" },
   });
   const sid = await subjectIdOfModule(moduleId);
   if (sid) await touchSubject(sid);
@@ -38,23 +39,20 @@ export async function addSession(moduleId: string, formData: FormData) {
 
 export async function updateSession(sessionId: string, formData: FormData) {
   if (await blockedForRead()) return;
-  const topic = String(formData.get("topic") ?? "").trim();
-  const content = String(formData.get("content") ?? "");
-  const numRaw = String(formData.get("number") ?? "").trim();
-  const number = numRaw ? Math.max(1, Math.round(Number(numRaw))) : null;
-
+  const d = readSession(formData);
   const session = await prisma.session.update({
     where: { id: sessionId },
-    data: {
-      ...(topic ? { topic } : {}),
-      content,
-      number: Number.isFinite(number as number) ? number : null,
-      date: parseDateInput(formData.get("date")),
-      author: String(formData.get("author") ?? "").trim() || null,
-    },
+    data: { ...d, ...(d.topic ? {} : { topic: undefined }) },
     select: { module: { select: { subjectId: true } } },
   });
   await touchSubject(session.module.subjectId);
+  revalidateAll();
+}
+
+export async function setSessionSlidesUrl(sessionId: string, formData: FormData) {
+  if (await blockedForRead()) return;
+  const url = String(formData.get("driveUrl") ?? "").trim();
+  await prisma.session.update({ where: { id: sessionId }, data: { slidesUrl: url || null } });
   revalidateAll();
 }
 

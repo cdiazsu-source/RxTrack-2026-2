@@ -162,6 +162,19 @@
   .cornell :where(.cornell-empty) {
     @apply text-sm text-muted-foreground;
   }
+  .cornell :where(.cornell-quote) {
+    @apply my-2 border-l-2 border-primary/40 pl-3 text-sm italic text-muted-foreground;
+  }
+  .cornell :where(.cornell-code) {
+    @apply my-2 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs;
+  }
+  .cornell :where(code) {
+    @apply rounded bg-muted px-1 py-0.5 font-mono text-[0.85em];
+  }
+  .cornell :where(.md-link),
+  .formula-prose :where(.md-link) {
+    @apply text-primary underline underline-offset-2;
+  }
 
   /* --- Render de fórmulas (formula-markup.ts) --- */
   .formula {

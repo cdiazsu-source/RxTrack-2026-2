@@ -31,6 +31,13 @@ enum ProjectStatus {
   COMPLETADO
 }
 
+/// Origen de una tarjeta de repaso.
+enum FlashcardSource {
+  GLOSARIO
+  FORMULA
+  MANUAL
+}
+
 /// Asignatura — entidad raíz. id = slug ("aif", "ft2"). code = "AIF".
 /// Los campos de contenido se resincronizan desde content/<code>.ts; el avance
 /// (attendanceMissed, weeklyGoal, y todo lo que cuelga con fromContent=false) no.
@@ -66,6 +73,7 @@ model Subject {
   evaluation    EvaluationItem[]
   bibliography  BibliographyItem[]
   pastMaterials PastMaterial[]
+  flashcards    Flashcard[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -101,18 +109,23 @@ model Module {
   @@index([subjectId])
 }
 
-/// Sesión de clase = apuntes en formato Cornell (markdown-lite seguro).
+/// Sesión de clase = apuntes en formato Cornell + transcripción, todo en Markdown.
+/// Las diapositivas NO se guardan: se enlazan a Drive (slidesUrl).
 model Session {
-  id        String    @id @default(cuid())
-  moduleId  String
-  module    Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  number    Int?
+  id         String    @id @default(cuid())
+  moduleId   String
+  module     Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  number     Int?
   /// Fecha de la clase (no la de guardado).
-  date      DateTime?
-  topic     String
-  content   String    @db.Text
+  date       DateTime?
+  topic      String
+  content    String    @db.Text
+  /// Transcripción de la clase, en Markdown. Alimenta el prompt de apuntes.
+  transcript String?   @db.Text
+  /// Enlace a las diapositivas de la clase (carpeta o archivo de Drive).
+  slidesUrl  String?
   /// Snapshot de quién del grupo la subió.
-  author    String?
+  author     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -251,6 +264,8 @@ model KeyDate {
   weight      String?
   note        String?   @db.Text
   fromContent Boolean   @default(true)
+  /// Módulos (ids) que cubre este parcial — para el "modo preparar parcial".
+  moduleIds   String[]  @default([])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -345,4 +360,49 @@ model InboxItem {
   createdAt DateTime @default(now())
 
   @@index([triagedAt])
+}
+
+/// Tarjeta de repaso con repetición espaciada (SM-2). Se puede generar
+/// automáticamente desde el glosario y las fórmulas, o crear a mano.
+/// front/back en Markdown.
+model Flashcard {
+  id             String          @id @default(cuid())
+  subjectId      String
+  subject        Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  moduleId       String?
+  front          String          @db.Text
+  back           String          @db.Text
+  source         FlashcardSource @default(MANUAL)
+  /// id del GlossaryTerm / Formula de origen (para no duplicar al regenerar).
+  sourceId       String?
+  suspended      Boolean         @default(false)
+
+  // --- Estado SM-2 ---
+  dueDate        DateTime  @default(now())
+  intervalDays   Int       @default(0)
+  easeFactor     Float     @default(2.5)
+  reps           Int       @default(0)
+  lapses         Int       @default(0)
+  lastReviewedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([source, sourceId])
+  @@index([subjectId])
+  @@index([dueDate])
+}
+
+/// Evento personal del calendario, no atado a un parcial (entrega, tutoría,
+/// recordatorio). subjectId opcional para colorearlo por asignatura.
+model PersonalEvent {
+  id        String   @id @default(cuid())
+  title     String
+  date      DateTime
+  note      String?  @db.Text
+  subjectId String?
+
+  createdAt DateTime @default(now())
+
+  @@index([date])
 }

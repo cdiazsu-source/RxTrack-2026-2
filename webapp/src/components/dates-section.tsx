@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Plus, Trash2 } from "lucide-react";
 
 import { addKeyDate, deleteKeyDate, setKeyDate } from "@/lib/actions/dates";
@@ -105,6 +106,9 @@ export function DatesSection({ subjectId, items }: { subjectId: string; items: K
                       {d.date ? "cambiar" : "poner fecha"}
                     </button>
                   )}
+                  <Link href={`/${subjectId}/fechas/${d.id}/preparar`} className="text-xs text-primary hover:underline">
+                    preparar →
+                  </Link>
                   {canEdit && !d.fromContent && (
                     <button type="button" onClick={() => deleteKeyDate(d.id)} className="text-muted-foreground hover-reveal hover:text-destructive" aria-label="Eliminar">
                       <Trash2 className="h-3.5 w-3.5" />

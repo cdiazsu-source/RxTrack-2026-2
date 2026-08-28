@@ -34,6 +34,13 @@ export async function addKeyDate(subjectId: string, formData: FormData) {
   revalidateAll();
 }
 
+/** Qué módulos cubre un parcial (para el "modo preparar parcial"). */
+export async function setKeyDateModules(id: string, moduleIds: string[]) {
+  if (await blockedForRead()) return;
+  await prisma.keyDate.update({ where: { id }, data: { moduleIds } });
+  revalidateAll();
+}
+
 export async function deleteKeyDate(id: string) {
   if (await blockedForRead()) return;
   const d = await prisma.keyDate.findUnique({ where: { id }, select: { fromContent: true } });

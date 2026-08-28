@@ -1,0 +1,17 @@
+{
+  "name": "RxTrack 2026-2s",
+  "short_name": "RxTrack",
+  "description": "Tracker académico del semestre — Química Farmacéutica UNAL",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F7F8F6",
+  "theme_color": "#4A7729",
+  "lang": "es",
+  "icons": [
+    { "src": "/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}

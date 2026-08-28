@@ -42,6 +42,8 @@ export default async function ModuleDetailPage({
     date: s.date ? s.date.toISOString() : null,
     topic: s.topic,
     content: s.content,
+    transcript: s.transcript,
+    slidesUrl: s.slidesUrl,
     author: s.author,
   }));
 
