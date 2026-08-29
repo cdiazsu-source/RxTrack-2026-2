@@ -43,10 +43,13 @@ export function moduleProgress(m: ModuleProgressInput): number {
   const parts: Array<[number, number]> = [
     [MODULE_WEIGHTS.status, STATUS_SCORE[m.status]],
     [MODULE_WEIGHTS.sessions, m.sessionCount > 0 ? 1 : 0],
-    [MODULE_WEIGHTS.lab, labScore(m.hasLab, m.labReportStatus)],
   ];
-  // El checklist solo cuenta si el módulo tiene subtareas; si no, se reparte su
-  // peso entre los demás componentes (norma-ponderada sobre lo aplicable).
+  // El laboratorio solo cuenta si el módulo tiene práctica; si no, su peso se
+  // reparte entre los demás (norma-ponderada sobre lo aplicable).
+  if (m.hasLab) {
+    parts.push([MODULE_WEIGHTS.lab, labScore(true, m.labReportStatus)]);
+  }
+  // Igual con el checklist: solo cuenta si el módulo tiene subtareas.
   if (m.checklistTotal > 0) {
     parts.push([MODULE_WEIGHTS.checklist, m.checklistDone / m.checklistTotal]);
   }

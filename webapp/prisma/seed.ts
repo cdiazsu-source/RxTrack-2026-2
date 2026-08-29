@@ -175,6 +175,45 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
     }
   }
 
+  // --- Podar filas de content que ya no están en el archivo, SOLO si no tienen
+  //     avance de la persona (nota, fecha, bitácora…). Esto limpia cuando se
+  //     renombra o reemplaza contenido (p. ej. un esqueleto por el syllabus real).
+  const glossaryKeep = (content.glossary ?? []).map((g) => g.term);
+  await prisma.glossaryTerm.deleteMany({
+    where: { subjectId: subject.id, fromContent: true, term: { notIn: glossaryKeep.length ? glossaryKeep : ["__none__"] } },
+  });
+
+  const formulaKeep = (content.formulas ?? []).map((f) => f.name);
+  await prisma.formula.deleteMany({
+    where: { subjectId: subject.id, fromContent: true, name: { notIn: formulaKeep.length ? formulaKeep : ["__none__"] } },
+  });
+
+  const bibKeep = (content.bibliography ?? []).map((b) => b.reference);
+  await prisma.bibliographyItem.deleteMany({
+    where: { subjectId: subject.id, fromContent: true, reference: { notIn: bibKeep.length ? bibKeep : ["__none__"] } },
+  });
+
+  const evalKeep = (content.evaluation ?? []).map((e) => e.name);
+  await prisma.evaluationItem.deleteMany({
+    where: { subjectId: subject.id, grade: null, name: { notIn: evalKeep.length ? evalKeep : ["__none__"] } },
+  });
+
+  const dateKeep = (content.keyDates ?? []).map((d) => d.name);
+  await prisma.keyDate.deleteMany({
+    where: { subjectId: subject.id, fromContent: true, date: null, name: { notIn: dateKeep.length ? dateKeep : ["__none__"] } },
+  });
+
+  const projKeep = (content.projects ?? []).map((p) => p.title);
+  await prisma.project.deleteMany({
+    where: {
+      subjectId: subject.id,
+      isManual: false,
+      title: { notIn: projKeep.length ? projKeep : ["__none__"] },
+      notes: { none: {} },
+      checklistItems: { none: {} },
+    },
+  });
+
   const modCount = modules.length;
   console.log(`  ${content.code.padEnd(4)} ${content.name} — ${modCount} módulo(s)`);
 }
