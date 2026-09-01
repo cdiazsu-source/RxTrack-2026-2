@@ -5,15 +5,25 @@ import { blockedForRead } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
 
-export type ChecklistParent = { type: "module" | "project"; id: string };
+export type ChecklistParent = { type: "module" | "project" | "labReport"; id: string };
+
+function parentWhere(parent: ChecklistParent) {
+  if (parent.type === "module") return { moduleId: parent.id };
+  if (parent.type === "project") return { projectId: parent.id };
+  return { labReportId: parent.id };
+}
 
 async function subjectIdOfParent(parent: ChecklistParent): Promise<string | null> {
   if (parent.type === "module") {
     const m = await prisma.module.findUnique({ where: { id: parent.id }, select: { subjectId: true } });
     return m?.subjectId ?? null;
   }
-  const p = await prisma.project.findUnique({ where: { id: parent.id }, select: { subjectId: true } });
-  return p?.subjectId ?? null;
+  if (parent.type === "project") {
+    const p = await prisma.project.findUnique({ where: { id: parent.id }, select: { subjectId: true } });
+    return p?.subjectId ?? null;
+  }
+  const l = await prisma.labReport.findUnique({ where: { id: parent.id }, select: { subjectId: true } });
+  return l?.subjectId ?? null;
 }
 
 async function subjectIdOfItem(itemId: string): Promise<string | null> {
@@ -22,9 +32,10 @@ async function subjectIdOfItem(itemId: string): Promise<string | null> {
     select: {
       module: { select: { subjectId: true } },
       project: { select: { subjectId: true } },
+      labReport: { select: { subjectId: true } },
     },
   });
-  return it?.module?.subjectId ?? it?.project?.subjectId ?? null;
+  return it?.module?.subjectId ?? it?.project?.subjectId ?? it?.labReport?.subjectId ?? null;
 }
 
 export async function addChecklistItem(parent: ChecklistParent, formData: FormData) {
@@ -32,7 +43,7 @@ export async function addChecklistItem(parent: ChecklistParent, formData: FormDa
   const text = String(formData.get("text") ?? "").trim();
   if (!text) return;
 
-  const where = parent.type === "module" ? { moduleId: parent.id } : { projectId: parent.id };
+  const where = parentWhere(parent);
   const last = await prisma.checklistItem.findFirst({
     where,
     orderBy: { order: "desc" },
@@ -41,7 +52,7 @@ export async function addChecklistItem(parent: ChecklistParent, formData: FormDa
 
   await prisma.checklistItem.create({
     data: {
-      ...(parent.type === "module" ? { moduleId: parent.id } : { projectId: parent.id }),
+      ...where,
       text,
       order: (last?.order ?? -1) + 1,
     },
@@ -77,10 +88,14 @@ export async function moveChecklistItem(itemId: string, dir: "up" | "down") {
   if (await blockedForRead()) return;
   const item = await prisma.checklistItem.findUnique({
     where: { id: itemId },
-    select: { moduleId: true, projectId: true },
+    select: { moduleId: true, projectId: true, labReportId: true },
   });
   if (!item) return;
-  const where = item.moduleId ? { moduleId: item.moduleId } : { projectId: item.projectId };
+  const where = item.moduleId
+    ? { moduleId: item.moduleId }
+    : item.projectId
+      ? { projectId: item.projectId }
+      : { labReportId: item.labReportId };
 
   const items = await prisma.checklistItem.findMany({
     where,

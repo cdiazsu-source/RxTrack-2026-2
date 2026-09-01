@@ -4,6 +4,7 @@
 export const SUBJECT_SECTIONS = [
   { segment: "", label: "Panel" },
   { segment: "modulos", label: "Módulos" },
+  { segment: "laboratorio", label: "Laboratorio" },
   { segment: "proyectos", label: "Proyectos" },
   { segment: "fechas", label: "Fechas" },
   { segment: "repaso", label: "Repaso" },

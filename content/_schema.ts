@@ -100,8 +100,9 @@ export interface SubjectContent {
   /**
    * Qué secciones de la asignatura se muestran en la sub-navegación, según su
    * naturaleza. Vacío u omitido = todas. El "Panel" siempre se muestra.
-   * Valores válidos: "modulos" | "proyectos" | "fechas" | "glosario" |
-   *                  "formulas" | "bibliografia" | "insumos" | "prompt-ia"
+   * Valores válidos: "modulos" | "laboratorio" | "proyectos" | "fechas" |
+   *                  "glosario" | "formulas" | "bibliografia" | "insumos" |
+   *                  "prompt-ia"
    */
   sections?: string[];
 

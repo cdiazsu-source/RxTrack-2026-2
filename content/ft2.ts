@@ -17,7 +17,7 @@ export const ft2: SubjectContent = {
 
   // Asignatura teórico-práctica con laboratorio y componente cuantitativo:
   // se muestran todas las secciones.
-  sections: ["modulos", "proyectos", "fechas", "glosario", "formulas", "bibliografia", "insumos", "prompt-ia"],
+  sections: ["modulos", "laboratorio", "proyectos", "fechas", "glosario", "formulas", "bibliografia", "insumos", "prompt-ia"],
   descriptionSummary:
     "Farmacotecnia II es la asignatura del programa de Farmacia enfocada en el diseño y desarrollo de **productos farmacéuticos heterodispersos** — suspensiones, emulsiones y sistemas semisólidos — desde sus fundamentos fisicoquímicos y biofarmacéuticos hasta su **manufactura a escala de laboratorio**.",
   objectiveGeneral:
