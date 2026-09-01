@@ -86,7 +86,7 @@ export function UpdatesFeed({ items, title = "Últimas actualizaciones" }: { ite
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(item.at)}</p>
                   {showNext && item.nextText && (
-                    <p className="animate-rx-blink mt-2 flex items-start gap-1.5 rounded-md border border-primary/40 bg-primary/5 px-2 py-1.5 text-xs font-medium">
+                    <p className="rx-next mt-2 flex items-start gap-1.5 rounded-md px-2.5 py-2 text-xs font-semibold">
                       <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
                       <span>
                         <span className="text-primary">Sigue:</span> {item.nextText}

@@ -127,19 +127,35 @@
     }
   }
 
-  /* "Titileo" de la subtarea que sigue. Suave y lento a propósito; el bloque de
-     prefers-reduced-motion de arriba lo neutraliza (queda solo el color/peso). */
-  @keyframes rx-blink {
-    0%,
-    100% {
-      opacity: 1;
+  /* TDAH — criterio 8: nada parpadea de forma indefinida. "Lo que sigue" se
+     resalta de forma ESTÁTICA (acento a la izquierda + fondo tenue + peso),
+     nunca con animación en bucle. */
+  .rx-next {
+    @apply border-l-[3px] border-l-primary bg-primary/[0.06];
+  }
+
+  /* Área mínima de toque (criterio 7): 44×44 px reales aunque el contenido
+     visible sea más pequeño. */
+  .tap {
+    @apply inline-flex items-center justify-center;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+
+  /* Entrada del toast: un solo gesto corto, sin rebote. El bloque de
+     prefers-reduced-motion de arriba lo neutraliza. */
+  @keyframes rx-toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
     }
-    50% {
-      opacity: 0.6;
+    to {
+      opacity: 1;
+      transform: none;
     }
   }
-  .animate-rx-blink {
-    animation: rx-blink 2s ease-in-out infinite;
+  .rx-toast-in {
+    animation: rx-toast-in 0.18s cubic-bezier(0.23, 1, 0.32, 1) both;
   }
 }
 

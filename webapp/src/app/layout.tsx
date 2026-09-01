@@ -3,6 +3,7 @@ import { Fraunces, Inter } from "next/font/google";
 
 import { SiteNav } from "@/components/site-nav";
 import { PwaRegister } from "@/components/pwa-register";
+import { Toaster } from "@/components/ui/toast";
 import { AccessProvider } from "@/components/access-context";
 import { canEdit } from "@/lib/session";
 import { listSubjects } from "@/lib/subjects";
@@ -44,6 +45,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <AccessProvider canEdit={editable}>
           <SiteNav canEdit={editable} subjects={navSubjects} inboxCount={inboxCount} />
           <main className="page-enter mx-auto max-w-6xl px-5 py-8">{children}</main>
+          <Toaster />
           <PwaRegister />
         </AccessProvider>
       </body>

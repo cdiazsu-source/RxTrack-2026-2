@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import { toast } from "@/components/ui/toast";
 
 import { addSession, deleteSession, setSessionSlidesUrl, updateSession } from "@/lib/actions/sessions";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import { DriveLinkEditor } from "@/components/drive-link-editor";
 import { useCanEdit } from "@/components/access-context";
 import { renderCornell } from "@/lib/markdown-lite";
 import { cornellPrompt } from "@/lib/prompts";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { clearDraft, draftAge, loadDraft, saveDraft } from "@/lib/draft";
 
 export type SessionView = {
@@ -42,6 +43,8 @@ function SessionForm({
   onDone: () => void;
 }) {
   const draftKey = session ? `session:${session.id}` : `session:new:${moduleId}`;
+  const topicKey = `${draftKey}:topic`;
+  const transcriptKey = `${draftKey}:transcript`;
   const [content, setContent] = useState(session?.content ?? "");
   const [transcript, setTranscript] = useState(session?.transcript ?? "");
   const [restored, setRestored] = useState<null | { value: string; savedAt: number }>(null);
@@ -49,10 +52,22 @@ function SessionForm({
   const [topic, setTopic] = useState(session?.topic ?? "");
 
   useEffect(() => {
+    // Apuntes: el borrador se ofrece con botón (puede diferir mucho del guardado).
     const d = loadDraft(draftKey);
     if (d && d.value !== (session?.content ?? "")) setRestored(d);
+    // Tema y transcripción: se rellenan solos si el campo está vacío (criterio 6).
+    const dt = loadDraft(topicKey);
+    if (dt?.value && !(session?.topic ?? "")) setTopic(dt.value);
+    const dtr = loadDraft(transcriptKey);
+    if (dtr?.value && !(session?.transcript ?? "")) setTranscript(dtr.value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const clearAllDrafts = () => {
+    clearDraft(draftKey);
+    clearDraft(topicKey);
+    clearDraft(transcriptKey);
+  };
 
   return (
     <form
@@ -61,7 +76,8 @@ function SessionForm({
         fd.set("transcript", transcript);
         if (session) await updateSession(session.id, fd);
         else await addSession(moduleId, fd);
-        clearDraft(draftKey);
+        clearAllDrafts();
+        toast(session ? "Apuntes guardados" : "Sesión guardada");
         onDone();
       }}
       className="flex flex-col gap-3 rounded-md border border-border p-4"
@@ -83,7 +99,16 @@ function SessionForm({
         <Input name="date" type="date" defaultValue={session?.date ? session.date.slice(0, 10) : ""} className="w-40" />
         <Input name="author" placeholder="Tu nombre (opcional)" defaultValue={session?.author ?? ""} className="w-44" />
       </div>
-      <Input name="topic" placeholder="Tema de la clase" value={topic} onChange={(e) => setTopic(e.target.value)} required />
+      <Input
+        name="topic"
+        placeholder="Tema de la clase"
+        value={topic}
+        onChange={(e) => {
+          setTopic(e.target.value);
+          saveDraft(topicKey, e.target.value);
+        }}
+        required
+      />
 
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">Apuntes (método Cornell · Markdown)</label>
@@ -107,14 +132,21 @@ function SessionForm({
         }}
         rows={12}
         placeholder={"#### Tabla del método Cornell\n\n| Preguntas clave | Notas |\n| --- | --- |\n| ... | ... |"}
-        className="font-mono text-xs leading-relaxed"
+        className="font-mono text-[13px] leading-relaxed"
       />
+      <p className="-mt-1 text-[11px] text-muted-foreground">
+        Se guarda un borrador local en cada tecla. Puedes cerrar y volver sin perder nada; para que quede
+        registrado, pulsa Guardar.
+      </p>
 
       <label className="text-sm font-medium">Transcripción de la clase (Markdown, opcional)</label>
       <Textarea
         name="transcript-visible"
         value={transcript}
-        onChange={(e) => setTranscript(e.target.value)}
+        onChange={(e) => {
+          setTranscript(e.target.value);
+          saveDraft(transcriptKey, e.target.value);
+        }}
         rows={6}
         placeholder="Pega aquí la transcripción (p. ej. de Buzz/Whisper). Se guarda como texto y alimenta el prompt de apuntes."
         className="font-mono text-xs leading-relaxed"
@@ -138,6 +170,9 @@ function SessionArticle({
   onEdit: () => void;
 }) {
   const [showTranscript, setShowTranscript] = useState(false);
+  // TDAH — criterio 4: los apuntes largos empiezan plegados; nada de muro de texto.
+  const isLong = s.content.length > 700;
+  const [expanded, setExpanded] = useState(false);
   return (
     <article className="rounded-md border border-border p-4">
       <header className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
@@ -150,7 +185,25 @@ function SessionArticle({
         </span>
       </header>
 
-      <div className="cornell text-sm" dangerouslySetInnerHTML={{ __html: renderCornell(s.content) }} />
+      <div className="relative">
+        <div
+          className={cn("cornell text-sm", isLong && !expanded && "max-h-72 overflow-hidden")}
+          dangerouslySetInnerHTML={{ __html: renderCornell(s.content) }}
+        />
+        {isLong && !expanded && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent" />
+        )}
+      </div>
+      {isLong && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-2 inline-flex items-center gap-1 rounded-md py-1 text-xs font-medium text-primary"
+        >
+          <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
+          {expanded ? "Ver menos" : "Ver apunte completo"}
+        </button>
+      )}
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <DriveLinkEditor url={s.slidesUrl} action={setSessionSlidesUrl.bind(null, s.id)} label="Diapositivas" />
@@ -175,11 +228,19 @@ function SessionArticle({
 
       {canEdit && (
         <div className="mt-3 flex gap-1">
-          <button type="button" onClick={onEdit} className="rounded p-1 text-muted-foreground hover:bg-accent" aria-label="Editar sesión">
-            <Pencil className="h-3.5 w-3.5" />
+          <button type="button" onClick={onEdit} className="tap rounded-md text-muted-foreground hover:bg-accent" aria-label="Editar sesión">
+            <Pencil className="h-4 w-4" />
           </button>
-          <button type="button" onClick={() => deleteSession(s.id)} className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label="Eliminar sesión">
-            <Trash2 className="h-3.5 w-3.5" />
+          <button
+            type="button"
+            onClick={() => {
+              deleteSession(s.id);
+              toast("Sesión eliminada", "info");
+            }}
+            className="tap rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+            aria-label="Eliminar sesión"
+          >
+            <Trash2 className="h-4 w-4" />
           </button>
         </div>
       )}
