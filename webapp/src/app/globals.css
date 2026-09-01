@@ -7,11 +7,12 @@
     /* Paleta institucional Universidad Nacional de Colombia.
        Verde 7743 C #4A7729 como primario; rojo 187 C #A6192E como destructivo;
        verde 376 C #84BD00 como éxito. Valores en HSL para hsl(var(--token)). */
-    --background: 200 20% 98%;
-    --foreground: 200 6% 18%;
+    /* Rediseño: neutros ligeramente cálidos (menos "clínico"), verde UNAL intacto. */
+    --background: 42 30% 98%;
+    --foreground: 40 8% 16%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 200 6% 18%;
+    --card: 40 33% 99.5%;
+    --card-foreground: 40 8% 16%;
 
     --primary: 95 49% 31%;
     --primary-foreground: 0 0% 100%;
@@ -19,8 +20,8 @@
     --secondary: 78 40% 92%;
     --secondary-foreground: 95 49% 20%;
 
-    --muted: 200 14% 95%;
-    --muted-foreground: 200 5% 40%;
+    --muted: 42 18% 95%;
+    --muted-foreground: 40 6% 42%;
 
     --accent: 78 50% 90%;
     --accent-foreground: 95 49% 20%;
@@ -34,11 +35,11 @@
     --warning: 32 90% 42%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 200 12% 85%;
-    --input: 200 12% 85%;
+    --border: 40 14% 87%;
+    --input: 40 14% 87%;
     --ring: 95 49% 31%;
 
-    --radius: 0.7rem;
+    --radius: 0.75rem;
   }
 
   * {
@@ -50,9 +51,30 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Rediseño: tipografía de "display" serif (Fraunces) para títulos; Inter para
+     el cuerpo. Los CardTitle de la app son <h3>, así que también entran. */
   h1,
-  h2 {
-    letter-spacing: -0.018em;
+  h2,
+  h3 {
+    font-family: var(--font-fraunces), "Iowan Old Style", Palatino, Georgia, serif;
+    letter-spacing: -0.01em;
+  }
+  h1 {
+    letter-spacing: -0.02em;
+  }
+
+  @keyframes rx-rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .page-enter {
+    animation: rx-rise 0.35s cubic-bezier(0.23, 1, 0.32, 1) both;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Fraunces, Inter } from "next/font/google";
 
 import { SiteNav } from "@/components/site-nav";
 import { PwaRegister } from "@/components/pwa-register";
@@ -8,6 +9,14 @@ import { listSubjects } from "@/lib/subjects";
 import { prisma } from "@/lib/prisma";
 
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-fraunces",
+  display: "swap",
+  weight: ["400", "500", "600"],
+});
 
 export const metadata: Metadata = {
   title: "RxTrack 2026-2s",
@@ -30,11 +39,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const navSubjects = subjects.map((s) => ({ id: s.id, code: s.code, name: s.name }));
 
   return (
-    <html lang="es">
+    <html lang="es" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
         <AccessProvider canEdit={editable}>
           <SiteNav canEdit={editable} subjects={navSubjects} inboxCount={inboxCount} />
-          <main className="mx-auto max-w-6xl px-5 py-8">{children}</main>
+          <main className="page-enter mx-auto max-w-6xl px-5 py-8">{children}</main>
           <PwaRegister />
         </AccessProvider>
       </body>

@@ -46,7 +46,7 @@ export function SiteNav({
   return (
     <header className="site-nav sticky top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
-        <Link href="/" className="text-lg font-bold tracking-tight text-primary">
+        <Link href="/" className="font-display text-xl font-semibold tracking-tight text-primary">
           RxTrack
         </Link>
 

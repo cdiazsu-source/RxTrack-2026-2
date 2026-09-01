@@ -44,6 +44,10 @@ const config: Config = {
           foreground: "hsl(var(--warning-foreground))",
         },
       },
+      fontFamily: {
+        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+        display: ["var(--font-fraunces)", "Iowan Old Style", "Palatino", "Georgia", "serif"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
