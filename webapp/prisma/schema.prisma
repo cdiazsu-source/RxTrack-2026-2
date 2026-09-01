@@ -2,7 +2,8 @@
 // Ver ../../CLAUDE.md y la propuesta de arquitectura (secciones 3, 8, 9, 10).
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {

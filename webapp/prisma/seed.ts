@@ -14,9 +14,19 @@
  *   - Nada con fromContent=false / isManual=true (creado dentro de la app).
  */
 import { PrismaClient } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 import { ALL_SUBJECTS } from "../../content";
 
-const prisma = new PrismaClient();
+// Conexión por WebSocket (puerto 443) en vez de Postgres directo (5432): algunas
+// redes bloquean el 5432 saliente y el seed nunca conecta. Solo afecta a este
+// script — la app en Vercel (src/lib/prisma.ts) sigue con la conexión directa
+// normal, que ahí sí funciona.
+neonConfig.webSocketConstructor = ws;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaNeon(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number) {
   const subjectData = {
@@ -241,6 +251,28 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
     },
   });
 
+  // Módulos: emparejados arriba por slug, pero nunca se podaban — un módulo
+  // renombrado/quitado del content se quedaba huérfano para siempre. Se poda
+  // SOLO si no tiene ningún rastro de avance (más estricto que los demás: un
+  // módulo puede acumular sesiones, checklist, recursos, laboratorio y ejercicios).
+  const modKeep = modules.map((m) => m.slug);
+  await prisma.module.deleteMany({
+    where: {
+      subjectId: subject.id,
+      fromContent: true,
+      slug: { notIn: modKeep.length ? modKeep : ["__none__"] },
+      status: "NO_VISTO",
+      driveUrl: null,
+      notesUrl: null,
+      labReportStatus: null,
+      sessions: { none: {} },
+      checklistItems: { none: {} },
+      resources: { none: {} },
+      labMaterials: { none: {} },
+      exercises: { none: {} },
+    },
+  });
+
   const modCount = modules.length;
   console.log(`  ${content.code.padEnd(4)} ${content.name} — ${modCount} módulo(s)`);
 }
@@ -267,4 +299,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });
