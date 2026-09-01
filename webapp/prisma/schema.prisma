@@ -101,12 +101,33 @@ model Module {
   checklistItems ChecklistItem[]
   resources      Resource[]
   labMaterials   LabMaterial[]
+  exercises      Exercise[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([subjectId, slug])
   @@index([subjectId])
+}
+
+/// Ejercicio resuelto de un módulo: enunciado + solución paso a paso, ambos en
+/// Markdown (se renderizan con markdown-lite). Fuente de verdad en
+/// content/<code>.ts; el seed lo empareja por (moduleId, question) y solo toca
+/// filas fromContent=true. No guarda avance por ejercicio.
+model Exercise {
+  id          String  @id @default(cuid())
+  moduleId    String
+  module      Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  question    String  @db.Text
+  solution    String  @db.Text
+  order       Int     @default(0)
+  /// false = creado dentro de la app; el resync del seed lo ignora.
+  fromContent Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([moduleId])
 }
 
 /// Sesión de clase = apuntes en formato Cornell + transcripción, todo en Markdown.
@@ -241,11 +262,17 @@ model Formula {
   subject     Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   moduleId    String?
   name        String
-  expression  String  @db.Text
-  variables   String  @db.Text @default("")
-  description String  @db.Text @default("")
-  derivation  String  @db.Text @default("")
-  fromContent Boolean @default(true)
+  expression  String   @db.Text
+  variables   String   @db.Text @default("")
+  description String   @db.Text @default("")
+  derivation  String   @db.Text @default("")
+  /// Ejemplos resueltos (Markdown, uno por elemento). Se renderizan aparte del
+  /// desarrollo, en un bloque "Ejemplos resueltos".
+  examples    String[] @default([])
+  /// Orden de aparición en la pestaña Fórmulas (menor = primero). Lo fija el
+  /// seed por la posición en content/<code>.ts; los agregados en la app van al final.
+  order       Int      @default(0)
+  fromContent Boolean  @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

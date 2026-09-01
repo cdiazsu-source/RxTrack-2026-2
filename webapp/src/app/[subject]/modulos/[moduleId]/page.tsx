@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Check, ChevronRight } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getSubjectBySlug } from "@/lib/subjects";
+import { canEdit } from "@/lib/session";
 import { setModuleDriveUrl } from "@/lib/actions/modules";
 import { moduleProgress, pct } from "@/lib/progress";
 import { ModuleStatusSelect } from "@/components/module-status-select";
@@ -12,6 +13,7 @@ import { ProgressRing } from "@/components/progress-ring";
 import { ResumeTracker } from "@/components/resume-banner";
 import { SessionNotes, type SessionView } from "@/components/session-notes";
 import { Checklist } from "@/components/checklist";
+import { ExercisesPanel } from "@/components/exercises-panel";
 import { ResourcesPanel } from "@/components/resources-panel";
 import { LabPanel } from "@/components/lab-panel";
 import { inlineLite } from "@/lib/markdown-lite";
@@ -26,15 +28,19 @@ export default async function ModuleDetailPage({
   const subject = await getSubjectBySlug(params.subject);
   if (!subject) notFound();
 
-  const mod = await prisma.module.findFirst({
-    where: { id: params.moduleId, subjectId: subject.id },
-    include: {
-      sessions: { orderBy: { number: "asc" } },
-      checklistItems: { orderBy: { order: "asc" } },
-      resources: { orderBy: { order: "asc" } },
-      labMaterials: { orderBy: { order: "asc" } },
-    },
-  });
+  const [mod, editable] = await Promise.all([
+    prisma.module.findFirst({
+      where: { id: params.moduleId, subjectId: subject.id },
+      include: {
+        sessions: { orderBy: { number: "asc" } },
+        checklistItems: { orderBy: { order: "asc" } },
+        resources: { orderBy: { order: "asc" } },
+        labMaterials: { orderBy: { order: "asc" } },
+        exercises: { orderBy: { order: "asc" } },
+      },
+    }),
+    canEdit(),
+  ]);
   if (!mod) notFound();
 
   const sessions: SessionView[] = mod.sessions.map((s) => ({
@@ -142,6 +148,20 @@ export default async function ModuleDetailPage({
           title="Checklist del módulo"
         />
       </section>
+
+      {(mod.exercises.length > 0 || editable) && (
+        <section id="ejercicios" className="scroll-mt-24">
+          <ExercisesPanel
+            moduleId={mod.id}
+            exercises={mod.exercises.map((e) => ({
+              id: e.id,
+              question: e.question,
+              solution: e.solution,
+              order: e.order,
+            }))}
+          />
+        </section>
+      )}
 
       <ResourcesPanel moduleId={mod.id} resources={mod.resources} />
 

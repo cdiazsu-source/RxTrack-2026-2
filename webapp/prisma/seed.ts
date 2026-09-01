@@ -68,6 +68,28 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
       },
     });
     moduleIdBySlug.set(m.slug, row.id);
+
+    // --- Ejercicios del módulo: emparejar por (moduleId, question), solo fromContent ---
+    const exercises = m.exercises ?? [];
+    for (let j = 0; j < exercises.length; j++) {
+      const ex = exercises[j];
+      const existingEx = await prisma.exercise.findFirst({
+        where: { moduleId: row.id, question: ex.question, fromContent: true },
+        select: { id: true },
+      });
+      if (existingEx) {
+        await prisma.exercise.update({ where: { id: existingEx.id }, data: { solution: ex.solution, order: j } });
+      } else {
+        await prisma.exercise.create({
+          data: { moduleId: row.id, question: ex.question, solution: ex.solution, order: j, fromContent: true },
+        });
+      }
+    }
+    // Poda de ejercicios de content que ya no están en el archivo (solo fromContent).
+    const exKeep = exercises.map((e) => e.question);
+    await prisma.exercise.deleteMany({
+      where: { moduleId: row.id, fromContent: true, question: { notIn: exKeep.length ? exKeep : ["__none__"] } },
+    });
   }
   const modId = (slug?: string | null) => (slug ? moduleIdBySlug.get(slug) ?? null : null);
 
@@ -88,7 +110,9 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
   }
 
   // --- Fórmulas: emparejar por (subjectId, name), solo fromContent ---
-  for (const f of content.formulas ?? []) {
+  const formulas = content.formulas ?? [];
+  for (let i = 0; i < formulas.length; i++) {
+    const f = formulas[i];
     const existing = await prisma.formula.findFirst({
       where: { subjectId: subject.id, name: f.name, fromContent: true },
       select: { id: true },
@@ -98,6 +122,9 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
       variables: f.variables ?? "",
       description: f.description ?? "",
       derivation: f.derivation ?? "",
+      examples: f.examples ?? [],
+      // El orden en la pestaña Fórmulas = posición en content/<code>.ts.
+      order: i,
       moduleId: modId(f.moduleSlug),
     };
     if (existing) {

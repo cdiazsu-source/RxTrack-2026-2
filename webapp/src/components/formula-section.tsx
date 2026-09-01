@@ -11,7 +11,7 @@ import { Select } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCanEdit } from "@/components/access-context";
 import { renderDerivation, renderFormula } from "@/lib/formula-markup";
-import { inlineLite } from "@/lib/markdown-lite";
+import { inlineLite, renderCornell } from "@/lib/markdown-lite";
 import type { ModuleRef } from "@/components/glossary-section";
 
 export type FormulaView = {
@@ -21,6 +21,7 @@ export type FormulaView = {
   variables: string;
   description: string;
   derivation: string;
+  examples: string[];
   moduleId: string | null;
 };
 
@@ -49,10 +50,10 @@ function FormulaRow({ f, moduleTitle, canEdit }: { f: FormulaView; moduleTitle: 
           </button>
         )}
       </div>
-      {(f.variables || f.derivation) && (
+      {(f.variables || f.derivation || f.examples.length > 0) && (
         <button type="button" onClick={() => setOpen((o) => !o)} className="mt-2 inline-flex items-center gap-1 text-xs text-primary">
           <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
-          {open ? "Ocultar desarrollo" : "Ver desarrollo"}
+          {open ? "Ocultar desarrollo" : f.examples.length > 0 ? "Ver desarrollo y ejemplos" : "Ver desarrollo"}
         </button>
       )}
       {open && (
@@ -62,6 +63,20 @@ function FormulaRow({ f, moduleTitle, canEdit }: { f: FormulaView; moduleTitle: 
           )}
           {f.derivation && (
             <div className="formula-prose" dangerouslySetInnerHTML={{ __html: renderDerivation(f.derivation) }} />
+          )}
+          {f.examples.length > 0 && (
+            <div className="mt-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Ejemplos resueltos</p>
+              <div className="mt-2 flex flex-col gap-2">
+                {f.examples.map((ex, i) => (
+                  <div
+                    key={i}
+                    className="cornell rounded-md border border-border bg-muted/30 p-3 text-sm"
+                    dangerouslySetInnerHTML={{ __html: renderCornell(ex) }}
+                  />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -107,6 +122,12 @@ export function FormulaSection({
               <Textarea name="variables" placeholder="Variables (usa el mismo markup, una por línea)" rows={2} className="font-mono text-xs" />
               <Textarea name="description" placeholder="¿Para qué sirve? (admite **negrita**)" rows={2} />
               <Textarea name="derivation" placeholder="Desarrollo e interpretación (una línea por idea)" rows={4} className="font-mono text-xs" />
+              <Textarea
+                name="examples"
+                placeholder={"Ejemplos resueltos en Markdown (tablas, listas, **negrita**). Separa cada ejemplo con una línea:\n---"}
+                rows={4}
+                className="font-mono text-xs"
+              />
               <Select name="moduleId" defaultValue="">
                 <option value="">Sin módulo</option>
                 {modules.map((m) => (

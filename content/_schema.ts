@@ -12,6 +12,13 @@
  * asignatura (para el cross-link opcional glosario/fórmula/bibliografía ↔ módulo).
  */
 
+export interface ExerciseContent {
+  /** Enunciado en Markdown (markdown-lite: encabezados, tablas, listas, **negrita**). */
+  question: string;
+  /** Solución paso a paso en Markdown. Se muestra solo al pulsar "Ver solución". */
+  solution: string;
+}
+
 export interface ModuleContent {
   /** Identificador estable dentro de la asignatura. No cambiarlo una vez usado. */
   slug: string;
@@ -20,6 +27,11 @@ export interface ModuleContent {
   hasLab?: boolean;
   /** Protocolo / práctica asociada, si tiene laboratorio. */
   labProtocol?: string;
+  /**
+   * Ejercicios resueltos del módulo (una pregunta a la vez en la app). El orden
+   * del arreglo es el orden en que aparecen.
+   */
+  exercises?: ExerciseContent[];
 }
 
 export interface GlossaryContent {
@@ -36,6 +48,11 @@ export interface FormulaContent {
   description?: string;
   /** Desarrollo e interpretación; una línea por idea. Admite `**negrita**` + el markup. */
   derivation?: string;
+  /**
+   * Ejemplos resueltos (Markdown, markdown-lite). Se muestran en un bloque
+   * aparte "Ejemplos resueltos", debajo del desarrollo.
+   */
+  examples?: string[];
   moduleSlug?: string | null;
 }
 

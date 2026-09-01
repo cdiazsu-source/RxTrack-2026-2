@@ -15,7 +15,10 @@ export default async function FormulasPage({ params }: { params: { subject: stri
   if (!isSectionVisible(subject.sections, "formulas")) notFound();
 
   const [formulas, modules] = await Promise.all([
-    prisma.formula.findMany({ where: { subjectId: subject.id }, orderBy: { createdAt: "asc" } }),
+    prisma.formula.findMany({
+      where: { subjectId: subject.id },
+      orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+    }),
     prisma.module.findMany({ where: { subjectId: subject.id }, orderBy: { order: "asc" }, select: { id: true, title: true } }),
   ]);
 
@@ -26,6 +29,7 @@ export default async function FormulasPage({ params }: { params: { subject: stri
     variables: f.variables,
     description: f.description,
     derivation: f.derivation,
+    examples: f.examples,
     moduleId: f.moduleId,
   }));
 

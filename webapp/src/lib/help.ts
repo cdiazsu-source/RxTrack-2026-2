@@ -10,6 +10,8 @@ export const HELP: Record<string, string> = {
     "Tus apuntes de cada clase, en formato Cornell. El texto se guarda tal cual; se renderiza de forma segura (**negrita**, tablas con | pipes |, viñetas, casillas). La app no llama a ninguna IA: el botón de 'prompt' solo arma un texto para que TÚ lo pegues en tu asistente.",
   checklist:
     "Subtareas del módulo o del proyecto. Las marcas, editas, borras o agregas libremente. Un `db:seed` nunca las desmarca ni las borra. La barra cuenta hechas / total.",
+  ejercicios:
+    "Problemas resueltos del módulo, de uno en uno. El enunciado se ve siempre; la solución paso a paso aparece solo al pulsar 'Ver solución'. Vienen del temario (content/) y el `db:seed` los sincroniza; los que agregues en la app se quedan. No guarda tu progreso por ejercicio.",
   recursos: "Enlaces externos (videos, artículos, guías). La app solo los abre en una pestaña nueva; no descarga ni guarda nada.",
   laboratorio:
     "Protocolo de la práctica, lista de materiales y estado del informe (Pendiente → Entregado → Calificado). El estado lo pones tú.",
