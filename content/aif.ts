@@ -41,7 +41,7 @@ export const aif: SubjectContent = {
 
   // AIF tiene componente cuantitativo y de laboratorio fuerte: se muestran todas
   // las secciones.
-  sections: ["modulos", "proyectos", "fechas", "glosario", "formulas", "bibliografia", "insumos", "prompt-ia"],
+  sections: ["modulos", "laboratorio", "proyectos", "fechas", "glosario", "formulas", "bibliografia", "insumos", "prompt-ia"],
 
   modules: [
     {
