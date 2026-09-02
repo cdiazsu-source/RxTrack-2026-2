@@ -16,7 +16,45 @@ import { useCanEdit } from "@/components/access-context";
 import { renderCornell } from "@/lib/markdown-lite";
 import { cornellPrompt } from "@/lib/prompts";
 import { cn, formatDate } from "@/lib/utils";
+import { relativeDays } from "@/lib/relative-time";
 import { clearDraft, draftAge, loadDraft, saveDraft } from "@/lib/draft";
+
+// El apunte SIEMPRE lleva un nombre de usuario. Se recuerda el último y se
+// sugieren los ya usados (por ahora solo "Cesar Diaz Suarez").
+const DEFAULT_AUTHOR = "Cesar Diaz Suarez";
+const LAST_AUTHOR_KEY = "rxtrack:lastAuthor";
+const AUTHORS_KEY = "rxtrack:authors";
+
+function loadKnownAuthors(): string[] {
+  try {
+    const raw = localStorage.getItem(AUTHORS_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : null;
+    const list = Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string" && x.trim() !== "") : [];
+    return list.includes(DEFAULT_AUTHOR) ? list : [DEFAULT_AUTHOR, ...list];
+  } catch {
+    return [DEFAULT_AUTHOR];
+  }
+}
+
+function loadLastAuthor(): string {
+  try {
+    return localStorage.getItem(LAST_AUTHOR_KEY) || DEFAULT_AUTHOR;
+  } catch {
+    return DEFAULT_AUTHOR;
+  }
+}
+
+function rememberAuthor(name: string): void {
+  const n = name.trim();
+  if (!n) return;
+  try {
+    localStorage.setItem(LAST_AUTHOR_KEY, n);
+    const known = loadKnownAuthors();
+    if (!known.includes(n)) localStorage.setItem(AUTHORS_KEY, JSON.stringify([...known, n]));
+  } catch {
+    /* noop */
+  }
+}
 
 export type SessionView = {
   id: string;
@@ -34,12 +72,15 @@ function SessionForm({
   subjectName,
   moduleTitle,
   session,
+  previous,
   onDone,
 }: {
   moduleId: string;
   subjectName: string;
   moduleTitle: string;
   session?: SessionView;
+  /** Última sesión guardada del módulo — se muestra al empezar una nueva. */
+  previous?: SessionView;
   onDone: () => void;
 }) {
   const draftKey = session ? `session:${session.id}` : `session:new:${moduleId}`;
@@ -50,6 +91,8 @@ function SessionForm({
   const [restored, setRestored] = useState<null | { value: string; savedAt: number }>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [topic, setTopic] = useState(session?.topic ?? "");
+  const [author, setAuthor] = useState(session?.author ?? "");
+  const [knownAuthors, setKnownAuthors] = useState<string[]>([]);
 
   useEffect(() => {
     // Apuntes: el borrador se ofrece con botón (puede diferir mucho del guardado).
@@ -60,8 +103,13 @@ function SessionForm({
     if (dt?.value && !(session?.topic ?? "")) setTopic(dt.value);
     const dtr = loadDraft(transcriptKey);
     if (dtr?.value && !(session?.transcript ?? "")) setTranscript(dtr.value);
+    // Usuario: obligatorio. En una sesión nueva se precarga el último usado.
+    setKnownAuthors(loadKnownAuthors());
+    if (!session) setAuthor((a) => a || loadLastAuthor());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const prevDays = previous?.date ? relativeDays(previous.date) : "";
 
   const clearAllDrafts = () => {
     clearDraft(draftKey);
@@ -72,16 +120,33 @@ function SessionForm({
   return (
     <form
       action={async (fd) => {
+        const name = author.trim();
+        if (!name) return;
+        fd.set("author", name);
         fd.set("content", content);
         fd.set("transcript", transcript);
         if (session) await updateSession(session.id, fd);
         else await addSession(moduleId, fd);
+        rememberAuthor(name);
         clearAllDrafts();
         toast(session ? "Apuntes guardados" : "Sesión guardada");
         onDone();
       }}
       className="flex flex-col gap-3 rounded-md border border-border p-4"
     >
+      {!session && previous && (
+        <div className="rounded-md border border-border bg-muted/40 p-2.5">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Sesión anterior</p>
+          <p className="mt-0.5 text-sm font-medium leading-snug">
+            {previous.number != null ? `N.º ${previous.number} — ` : ""}
+            {previous.topic}
+          </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {previous.date ? `${formatDate(previous.date)}${prevDays ? ` · ${prevDays}` : ""}` : "sin fecha registrada"}
+          </p>
+        </div>
+      )}
+
       {restored && (
         <div className="flex flex-wrap items-center gap-2 rounded-md bg-warning/10 p-2 text-xs">
           <span>Hay un borrador sin guardar de {draftAge(restored.savedAt)}.</span>
@@ -95,9 +160,29 @@ function SessionForm({
       )}
 
       <div className="flex flex-wrap gap-2">
-        <Input name="number" type="number" min={1} placeholder="N.º" defaultValue={session?.number ?? ""} className="w-20" />
+        <Input
+          name="number"
+          type="number"
+          min={1}
+          placeholder="N.º"
+          defaultValue={session?.number ?? (previous?.number != null ? previous.number + 1 : "")}
+          className="w-20"
+        />
         <Input name="date" type="date" defaultValue={session?.date ? session.date.slice(0, 10) : ""} className="w-40" />
-        <Input name="author" placeholder="Tu nombre (opcional)" defaultValue={session?.author ?? ""} className="w-44" />
+        <Input
+          name="author"
+          list="rxtrack-authors"
+          placeholder="Tu nombre de usuario"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          required
+          className="w-44"
+        />
+        <datalist id="rxtrack-authors">
+          {knownAuthors.map((a) => (
+            <option key={a} value={a} />
+          ))}
+        </datalist>
       </div>
       <Input
         name="topic"
@@ -263,6 +348,7 @@ export function SessionNotes({
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const sorted = [...sessions].sort((a, b) => (a.number ?? 0) - (b.number ?? 0) || a.id.localeCompare(b.id));
+  const previous = sorted.length ? sorted[sorted.length - 1] : undefined;
 
   return (
     <Card>
@@ -285,6 +371,7 @@ export function SessionNotes({
             moduleId={moduleId}
             subjectName={subjectName}
             moduleTitle={moduleTitle}
+            previous={previous}
             onDone={() => setAdding(false)}
           />
         )}
