@@ -1,9 +1,17 @@
 import type { SubjectContent } from "./_schema";
 
 /**
- * Análisis Instrumental Farmacéutico (UNAL) — desde el programa oficial
- * "PROGRAMACIÓN 2025-2S" (Prof. Lozano / García Castañeda / Martínez Ramírez).
- * Código 2015649. Las fechas se dejan vacías: van en la app.
+ * Análisis Instrumental Farmacéutico (UNAL) — programa oficial DEFINITIVO
+ * "PROGRAMACIÓN — Segundo Semestre de 2026". Código 2015649. Elaboró: JM Lozano.
+ * Profesores: García Castañeda (Módulo I), Nicolás Mateo González (Módulo II),
+ * Martínez Ramírez (Módulo III). Las fechas se ponen en la app.
+ *
+ * Estructura oficial = 3 módulos por semanas:
+ *   Módulo I  (sem 1–5)  : espectroscopía IR + métodos potenciométricos.
+ *   Módulo II (sem 6–10) : métodos físicos + espectrofotometría + UV-Visible.
+ *   Módulo III(sem 11–16): cromatografía + HPLC/GC + técnicas acopladas y MS.
+ * Los módulos temáticos de abajo conservan su `slug` (no romper apuntes) y solo
+ * se reetiquetan/reordenan bajo ese agrupamiento.
  */
 export const aif: SubjectContent = {
   code: "AIF",
@@ -11,22 +19,24 @@ export const aif: SubjectContent = {
   name: "Análisis Instrumental Farmacéutico",
   credits: "4",
   professors: [
-    "José Manuel Lozano Moreno (Módulo I)",
-    "Javier Eduardo García Castañeda (Módulo II)",
-    "Jorge Ariel Martínez Ramírez (Módulo III)",
+    "Javier Eduardo García Castañeda — Módulo I (jaegarciac@unal.edu.co)",
+    "Nicolás Mateo González — Módulo II (nmgonzalezl@unal.edu.co)",
+    "Jorge Ariel Martínez Ramírez — Módulo III (jamartinezra@unal.edu.co)",
   ],
-  scheduleTheory: "Martes 7:00–9:00, Miércoles 7:00–8:00",
-  scheduleLab: "Miércoles / Jueves / Viernes 8:00–13:00 (según grupo)",
+  scheduleTheory:
+    "Clases magistrales: Martes 7:00–9:00 (Ed. Gloria Galeano Garcés–Aulas, salón 207) · Miércoles 7:00–8:00 (salón 107)",
+  scheduleLab:
+    "Prácticas de laboratorio 8:00–13:00 (Laboratorio 120, Edificio 500, Facultad de Ciencias Agrarias): Grupo 1 miércoles · Grupo 2 jueves · Grupo 3 viernes",
   totalClasses: 32,
   hasLab: true,
   descriptionSummary:
-    "Manejo teórico y práctico de las **técnicas instrumentales** más usadas en el análisis fisicoquímico farmacéutico —polarimetría, refractometría, espectrofotometría UV-Vis, IR, métodos potenciométricos, HPLC y GC— con énfasis en el **fundamento de la técnica**, el conocimiento del instrumento y el desarrollo de métodos analíticos aplicados al **control de calidad**.",
+    "Manejo teórico y práctico de las **técnicas instrumentales** más usadas en el análisis fisicoquímico: **polarimetría, refractometría, espectroscopia UV-Vis e IR, métodos potenciométricos, cromatografía HPLC y de gases**. La profundidad está dada por el **fundamento de la técnica**, el conocimiento y manejo del instrumento, y el desarrollo de técnicas analíticas aplicadas al análisis farmacéutico y al **control de calidad**.",
   objectiveGeneral:
-    "Proporcionar al estudiante conocimiento de los **principios fundamentales del análisis instrumental** aplicado al análisis farmacéutico y su aplicación en el control de la calidad. Al finalizar será capaz de **seleccionar y ejecutar** apropiadamente las técnicas para el análisis cualitativo y cuantitativo en el ámbito farmacéutico, químico y de alimentos, con tratamiento de datos e interpretación de resultados bajo la normatividad nacional e internacional.",
+    "Proporcionar al estudiante conocimiento de los **principios fundamentales del Análisis Instrumental** que le permitirán la posterior comprensión del análisis instrumental aplicado al **análisis farmacéutico** y su aplicación en el **control de la calidad**.",
   objectivesSpecific: [
-    "Relacionar el **fundamento fisicoquímico** de cada técnica con el tipo de información que entrega, su instrumentación y sus límites.",
-    "Desarrollar y aplicar **métodos analíticos** cuantitativos (curva de calibración, adición de estándar, estándar interno) con criterios de calidad.",
-    "Interpretar espectros y cromatogramas para **identificar y cuantificar** analitos en materias primas y productos farmacéuticos.",
+    "**Seleccionar y ejecutar** apropiadamente las técnicas para el análisis cualitativo y cuantitativo en el ámbito farmacéutico, químico y de alimentos.",
+    "Realizar el **tratamiento de datos, análisis de resultados y conceptualización** bajo los criterios de la normatividad nacional e internacional.",
+    "**Comunicar** el conocimiento adquirido en la asignatura.",
   ],
 
   // AIF tiene componente cuantitativo y de laboratorio fuerte: se muestran todas
@@ -38,7 +48,7 @@ export const aif: SubjectContent = {
       slug: "conceptos-previos",
       title: "Conceptos previos: unidades de concentración y equivalentes",
       description:
-        "Repaso operativo de lo que el resto del curso da por sabido: **unidades de concentración** (molaridad, **normalidad**, **molalidad**, % p/p y % p/v, ppm), **equivalentes y miliequivalentes**, el **peso equivalente** y su dependencia de la reacción (ácido-base, redox, precipitación), y cómo **se conservan los equivalentes al diluir y al tomar alícuotas**. Es la base para las volumetrías del Módulo 5 y para todo cálculo de preparación de soluciones valorantes.",
+        "Repaso operativo de lo que el resto del curso da por sabido: **unidades de concentración** (molaridad, **normalidad**, **molalidad**, % p/p y % p/v, ppm), **equivalentes y miliequivalentes**, el **peso equivalente** y su dependencia de la reacción (ácido-base, redox, precipitación), y cómo **se conservan los equivalentes al diluir y al tomar alícuotas**. Es la base para las **titulaciones potenciométricas del Módulo I** y para todo cálculo de preparación de soluciones valorantes.",
       hasLab: false,
       exercises: [
         {
@@ -121,76 +131,89 @@ export const aif: SubjectContent = {
         },
       ],
     },
-    {
-      slug: "metodos-fisicos",
-      title: "Módulo 1: Métodos físicos de análisis — refractometría y polarimetría",
-      description:
-        "Fundamento, instrumentación y aplicaciones de la **refractometría** (índice de refracción, ley de Snell) y la **polarimetría** (rotación óptica, rotación específica). Uso en identificación y control de pureza de materias primas.",
-      hasLab: true,
-      labProtocol: "Práctica 1. Métodos físicos de análisis: refractometría y polarimetría. Estandarización de soluciones.",
-    },
-    {
-      slug: "espectrofotometria-fundamentos",
-      title: "Módulo 2: Fundamentos de espectrofotometría",
-      description:
-        "Interacción radiación-materia. Leyes de la espectrofotometría: **ley de Lambert-Beer** y sus desviaciones. **Error espectrofotométrico**. Métodos de cuantificación por **aditividad** y **diferencial**. Elementos de estadística en el análisis instrumental (curva de calibración, S/N, LOD/LOQ).",
-      hasLab: true,
-      labProtocol: "Práctica 2. Estandarización de soluciones. Construcción y evaluación de una curva de calibración.",
-    },
-    {
-      slug: "uv-visible",
-      title: "Módulo 3: Espectrofotometría UV-Visible",
-      description:
-        "Transiciones electrónicas, **cromóforos y auxocromos**. Instrumentación (fuentes, monocromador, detector). Aplicaciones cualitativas y **cuantitativas** en control de calidad; determinación de la constante **pKa** por espectrofotometría; espectrofotometría de mezclas.",
-      hasLab: true,
-      labProtocol: "Prácticas 3 y 4. Aplicación de la espectrofotometría UV-Visible: cuantificación de un analito y determinación de pKa.",
-    },
+
+    // ── MÓDULO I (semanas 1–5) — Prof. Javier Eduardo García Castañeda ──────────
     {
       slug: "ir",
-      title: "Módulo 4: Espectroscopía en la región infrarroja (FT-IR)",
+      title: "Módulo I — Espectroscopía en la región infrarroja (FT-IR)",
       description:
-        "Vibraciones moleculares y bandas características (huella dactilar). Técnicas de muestreo: **pastilla de KBr** y **ATR**. Instrumentación FT-IR. Aplicaciones **cualitativas**: identificación de materias primas frente a espectros de referencia de farmacopea.",
+        "**Módulo I (semanas 1–5).** Fundamentos y aplicaciones de la espectroscopía en la **región infrarroja**. Vibraciones moleculares y bandas características (huella dactilar). Técnicas de muestreo: **pastilla de KBr** y **ATR**. Instrumentación **FT-IR**. Aplicaciones cualitativas: identificación de materias primas frente a espectros de referencia de farmacopea. Se hace **quiz en cada clase**.",
       hasLab: true,
-      labProtocol: "Aplicación de la espectroscopía FT-IR en pastilla de KBr y método ATR. Identificación de materias primas.",
+      labProtocol:
+        "Prácticas 1 y 2 (con quiz): aplicación de la espectrofotometría IR en pastilla de KBr y método ATR; preparación y estandarización de soluciones; determinación de % de humedad en una materia prima. Práctica 3: seminario Instrumentación FT-IR (quiz seminario).",
     },
     {
       slug: "metodos-electrometricos",
-      title: "Módulo 5: Métodos potenciométricos y electrométricos",
+      title: "Módulo I — Métodos potenciométricos y titulaciones potenciométricas",
       description:
-        "**Potenciometría** y electrodos selectivos de iones; medida y control de **pH**. **Titulaciones potenciométricas** en medio acuoso y no acuoso, de **óxido-reducción** y **complejometría**. Aplicación a las volumetrías de neutralización del control de calidad.",
+        "**Módulo I (semanas 1–5).** **Titulaciones potenciométricas** en medio acuoso y no acuoso y de **óxido-reducción**. Potenciometría y electrodos selectivos de iones; medida y control de **pH**. Aplicación a las volumetrías de neutralización del control de calidad. **Quiz en cada clase**; el **PRIMER PARCIAL** cubre los temas del Módulo I.",
       hasLab: true,
-      labProtocol: "Aplicaciones de la potenciometría a las volumetrías de neutralización en medio acuoso y no acuoso, óxido-reducción y complejometría.",
+      labProtocol:
+        "Aplicaciones de la potenciometría en medios acuoso y no acuoso y de óxido-reducción. Práctica 4: seminario Instrumentación en titulaciones potenciométricas (quiz seminario). Seminario de resultados oral y parcial práctico.",
+    },
+
+    // ── MÓDULO II (semanas 6–10) — Prof. Nicolás Mateo González ────────────────
+    {
+      slug: "metodos-fisicos",
+      title: "Módulo II — Métodos físicos de análisis: refractometría y polarimetría",
+      description:
+        "**Módulo II (semana 6).** Fundamento, instrumentación y aplicaciones de la **refractometría** (índice de refracción, ley de Snell) y la **polarimetría** (rotación óptica, rotación específica). Uso en identificación y control de pureza de materias primas.",
+      hasLab: true,
+      labProtocol:
+        "Prácticas 1 y 2: 1) métodos físicos de análisis — refractometría y polarimetría; 2) espectrofotometría UV-Visible: cuantificación de un analito en las regiones Visible y UV del espectro electromagnético.",
     },
     {
-      slug: "cromatografia-fundamentos",
-      title: "Módulo 6: Introducción a la cromatografía",
+      slug: "espectrofotometria-fundamentos",
+      title: "Módulo II — Fundamentos de espectrofotometría",
       description:
-        "Historia y **clasificación de los métodos cromatográficos**. Principios básicos de la separación: retención (**k**), selectividad (**α**), eficiencia (**N**, HETP, **ecuación de van Deemter**) y **resolución**. Partes principales de un sistema cromatográfico. **Idoneidad del sistema** (system suitability).",
+        "**Módulo II (semanas 7–9).** Interacción radiación-materia. **Conceptos básicos y leyes de la espectrofotometría**: **ley de Lambert-Beer** y sus desviaciones, **error espectrofotométrico**. Métodos de cuantificación por **aditividad** y **diferencial**.",
       hasLab: true,
-      labProtocol: "Práctica-taller: reconocimiento de un sistema de cromatografía líquida y uno de gases. Partes principales y mecanismos de separación.",
+      labProtocol:
+        "Prácticas 3 y 4: aditividad de absorbancias y aplicación de la espectrofotometría UV-Visible; determinación de la constante **pKa** para analitos en las regiones Visible y UV.",
+    },
+    {
+      slug: "uv-visible",
+      title: "Módulo II — Espectrofotometría UV-Visible",
+      description:
+        "**Módulo II (semanas 9–10).** Aplicaciones de la espectrofotometría en la **región UV-VIS**. Transiciones electrónicas, **cromóforos y auxocromos**, instrumentación. **Elementos de estadística** en el análisis instrumental farmacéutico. Determinación de **pKa** por espectrofotometría; espectrofotometría de mezclas. Seminario: Instrumentación UV-Visible (**16 de septiembre**). El **SEGUNDO PARCIAL** cubre los temas del Módulo II.",
+      hasLab: true,
+      labProtocol:
+        "Parcial práctico de las prácticas 1 a 4. Discusión y evaluación de informes: métodos físicos de análisis, valoración de soluciones y espectrofotometría UV-Vis.",
+    },
+
+    // ── MÓDULO III (semanas 11–16) — Prof. Jorge Ariel Martínez Ramírez ────────
+    {
+      slug: "cromatografia-fundamentos",
+      title: "Módulo III — Introducción a la cromatografía",
+      description:
+        "**Módulo III (semanas 11–12).** Introducción a la cromatografía: **historia y clasificación** de los métodos cromatográficos. **Fundamentación de la separación**: cromatograma, mecanismos de separación, retención (**k**), selectividad (**α**), eficiencia (**N**, HETP, **van Deemter**) y **resolución**. Partes principales de un sistema cromatográfico. **Idoneidad del sistema** (system suitability).",
+      hasLab: true,
+      labProtocol:
+        "Práctica 1 (Quiz 1): reconocimiento de un sistema de cromatografía líquida y uno de gases; verificación de calibración de micropipetas; partes principales (suministro de fases móviles, inyección, bombas, hornos, columnas, sistemas de detección) y mecanismos de separación. Seminario: Instrumentación HPLC y GC.",
     },
     {
       slug: "hplc-gc",
-      title: "Módulo 7: Cromatografía líquida (HPLC) y de gases (GC)",
+      title: "Módulo III — Cromatografía líquida (HPLC) y de gases (GC)",
       description:
-        "Fases móviles y estacionarias, inyección, bombas, hornos, columnas y **sistemas de detección**. **Cuantificación**: estándar externo, **estándar interno** y adición de estándar. Aplicación a la valoración de fármacos y a solventes residuales; evaluación experimental de la **ecuación de van Deemter**.",
+        "**Módulo III (semana 13).** Sistemas de **identificación y cuantificación**: **estándar externo**, **estándar interno** y **adición de estándar**. Fases móviles y estacionarias, inyección, bombas, hornos, columnas y sistemas de detección en HPLC y GC. Aplicación a la valoración de fármacos en un medicamento.",
       hasLab: true,
-      labProtocol: "Práctica II: evaluación de la ecuación de van Deemter. Práctica III: identificación y cuantificación de dos fármacos en un medicamento.",
+      labProtocol:
+        "Práctica 2: índices de retención de Kováts. Práctica 3: evaluación del cambio de distintos parámetros cromatográficos en la identificación y cuantificación de dos fármacos en un medicamento. Práctica 4: análisis de identificación y cuantificación de dos fármacos en un medicamento.",
     },
     {
       slug: "tecnicas-acopladas-ms",
-      title: "Módulo 8: Técnicas acopladas (GC-MS) e introducción a la espectrometría de masas",
+      title: "Módulo III — Técnicas acopladas (GC-MS / LC-MS) y espectrometría de masas",
       description:
-        "Introducción a las **técnicas acopladas GC-MS**. La **espectrometría de masas** como detector: ionización por **impacto electrónico**, patrón de fragmentación, e introducción a la interpretación de espectros de masas.",
+        "**Módulo III (semanas 14–16).** Introducción a las **técnicas acopladas o hifenadas** (**GC-MS** y **LC-MS**). La **espectrometría de masas** como detector: introducción a la **interpretación de espectros de masas**. Retroalimentaciones prácticas. El **TERCER PARCIAL** cubre los temas del Módulo III.",
       hasLab: true,
-      labProtocol: "Práctica demostrativa y taller de interpretación de un espectro de masas en modo de impacto electrónico.",
+      labProtocol: "Práctica 5: análisis de un espectro de masas.",
     },
   ],
 
   glossary: [
     { term: "Relación señal/ruido (S/N)", moduleSlug: "espectrofotometria-fundamentos", definition: "Cociente entre la **señal analítica** y el **ruido de fondo**; determina la detectabilidad. LOD ≈ S/N de 3; LOQ ≈ S/N de 10." },
     { term: "LOD / LOQ", moduleSlug: "espectrofotometria-fundamentos", definition: "**Límite de detección**: menor concentración distinguible del blanco con confianza razonable. **Límite de cuantificación**: menor concentración medible con exactitud y precisión aceptables." },
-    { term: "Adición de estándar", moduleSlug: "espectrofotometria-fundamentos", definition: "Técnica de calibración en la que se añaden cantidades conocidas del analito a la propia muestra para **corregir el efecto matriz**." },
+    { term: "Adición de estándar", moduleSlug: "hplc-gc", definition: "Técnica de calibración en la que se añaden cantidades conocidas del analito a la propia muestra para **corregir el efecto matriz**." },
     { term: "Estándar interno", moduleSlug: "hplc-gc", definition: "Compuesto de referencia añadido en cantidad constante a patrones y muestras; se cuantifica por la **razón de señales** analito/estándar, corrigiendo variaciones de inyección." },
     { term: "Ley de Lambert-Beer", moduleSlug: "espectrofotometria-fundamentos", definition: "La **absorbancia** es proporcional a la concentración y al paso óptico: A = ε·b·c. Se desvía a concentraciones altas y con radiación no monocromática." },
     { term: "Cromóforo / auxocromo", moduleSlug: "uv-visible", definition: "**Cromóforo**: grupo responsable de la absorción UV-Vis (conjugación, aromáticos). **Auxocromo**: grupo que desplaza o intensifica la banda (–OH, –NH₂)." },
@@ -199,6 +222,8 @@ export const aif: SubjectContent = {
     { term: "Titulación potenciométrica", moduleSlug: "metodos-electrometricos", definition: "Valoración en la que el punto de equivalencia se detecta por el **cambio brusco de potencial** (o de pH), no por un indicador visual." },
     { term: "Idoneidad del sistema (system suitability)", moduleSlug: "cromatografia-fundamentos", definition: "Pruebas (repetibilidad de área, factor de cola, platos teóricos, resolución) que verifican que el sistema cromatográfico es **apto antes** de analizar muestras." },
     { term: "Resolución cromatográfica (Rs)", moduleSlug: "cromatografia-fundamentos", definition: "Grado de separación entre dos picos vecinos; combina **retención, selectividad y eficiencia**. Rs ≥ 1,5 = separación a línea base." },
+    { term: "Índices de retención de Kováts", moduleSlug: "hplc-gc", definition: "Escala que sitúa el tiempo de retención de un analito en GC entre los de dos n-alcanos de referencia; permite **comparar retenciones entre equipos y columnas**." },
+    { term: "Técnicas acopladas (hifenadas)", moduleSlug: "tecnicas-acopladas-ms", definition: "Unión de una técnica de separación con una de detección espectroscópica en línea (**GC-MS**, **LC-MS**): separa y a la vez identifica cada componente." },
     { term: "Ionización por impacto electrónico", moduleSlug: "tecnicas-acopladas-ms", definition: "En espectrometría de masas, bombardeo de la molécula con electrones de 70 eV; produce el **ion molecular** y un patrón de fragmentación reproducible." },
   ],
 
@@ -392,23 +417,27 @@ export const aif: SubjectContent = {
     },
   ],
 
+  // Sistema de evaluación (PROGRAMA OFICIAL 2026-2, tal cual): tres módulos con
+  // 10% práctico + 20% parcial teórico cada uno, más 10% de seminarios. Suma 100.
   evaluation: [
-    { name: "Quices e informes — Módulo 1", weight: 10 },
-    { name: "1er Parcial (Módulo 1)", weight: 20 },
-    { name: "Trabajo de laboratorio — Módulo 2", weight: 10 },
-    { name: "2do Parcial (Módulo 2)", weight: 20 },
-    { name: "Talleres e informes — Módulo 3", weight: 10 },
-    { name: "3er Parcial (Módulo 3)", weight: 20 },
-    { name: "Seminarios", weight: 10 },
+    { name: "Módulo I — Quices, informes orales, trabajo de laboratorio y parcial práctico", weight: 10 },
+    { name: "Módulo I — Parcial teórico", weight: 20 },
+    { name: "Módulo II — Quices, informes orales, trabajo de laboratorio y parcial práctico", weight: 10 },
+    { name: "Módulo II — Parcial teórico", weight: 20 },
+    { name: "Módulo III — Quices, talleres, informes y ejercicios", weight: 10 },
+    { name: "Módulo III — Parcial", weight: 20 },
+    { name: "Seminarios (Instrumentación FT-IR/potenciometría, UV-Visible, HPLC y GC)", weight: 10 },
   ],
 
   keyDates: [
-    { name: "1er Parcial (Módulo 1)", weight: "20%" },
-    { name: "2do Parcial (Módulo 2)", weight: "20%" },
-    { name: "3er Parcial (Módulo 3)", weight: "20%" },
-    { name: "Seminario Módulo 1 — Instrumentación UV-Visible", weight: "parte del 10%" },
-    { name: "Seminario Módulo 2 — Instrumentación FT-IR y potenciometría", weight: "parte del 10%" },
-    { name: "Seminario Módulo 3 — Instrumentación HPLC y GC", weight: "parte del 10%" },
+    { name: "Primer parcial — Módulo I", weight: "20%", note: "Temas del Módulo I (espectroscopía IR + métodos potenciométricos). Alrededor de la semana 5." },
+    { name: "Parcial práctico — Módulo I", weight: "parte del 10%", note: "Prácticas del Módulo I; incluye seminario de resultados oral." },
+    { name: "Segundo parcial — Módulo II", weight: "20%", note: "Temas del Módulo II (métodos físicos + espectrofotometría UV-Vis + estadística). Alrededor de la semana 10." },
+    { name: "Parcial práctico — Módulo II", weight: "parte del 10%", note: "Prácticas 1 a 4; discusión y evaluación de informes." },
+    { name: "Tercer parcial — Módulo III", weight: "20%", note: "Temas del Módulo III (cromatografía + HPLC/GC + técnicas acopladas y MS). Semana 16." },
+    { name: "Seminario — Instrumentación FT-IR y potenciometría (Módulo I)", weight: "parte del 10%" },
+    { name: "Seminario — Instrumentación UV-Visible (Módulo II)", weight: "parte del 10%", note: "16 de septiembre." },
+    { name: "Seminario — Instrumentación HPLC y GC (Módulo III)", weight: "parte del 10%" },
   ],
 
   projects: [
@@ -418,15 +447,14 @@ export const aif: SubjectContent = {
   ],
 
   bibliography: [
-    { kind: "libro", reference: "Skoog D.A., Holler F.J., Crouch S.R. Principios de Análisis Instrumental. Cengage Learning Editores. 2008." },
-    { kind: "libro", reference: "Skoog, West, Holler, Crouch. Fundamentos de Química Analítica. Ed. Thomson. 9ª ed. 2015." },
-    { kind: "libro", reference: "Harris D.C. Análisis Químico Cuantitativo. Ed. Reverté. 3ª ed. Barcelona. 2006." },
+    { kind: "libro", reference: "Guías y tutoriales de la asignatura." },
+    { kind: "libro", reference: "Farmacopea de los Estados Unidos de América (USP)." },
     { kind: "libro", reference: "Olsen E. Métodos ópticos de análisis. Editorial Reverté. 1990." },
+    { kind: "libro", reference: "Skoog D.A., Crouch S.R., Holler F.J. Principios de Análisis Instrumental. Cengage Learning Editores. 2008." },
+    { kind: "libro", reference: "Skoog, West, Holler y Crouch. Fundamentos de Química Analítica. Ed. Thomson. 9ª ed. 2015." },
     { kind: "libro", reference: "Ayres G. Análisis Químico Cuantitativo. 2ª ed. Ed. El Castillo S.A. Madrid. 1970." },
+    { kind: "libro", reference: "Harris D.C. Análisis Químico Cuantitativo. Ed. Reverté. 3ª ed. Barcelona. 2006." },
     { kind: "libro", reference: "Quattrocchi O.A. Introducción a la HPLC. Aplicación y práctica. Artes gráficas Farro. 1992." },
-    { kind: "libro", reference: "Gross J.H. Mass Spectrometry. A textbook. 2nd ed. Springer. 2011." },
-    { kind: "libro", reference: "USP-NF — capítulos generales <621> Cromatografía, <851> Espectrofotometría, <781> Rotación óptica." },
-    { kind: "revista", reference: "Journal of Pharmaceutical and Biomedical Analysis" },
-    { kind: "revista", reference: "Analytical Chemistry" },
+    { kind: "libro", reference: "Gross J.H. Mass Spectrometry. A textbook. 2ª ed. Springer. 2011." },
   ],
 };
