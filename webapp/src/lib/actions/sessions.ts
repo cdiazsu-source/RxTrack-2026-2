@@ -41,6 +41,7 @@ function readSession(formData: FormData) {
     topic: String(formData.get("topic") ?? "").trim(),
     content: String(formData.get("content") ?? ""),
     transcript: String(formData.get("transcript") ?? "").trim() || null,
+    slidesText: String(formData.get("slidesText") ?? "").trim() || null,
     number: Number.isFinite(number as number) ? number : null,
     date: parseDateInput(formData.get("date")),
     author: String(formData.get("author") ?? "").trim() || null,
@@ -50,7 +51,7 @@ function readSession(formData: FormData) {
 export async function addSession(moduleId: string, formData: FormData) {
   if (await blockedForContribute()) return;
   const d = readSession(formData);
-  if (!d.topic && !d.content && !d.transcript) return;
+  if (!d.topic && !d.content && !d.transcript && !d.slidesText) return;
 
   await prisma.session.create({
     data: {

@@ -28,6 +28,43 @@ export function contextPrompt(subjectName: string, modules: PromptModule[], topi
   );
 }
 
+/**
+ * Prompt para EXTRAER el texto de unas diapositivas / un PDF de clase y dejarlo
+ * ordenado y relacionado con la asignatura. La persona pega el material al final;
+ * la IA devuelve texto limpio que luego se guarda en "Diapositivas / Notas de
+ * clase" y alimenta el prompt Cornell.
+ */
+export function slidesExtractPrompt(opts: {
+  subjectName: string;
+  modules: PromptModule[];
+  moduleTitle: string;
+  topic?: string;
+}): string {
+  const temario = opts.modules.length
+    ? opts.modules.map((m, i) => `${i + 1}. ${m.title}: ${stripMarkup(m.description)}`).join("\n")
+    : "(La asignatura aún no tiene temario cargado.)";
+
+  return (
+    `Eres un asistente de estudio experto en ${opts.subjectName}, del pregrado de ` +
+    `Química Farmacéutica. Contexto del curso:\n\n${temario}\n\n` +
+    `Te voy a pasar el material de una clase del módulo "${opts.moduleTitle}"` +
+    (opts.topic ? ` sobre "${opts.topic}"` : "") +
+    ` — pueden ser diapositivas, un PDF o notas sueltas, con formato desordenado.\n\n` +
+    `Tu tarea:\n` +
+    `1. EXTRAE todo el texto útil: definiciones, esquemas, listas, tablas, fórmulas, ` +
+    `ejemplos, valores, nombres de fármacos y referencias citadas.\n` +
+    `2. ORDÉNALO en secuencia lógica con encabezados \`####\` y viñetas \`*\`, en ` +
+    `Markdown; reconstruye las tablas con | pipes |.\n` +
+    `3. RELACIÓNALO con el curso: si un punto conecta con otro módulo del temario, ` +
+    `dilo en una línea entre corchetes, p. ej. \`[Ver módulo 2: …]\`.\n` +
+    `4. DESCARTA el ruido: números de diapositiva, logos, pies de página, "gracias".\n` +
+    `5. Marca con \`[?]\` lo que quede ilegible, cortado o dudoso.\n` +
+    `No resumas ni interpretes de más: el objetivo es transcribir y ordenar, no opinar.\n\n` +
+    `--- MATERIAL DE LA CLASE (diapositivas / PDF / notas) ---\n\n` +
+    `[pega aquí el texto de las diapositivas o del PDF]\n`
+  );
+}
+
 /** Plantilla de apuntes método Cornell a partir de una transcripción + diapositivas. */
 export function cornellPrompt(opts: {
   subjectName: string;

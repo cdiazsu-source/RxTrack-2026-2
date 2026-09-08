@@ -155,6 +155,10 @@ model Session {
   transcript String?       @db.Text
   /// Enlace a las diapositivas de la clase (carpeta o archivo de Drive).
   slidesUrl  String?
+  /// Texto de las diapositivas / notas de clase (pegado o extraído por IA a
+  /// partir de un PDF). Se suele completar después o no llega. Alimenta el
+  /// prompt de apuntes Cornell.
+  slidesText String?       @db.Text
   /// Snapshot de quién del grupo la subió.
   author     String?
   /// Etapa del apunte. Sube sola al agregar transcripción/Cornell; "REVISADA"

@@ -28,7 +28,7 @@ export default async function ModuleDetailPage({
   const subject = await getSubjectBySlug(params.subject);
   if (!subject) notFound();
 
-  const [mod, editable, session, modGlossary, modFormulas] = await Promise.all([
+  const [mod, editable, session, modGlossary, modFormulas, courseModules] = await Promise.all([
     prisma.module.findFirst({
       where: { id: params.moduleId, subjectId: subject.id },
       include: {
@@ -47,6 +47,11 @@ export default async function ModuleDetailPage({
       orderBy: { order: "asc" },
       select: { name: true },
     }),
+    prisma.module.findMany({
+      where: { subjectId: subject.id },
+      orderBy: { order: "asc" },
+      select: { title: true, description: true },
+    }),
   ]);
   if (!mod) notFound();
 
@@ -58,6 +63,7 @@ export default async function ModuleDetailPage({
     content: s.content,
     transcript: s.transcript,
     slidesUrl: s.slidesUrl,
+    slidesText: s.slidesText,
     author: s.author,
     status: s.status,
   }));
@@ -166,6 +172,7 @@ export default async function ModuleDetailPage({
           defaultAuthor={authorName}
           glossary={modGlossary.map((g) => g.term)}
           formulas={modFormulas.map((f) => f.name)}
+          courseModules={courseModules}
         />
       </section>
 

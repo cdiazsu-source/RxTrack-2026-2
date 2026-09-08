@@ -21,7 +21,7 @@ import { PromptBox } from "@/components/prompt-box";
 import { DriveLinkEditor } from "@/components/drive-link-editor";
 import { useCanContribute } from "@/components/access-context";
 import { renderCornell } from "@/lib/markdown-lite";
-import { cornellPrompt } from "@/lib/prompts";
+import { cornellPrompt, slidesExtractPrompt } from "@/lib/prompts";
 import {
   SESSION_STATUS_LABEL,
   SESSION_STATUS_NEXT,
@@ -76,9 +76,12 @@ export type SessionView = {
   content: string;
   transcript: string | null;
   slidesUrl: string | null;
+  slidesText: string | null;
   author: string | null;
   status: SessionStatus;
 };
+
+export type CourseModuleRef = { title: string; description: string };
 
 function SessionForm({
   moduleId,
@@ -89,6 +92,7 @@ function SessionForm({
   defaultAuthor,
   glossary,
   formulas,
+  courseModules,
   onDone,
 }: {
   moduleId: string;
@@ -102,15 +106,20 @@ function SessionForm({
   /** Glosario y fórmulas del módulo, para enriquecer el prompt Cornell. */
   glossary: string[];
   formulas: string[];
+  /** Temario de la asignatura, para el prompt de extraer diapositivas. */
+  courseModules: CourseModuleRef[];
   onDone: () => void;
 }) {
   const draftKey = session ? `session:${session.id}` : `session:new:${moduleId}`;
   const topicKey = `${draftKey}:topic`;
   const transcriptKey = `${draftKey}:transcript`;
+  const slidesKey = `${draftKey}:slides`;
   const [content, setContent] = useState(session?.content ?? "");
   const [transcript, setTranscript] = useState(session?.transcript ?? "");
+  const [slidesText, setSlidesText] = useState(session?.slidesText ?? "");
   const [restored, setRestored] = useState<null | { value: string; savedAt: number }>(null);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [showSlidesPrompt, setShowSlidesPrompt] = useState(false);
   const [topic, setTopic] = useState(session?.topic ?? "");
   const [author, setAuthor] = useState(session?.author ?? "");
   const [knownAuthors, setKnownAuthors] = useState<string[]>([]);
@@ -124,6 +133,8 @@ function SessionForm({
     if (dt?.value && !(session?.topic ?? "")) setTopic(dt.value);
     const dtr = loadDraft(transcriptKey);
     if (dtr?.value && !(session?.transcript ?? "")) setTranscript(dtr.value);
+    const dsl = loadDraft(slidesKey);
+    if (dsl?.value && !(session?.slidesText ?? "")) setSlidesText(dsl.value);
     // Usuario: obligatorio. En una sesión nueva se precarga la cuenta (o el
     // último nombre usado en este navegador).
     setKnownAuthors(loadKnownAuthors(defaultAuthor));
@@ -137,6 +148,7 @@ function SessionForm({
     clearDraft(draftKey);
     clearDraft(topicKey);
     clearDraft(transcriptKey);
+    clearDraft(slidesKey);
   };
 
   return (
@@ -147,6 +159,7 @@ function SessionForm({
         fd.set("author", name);
         fd.set("content", content);
         fd.set("transcript", transcript);
+        fd.set("slidesText", slidesText);
         if (session) await updateSession(session.id, fd);
         else await addSession(moduleId, fd);
         rememberAuthor(name);
@@ -232,6 +245,7 @@ function SessionForm({
             moduleTitle,
             topic,
             transcription: transcript,
+            slides: slidesText,
             glossary,
             formulas,
             previousCornell: session ? undefined : previous?.content,
@@ -267,6 +281,31 @@ function SessionForm({
         className="font-mono text-xs leading-relaxed"
       />
 
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">Diapositivas / Notas de clase (opcional)</label>
+        <Button type="button" size="sm" variant="ghost" onClick={() => setShowSlidesPrompt((s) => !s)}>
+          <Sparkles className="h-3.5 w-3.5" />
+          Prompt para extraer diapositivas
+        </Button>
+      </div>
+      {showSlidesPrompt && (
+        <PromptBox
+          rows={9}
+          text={slidesExtractPrompt({ subjectName, modules: courseModules, moduleTitle, topic })}
+        />
+      )}
+      <Textarea
+        name="slidesText-visible"
+        value={slidesText}
+        onChange={(e) => {
+          setSlidesText(e.target.value);
+          saveDraft(slidesKey, e.target.value);
+        }}
+        rows={6}
+        placeholder="Texto de las diapositivas o del PDF de la clase. Puedes pegarlo tal cual o usar el prompt de arriba para que la IA lo extraiga y ordene. Alimenta el prompt de apuntes Cornell."
+        className="font-mono text-xs leading-relaxed"
+      />
+
       <div className="flex gap-2">
         <Button type="submit" size="sm">{session ? "Guardar cambios" : "Guardar sesión"}</Button>
         <Button type="button" variant="ghost" size="sm" onClick={onDone}>Cancelar</Button>
@@ -285,6 +324,7 @@ function SessionArticle({
   onEdit: () => void;
 }) {
   const [showTranscript, setShowTranscript] = useState(false);
+  const [showSlides, setShowSlides] = useState(false);
   // TDAH — criterio 4: los apuntes largos empiezan plegados; nada de muro de texto.
   const isLong = s.content.length > 700;
   const [expanded, setExpanded] = useState(false);
@@ -330,7 +370,17 @@ function SessionArticle({
       )}
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
-        <DriveLinkEditor url={s.slidesUrl} action={setSessionSlidesUrl.bind(null, s.id)} label="Diapositivas" />
+        <DriveLinkEditor url={s.slidesUrl} action={setSessionSlidesUrl.bind(null, s.id)} label="Diapositivas (enlace)" />
+        {s.slidesText && (
+          <button
+            type="button"
+            onClick={() => setShowSlides((v) => !v)}
+            className="inline-flex items-center gap-1 text-xs text-primary"
+          >
+            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showSlides ? "rotate-180" : ""}`} />
+            {showSlides ? "Ocultar diapositivas / notas" : "Ver diapositivas / notas"}
+          </button>
+        )}
         {s.transcript && (
           <button
             type="button"
@@ -342,6 +392,13 @@ function SessionArticle({
           </button>
         )}
       </div>
+
+      {showSlides && s.slidesText && (
+        <div
+          className="cornell mt-2 border-t border-border pt-2 text-sm text-muted-foreground"
+          dangerouslySetInnerHTML={{ __html: renderCornell(s.slidesText) }}
+        />
+      )}
 
       {showTranscript && s.transcript && (
         <div
@@ -399,6 +456,7 @@ export function SessionNotes({
   defaultAuthor,
   glossary = [],
   formulas = [],
+  courseModules = [],
 }: {
   moduleId: string;
   subjectName: string;
@@ -407,6 +465,7 @@ export function SessionNotes({
   defaultAuthor: string;
   glossary?: string[];
   formulas?: string[];
+  courseModules?: CourseModuleRef[];
 }) {
   const canEdit = useCanContribute();
   const [adding, setAdding] = useState(false);
@@ -443,6 +502,7 @@ export function SessionNotes({
             defaultAuthor={defaultAuthor}
             glossary={glossary}
             formulas={formulas}
+            courseModules={courseModules}
             onDone={() => setAdding(false)}
           />
         )}
@@ -464,6 +524,7 @@ export function SessionNotes({
               defaultAuthor={defaultAuthor}
               glossary={glossary}
               formulas={formulas}
+              courseModules={courseModules}
               onDone={() => setEditingId(null)}
             />
           ) : (
