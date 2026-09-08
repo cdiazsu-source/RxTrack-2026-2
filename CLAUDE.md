@@ -38,14 +38,15 @@ pregrado de Química Farmacéutica (UNAL). Nace de dos proyectos previos:
 
 ## Acceso
 
-Acceso compartido de grupo, sin cuenta por persona. Dos perfiles, misma cookie
-firmada con HMAC (`lib/auth.ts`, edge-safe):
+Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en
+`lib/auth.ts` (edge-safe). La cookie firmada con HMAC lleva `{ name, level }`.
 
-- `full` (`SITE_PASSWORD`) — edita todo.
-- `read` (`SITE_PASSWORD_READ`) — ve todo; no edita.
+- `cesar` / `SITE_PASSWORD` — `level: "full"`, edita todo.
+- `diana` / `SITE_PASSWORD_READ` — `level: "read"`, ve todo; no edita.
 
-`middleware.ts` protege todo salvo `/login`. Diseñado para migrar a magic-link
-por persona sin tocar los call-sites (`getSession()` pasaría a `{ userId, role }`).
+`getSession()` devuelve `{ authed, level, name }`; `canEdit()` sigue siendo
+`level === "full"`. La portada saluda con `Hola, <name>.`. Añadir personas =
+otra fila en `ACCOUNTS`. `middleware.ts` protege todo salvo `/login`.
 
 ## Estado
 

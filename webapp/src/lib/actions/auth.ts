@@ -9,10 +9,10 @@ export async function login(formData: FormData) {
   const username = String(formData.get("username") ?? "");
   const password = String(formData.get("password") ?? "");
 
-  const level = checkCredentials(username, password);
-  if (!level) redirect("/login?error=1");
+  const profile = checkCredentials(username, password);
+  if (!profile) redirect("/login?error=1");
 
-  cookies().set(SESSION_COOKIE, await signToken(level), {
+  cookies().set(SESSION_COOKIE, await signToken(profile), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

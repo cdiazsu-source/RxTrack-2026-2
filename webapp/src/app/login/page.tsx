@@ -34,7 +34,7 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
             </Button>
           </form>
           <p className="mt-4 text-xs text-muted-foreground">
-            Acceso compartido del grupo. Dos perfiles: uno que edita y uno de solo lectura.
+            Cada quien con su usuario. Cesar edita; Diana consulta.
           </p>
         </CardContent>
       </Card>

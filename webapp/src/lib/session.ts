@@ -2,12 +2,14 @@ import { cookies } from "next/headers";
 
 import { type AccessLevel, SESSION_COOKIE, verifyToken } from "@/lib/auth";
 
-export type Session = { authed: true; level: AccessLevel } | { authed: false };
+export type Session =
+  | { authed: true; level: AccessLevel; name: string }
+  | { authed: false };
 
 /** Sesión actual (server components / server actions). */
 export async function getSession(): Promise<Session> {
-  const level = await verifyToken(cookies().get(SESSION_COOKIE)?.value);
-  return level ? { authed: true, level } : { authed: false };
+  const profile = await verifyToken(cookies().get(SESSION_COOKIE)?.value);
+  return profile ? { authed: true, level: profile.level, name: profile.name } : { authed: false };
 }
 
 /** ¿La sesión puede editar? Solo el perfil "full". */

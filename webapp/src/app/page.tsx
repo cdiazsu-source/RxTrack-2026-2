@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
 import { listSubjects } from "@/lib/subjects";
 import { getSubjectProgress } from "@/lib/queries";
 import { buildFeed } from "@/lib/feed";
@@ -18,7 +19,7 @@ import { cn } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function SemesterPage() {
-  const subjects = await listSubjects();
+  const [session, subjects] = await Promise.all([getSession(), listSubjects()]);
 
   const [progressBySubject, meta, feed, allDates, streakDays] = await Promise.all([
     Promise.all(subjects.map((s) => getSubjectProgress(s.id))),
@@ -45,6 +46,10 @@ export default async function SemesterPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      {session.authed && (
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Hola, {session.name}.</h1>
+      )}
+
       <ResumeBanner route={meta?.resumeRoute ?? null} label={meta?.resumeLabel ?? null} note={meta?.resumeNote ?? null} />
 
       <div className="grid gap-4 md:grid-cols-[auto_1fr]">
