@@ -51,6 +51,5 @@ otra fila en `ACCOUNTS`. `middleware.ts` protege todo salvo `/login`.
 ## Estado
 
 Fase 0 (andamiaje) y Fase 1 (una asignatura de punta a punta) implementadas.
-Contenido cargado: **FT2** completo (portado del borrador) y **AIF** como
-esqueleto (verificar contra el programa oficial). FG/AF/SPF/FQ2/BFC son `Subject`
-stub sin temario — se llenan en `content/*.ts` (Fase 4).
+Temario cargado en `content/*.ts` desde el programa oficial: **FT2, AIF, FG, AF,
+SPF, FQ2**. **BFC** sigue como `Subject` stub sin temario (`modules: []`).
