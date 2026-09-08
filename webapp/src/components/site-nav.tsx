@@ -10,6 +10,9 @@ import { SubjectSwitcher, type SwitcherSubject } from "@/components/subject-swit
 import { SearchDialog } from "@/components/search-dialog";
 import { QuickCapture } from "@/components/quick-capture";
 
+/** Fecha del último cambio a la app. Actualízala a mano al publicar cambios. */
+const LAST_MODIFIED = "8 sep 2026";
+
 export function SiteNav({
   canEdit,
   subjects,
@@ -60,6 +63,9 @@ export function SiteNav({
         </div>
 
         <div className="ml-auto flex items-center gap-2">
+          <span className="hidden whitespace-nowrap text-xs text-muted-foreground md:inline">
+            Última modificación: {LAST_MODIFIED}
+          </span>
           <SearchDialog />
           <QuickCapture />
           {!canEdit && (
