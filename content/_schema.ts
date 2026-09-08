@@ -81,6 +81,32 @@ export interface ProjectContent {
   category?: string | null;
 }
 
+/**
+ * Práctica de laboratorio. Es material de referencia (no lleva avance por ítem;
+ * eso lo cubre `LabReport` dentro de la app). Se renderiza en la pestaña
+ * "Laboratorio" como una sección plegable por práctica.
+ */
+export interface LabPracticeContent {
+  number: number;
+  title: string;
+  /** Módulo de la MISMA asignatura al que corresponde (cross-link blando). */
+  moduleSlug?: string | null;
+  /** Por qué se hace la práctica y qué se busca demostrar. Admite `**negrita**`. */
+  fundamento: string;
+  /** Todo lo esencial para desarrollarla: reactivos clave, pasos críticos,
+   *  criterios de clasificación, precauciones. Un elemento por viñeta. */
+  keyPoints: string[];
+  /** Procedimiento paso a paso, en Markdown-lite: `#### Actividad`, listas
+   *  numeradas, tablas con `| pipes |` para las formulaciones. */
+  procedure: string;
+  /** Ecuaciones necesarias (mismo markup que `formulas`). */
+  equations?: FormulaContent[];
+  /** Datos / tablas que la guía pide registrar durante la práctica. */
+  dataRequested: string[];
+  /** Temas de consulta previos (opcional). */
+  studyTopics?: string[];
+}
+
 export interface SubjectContent {
   /** Código corto en mayúsculas: "AIF", "FT2", … */
   code: string;
@@ -114,4 +140,8 @@ export interface SubjectContent {
   bibliography?: BibliographyContent[];
   /** Entregables fijos de la asignatura (seminario, producto final, informes…). */
   projects?: ProjectContent[];
+  /** Bullets con el contexto y las reglas del laboratorio (pestaña Laboratorio). */
+  labRules?: string[];
+  /** Prácticas de laboratorio, cada una como su propia sección. */
+  labPractices?: LabPracticeContent[];
 }

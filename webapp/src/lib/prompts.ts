@@ -9,6 +9,43 @@ export interface PromptModule {
   description: string;
 }
 
+/** Contexto de una práctica de laboratorio, para poder preguntarle a una IA. */
+export function labPracticePrompt(opts: {
+  subjectName: string;
+  moduleTitle?: string | null;
+  practice: {
+    number: number;
+    title: string;
+    fundamento: string;
+    keyPoints: string[];
+    procedure: string;
+    equations: string[];
+    dataRequested: string[];
+  };
+}): string {
+  const p = opts.practice;
+  const bloque = (titulo: string, items: string[]) =>
+    items.length ? `\n${titulo}:\n${items.map((x) => `- ${x}`).join("\n")}\n` : "";
+
+  return (
+    `Eres un asistente experto en Farmacotecnia y tecnología farmacéutica. Estoy ` +
+    `en la asignatura ${opts.subjectName}` +
+    (opts.moduleTitle ? ` (${opts.moduleTitle})` : "") +
+    ` y voy a desarrollar la siguiente práctica de laboratorio. Úsala como ` +
+    `contexto para responder lo que te pregunte después.\n\n` +
+    `PRÁCTICA ${p.number} — ${p.title}\n\n` +
+    `FUNDAMENTO:\n${stripMarkup(p.fundamento)}\n` +
+    bloque("LO QUE DEBO TENER PRESENTE", p.keyPoints.map(stripMarkup)) +
+    `\nPROCEDIMIENTO:\n${stripMarkup(p.procedure)}\n` +
+    bloque("ECUACIONES QUE NECESITO", p.equations) +
+    bloque("DATOS QUE DEBO REGISTRAR", p.dataRequested) +
+    `\nCon este contexto, respóndeme lo que te pregunte sobre esta práctica: ` +
+    `montaje, cálculos con mis datos, interpretación de resultados, fuentes de ` +
+    `error, qué esperar. No inventes datos que no te haya dado; si falta un dato ` +
+    `para un cálculo, pídemelo.`
+  );
+}
+
 /** "Profesor experto en <asignatura> + temario + tema a profundizar". */
 export function contextPrompt(subjectName: string, modules: PromptModule[], topic: string): string {
   const temario = modules.length

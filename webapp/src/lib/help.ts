@@ -39,6 +39,8 @@ export const HELP: Record<string, string> = {
     "Protocolo de la práctica (de `modules[].labProtocol` en el content), lista de materiales (la haces tú) y estado del informe (Pendiente → Entregado → Calificado, lo pones tú). El seed reescribe el protocolo; lo demás es tuyo.",
   "lab-reports":
     "Informes de laboratorio de la asignatura. Los agregas tú a mano, uno por práctica. Cada uno lleva estado, nota, fecha de entrega, enlace a Drive, checklist de preparación y un desarrollo en Markdown. Nada de esto viene del content ni lo toca el seed.",
+  "lab-reglas":
+    "Reglas y contexto del laboratorio + una sección por cada práctica (fundamento, lo que hay que saber, procedimiento, ecuaciones, datos a registrar y un prompt para preguntarle a una IA). Es material de referencia: sale de `content/<code>.ts` (`labRules`, `labPractices`), NO se guarda en la base ni tiene avance. Para desarrollar una práctica y llevar su estado, crea un «Informe de laboratorio» más abajo.",
 
   // ---- Proyectos ----
   proyectos:
