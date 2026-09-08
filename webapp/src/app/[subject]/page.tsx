@@ -93,7 +93,10 @@ export default async function SubjectDashboard({ params }: { params: { subject: 
 
         <Card>
           <CardHeader>
-            <CardTitle>Esta semana</CardTitle>
+            <CardTitle className="flex items-center gap-1.5">
+              Esta semana
+              <HelpHint k="meta-semanal" />
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <WeeklyGoal subjectId={subject.id} goal={subject.weeklyGoal} />
@@ -128,7 +131,10 @@ export default async function SubjectDashboard({ params }: { params: { subject: 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
-            <CardTitle>Módulos</CardTitle>
+            <CardTitle className="flex items-center gap-1.5">
+              Módulos
+              <HelpHint k="modulos-general" />
+            </CardTitle>
             <Link href={`/${subject.id}/modulos`} className="text-xs text-primary hover:underline">Ver todos</Link>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
@@ -150,7 +156,10 @@ export default async function SubjectDashboard({ params }: { params: { subject: 
 
         <Card>
           <CardHeader>
-            <CardTitle>Próximas fechas</CardTitle>
+            <CardTitle className="flex items-center gap-1.5">
+              Próximas fechas
+              <HelpHint k="proximas-fechas" />
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             {upcoming.length === 0 ? (

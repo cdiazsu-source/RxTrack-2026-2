@@ -13,6 +13,7 @@ import { ProgressRing } from "@/components/progress-ring";
 import { ResumeTracker } from "@/components/resume-banner";
 import { SessionNotes, type SessionView } from "@/components/session-notes";
 import { Checklist } from "@/components/checklist";
+import { HelpHint } from "@/components/help-hint";
 import { ExercisesPanel } from "@/components/exercises-panel";
 import { ResourcesPanel } from "@/components/resources-panel";
 import { LabPanel } from "@/components/lab-panel";
@@ -123,7 +124,10 @@ export default async function ModuleDetailPage({
           <ProgressRing value={pct(progress)} size={64} stroke={6} sublabel="módulo" />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-primary">{subject.code}</p>
-            <h2 className="text-xl font-bold leading-tight">{mod.title}</h2>
+            <h2 className="flex items-center gap-1.5 text-xl font-bold leading-tight">
+              {mod.title}
+              <HelpHint k="modulo-cabecera" />
+            </h2>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
               <span className="text-muted-foreground">Estado:</span>
               <ModuleStatusSelect moduleId={mod.id} status={mod.status} />
@@ -154,7 +158,10 @@ export default async function ModuleDetailPage({
       {/* Descripción: plegada por defecto — no es lo primero que hay que hacer. */}
       <details className="group rounded-lg border border-border bg-card [&_summary]:list-none">
         <summary className="flex cursor-pointer items-center justify-between gap-2 p-4 text-sm font-medium">
-          Descripción del módulo
+          <span className="flex items-center gap-1.5">
+            Descripción del módulo
+            <HelpHint k="modulo-descripcion" />
+          </span>
           <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" aria-hidden />
         </summary>
         <div

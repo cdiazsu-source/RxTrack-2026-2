@@ -212,7 +212,7 @@ export function TasksPanel({
           <ListTodo className="h-4 w-4 text-primary" />
           Tareas de Diana
           <span className="font-normal text-muted-foreground">({open.length})</span>
-          <HelpHint text="Encargos concretos para Diana (extraer texto de diapositivas, transcribir un audio con Buzz, etc.). Ella los mueve de Pendiente a En curso y a Hecha; el resultado lo pega donde corresponda (apuntes, transcripción)." />
+          <HelpHint k="tareas" />
         </CardTitle>
         {canManage && (
           <Button size="sm" variant="outline" onClick={() => setAdding((v) => !v)}>

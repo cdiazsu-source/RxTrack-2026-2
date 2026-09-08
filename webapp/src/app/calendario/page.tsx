@@ -79,7 +79,7 @@ export default async function CalendarioPage({ searchParams }: { searchParams: {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="flex items-center gap-1.5 text-2xl font-bold">
           Calendario
-          <HelpHint text="Todas las fechas de las 7 asignaturas + fechas de clase + tus eventos personales, en un solo mes. Los parciales enlazan a 'preparar'." />
+          <HelpHint k="calendario" />
         </h1>
         <AddEventForm subjects={subjects.map((s) => ({ id: s.id, code: s.code }))} />
       </div>

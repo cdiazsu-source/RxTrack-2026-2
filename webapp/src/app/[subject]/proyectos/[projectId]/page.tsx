@@ -14,6 +14,7 @@ import { DriveLinkEditor } from "@/components/drive-link-editor";
 import { ResumeTracker } from "@/components/resume-banner";
 import { Checklist } from "@/components/checklist";
 import { NotesLog, type NoteView } from "@/components/notes-log";
+import { HelpHint } from "@/components/help-hint";
 
 export const dynamic = "force-dynamic";
 
@@ -66,7 +67,10 @@ export default async function ProjectDetailPage({
           {project.isManual && <Badge variant="secondary">Propio</Badge>}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-bold leading-tight">{project.title}</h2>
+          <h2 className="flex items-center gap-1.5 text-xl font-bold leading-tight">
+            {project.title}
+            <HelpHint k="proyecto-cabecera" />
+          </h2>
           <DriveLinkEditor url={project.driveUrl} action={setProjectDriveUrl.bind(null, project.id)} />
         </div>
         <div className="flex items-center gap-3">

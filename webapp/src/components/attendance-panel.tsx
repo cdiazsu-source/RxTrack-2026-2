@@ -5,6 +5,7 @@ import { Minus, Plus } from "lucide-react";
 
 import { setAttendanceMissed } from "@/lib/actions/semester";
 import { ProgressBar } from "@/components/ui/progress";
+import { HelpHint } from "@/components/help-hint";
 import { useCanEdit } from "@/components/access-context";
 
 export function AttendancePanel({
@@ -25,7 +26,10 @@ export function AttendancePanel({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium">Asistencia</span>
+        <span className="flex items-center gap-1.5 font-medium">
+          Asistencia
+          <HelpHint k="asistencia" />
+        </span>
         {canEdit && (
           <span className="flex items-center gap-1">
             <button

@@ -195,7 +195,7 @@ export function LabReportsPanel({ subjectId, reports }: { subjectId: string; rep
           <span className="font-normal text-muted-foreground">
             ({sorted.length} informe{sorted.length === 1 ? "" : "s"})
           </span>
-          <HelpHint text="Informes de laboratorio de la asignatura. Los agregas tú a mano, uno por práctica; cada uno lleva estado, nota, fecha de entrega, enlace a Drive, checklist de preparación y desarrollo en Markdown." />
+          <HelpHint k="lab-reports" />
         </CardTitle>
         {canEdit && (
           <Button size="sm" variant="outline" onClick={() => setAdding((s) => !s)}>

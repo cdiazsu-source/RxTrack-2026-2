@@ -37,7 +37,7 @@ export default async function InboxPage() {
       <div>
         <h1 className="flex items-center gap-1.5 text-2xl font-bold">
           Bandeja de captura
-          <HelpHint text="Todo lo que capturas con + o Ctrl+Shift+K cae aquí. Clasifícalo a una asignatura, conviértelo en subtarea de un módulo, o márcalo como listo." />
+          <HelpHint k="inbox" />
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">Vaciar la bandeja = nada se te pierde y nada te distrae mientras estudias.</p>
       </div>

@@ -29,7 +29,7 @@ export default async function RepasoPage() {
       <div>
         <h1 className="flex items-center gap-1.5 text-2xl font-bold">
           Repaso
-          <HelpHint text="Tarjetas con repetición espaciada. Se generan del glosario y las fórmulas de cada asignatura, o las creas a mano. Repasa poco y seguido." />
+          <HelpHint k="repaso" />
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {totalDue === 0 ? "Nada pendiente hoy. 👌" : `${totalDue} tarjeta(s) para hoy en total.`}

@@ -97,7 +97,7 @@ export function UpdatesFeed({ items, title = "Últimas actualizaciones" }: { ite
       <CardHeader>
         <CardTitle className="flex items-center gap-1.5">
           {title}
-          <HelpHint text="Notas de bitácora, subtareas completadas, proyectos nuevos y apuntes de clase trabajados, en orden. Toca una fila para abrir su proyecto o módulo. Debajo, titilando, aparece lo que sigue." />
+          <HelpHint k="feed" />
         </CardTitle>
       </CardHeader>
       <CardContent>

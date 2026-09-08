@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HelpHint } from "@/components/help-hint";
 import { formatDateTime } from "@/lib/utils";
 
 export type NoteView = {
@@ -94,7 +95,10 @@ export function NotesLog({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bitácora</CardTitle>
+        <CardTitle className="flex items-center gap-1.5">
+          Bitácora
+          <HelpHint k="bitacora" />
+        </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <form

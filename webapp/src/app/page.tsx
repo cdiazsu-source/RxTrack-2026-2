@@ -94,7 +94,7 @@ export default async function SemesterPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-1.5">
               Ahora
-              <HelpHint text="Lo más cercano en el tiempo, de todas las asignaturas. Máximo 3, para no abrumar." />
+              <HelpHint k="ahora" />
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">

@@ -6,6 +6,7 @@ import { buildFeed } from "@/lib/feed";
 import { ProjectCard, type ProjectCardView } from "@/components/project-card";
 import { NewProjectForm } from "@/components/new-project-form";
 import { UpdatesFeed } from "@/components/updates-feed";
+import { HelpHint } from "@/components/help-hint";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,11 @@ export default async function ProjectsPage({ params }: { params: { subject: stri
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm text-muted-foreground">
+      <h1 className="flex items-center gap-1.5 text-xl font-bold">
+        Proyectos
+        <HelpHint k="proyectos" />
+      </h1>
+      <p className="-mt-3 text-sm text-muted-foreground">
         Entregables, informes, parciales a preparar, producto final. Cada uno con su checklist, su bitácora y su estado.
       </p>
 

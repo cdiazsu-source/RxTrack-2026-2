@@ -35,7 +35,7 @@ export function EvaluationPanel({ subjectId, items }: { subjectId: string; items
         <CardTitle className="flex items-center gap-1.5">
           Evaluación
           <span className="font-normal text-muted-foreground">({totalWeight}%)</span>
-          <HelpHint text="Registra la nota (0 a 5) de cada componente a medida que las recibas. Se calcula la nota acumulada y, si mantienes el promedio, la proyección final. Nada de esto lo toca el db:seed." />
+          <HelpHint k="evaluacion" />
         </CardTitle>
         {canEdit && (
           <Button size="sm" variant="outline" onClick={() => setAdding((s) => !s)}>
