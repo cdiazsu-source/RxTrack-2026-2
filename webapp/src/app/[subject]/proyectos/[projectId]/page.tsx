@@ -5,6 +5,7 @@ import { ArrowLeft, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSubjectBySlug } from "@/lib/subjects";
 import { canEdit } from "@/lib/session";
+import { PEOPLE } from "@/lib/auth";
 import { deleteProject, setProjectDriveUrl } from "@/lib/actions/projects";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,10 @@ export default async function ProjectDetailPage({
     where: { id: params.projectId, subjectId: subject.id },
     include: {
       checklistItems: { orderBy: { order: "asc" } },
-      notes: { orderBy: { createdAt: "desc" } },
+      notes: {
+        orderBy: { createdAt: "desc" },
+        include: { checklistItem: { select: { text: true, done: true } } },
+      },
     },
   });
   if (!project) notFound();
@@ -40,7 +44,12 @@ export default async function ProjectDetailPage({
     author: n.author,
     authorRole: n.authorRole,
     createdAt: n.createdAt.toISOString(),
+    checklistItemId: n.checklistItemId,
+    checklistItemText: n.checklistItem?.text ?? null,
+    checklistItemDone: n.checklistItem?.done ?? false,
+    mentions: n.mentions,
   }));
+  const checkItems = project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done }));
 
   return (
     <div className="flex flex-col gap-5">
@@ -79,7 +88,7 @@ export default async function ProjectDetailPage({
         items={project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done, order: c.order }))}
       />
 
-      <NotesLog projectId={project.id} notes={notes} />
+      <NotesLog projectId={project.id} notes={notes} checklistItems={checkItems} people={PEOPLE} />
     </div>
   );
 }

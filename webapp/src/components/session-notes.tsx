@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HelpHint } from "@/components/help-hint";
 import { PromptBox } from "@/components/prompt-box";
 import { DriveLinkEditor } from "@/components/drive-link-editor";
-import { useCanEdit } from "@/components/access-context";
+import { useCanContribute } from "@/components/access-context";
 import { renderCornell } from "@/lib/markdown-lite";
 import { cornellPrompt } from "@/lib/prompts";
 import { cn, formatDate } from "@/lib/utils";
@@ -344,7 +344,7 @@ export function SessionNotes({
   moduleTitle: string;
   sessions: SessionView[];
 }) {
-  const canEdit = useCanEdit();
+  const canEdit = useCanContribute();
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const sorted = [...sessions].sort((a, b) => (a.number ?? 0) - (b.number ?? 0) || a.id.localeCompare(b.id));

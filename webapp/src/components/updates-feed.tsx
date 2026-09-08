@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, AtSign, Check, FolderPlus, ListChecks } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
@@ -11,6 +11,10 @@ export type NoteFeedItem = {
   id: string;
   body: string;
   author: string;
+  authorRole?: string | null;
+  mentions?: string[];
+  checklistItemText?: string | null;
+  checklistItemDone?: boolean;
   at: string;
   parentKey: string;
   parentLabel: string;
@@ -31,14 +35,43 @@ export type CheckFeedItem = {
   total: number;
 };
 
-export type FeedItem = NoteFeedItem | CheckFeedItem;
+export type ProjectFeedItem = {
+  kind: "project";
+  id: string;
+  title: string;
+  at: string;
+  parentKey: string;
+  parentLabel: string;
+  parentHref: string;
+};
 
-function ParentLink({ href, label }: { href: string; label: string }) {
+export type FeedItem = NoteFeedItem | CheckFeedItem | ProjectFeedItem;
+
+/** Cada entrada del feed es un enlace a su proyecto/módulo: toda la fila es
+ *  clickeable, no solo el título. */
+function RowLink({
+  href,
+  accent,
+  children,
+}: {
+  href: string;
+  accent: string;
+  children: React.ReactNode;
+}) {
   return (
-    <Link href={href} className="text-xs font-semibold text-primary hover:underline">
-      {label}
-    </Link>
+    <li>
+      <Link
+        href={href}
+        className={`block rounded-r-md border-l-2 ${accent} py-1.5 pl-3 pr-1 transition-colors hover:bg-muted/60`}
+      >
+        {children}
+      </Link>
+    </li>
   );
+}
+
+function ParentTitle({ label }: { label: string }) {
+  return <span className="block truncate text-xs font-semibold text-primary">{label}</span>;
 }
 
 export function UpdatesFeed({ items, title = "Últimas actualizaciones" }: { items: FeedItem[]; title?: string }) {
@@ -49,34 +82,65 @@ export function UpdatesFeed({ items, title = "Últimas actualizaciones" }: { ite
       <CardHeader>
         <CardTitle className="flex items-center gap-1.5">
           {title}
-          <HelpHint text="Notas de bitácora y subtareas completadas, en orden. Bajo una subtarea completada, titilando, aparece la que sigue en ese proyecto o módulo." />
+          <HelpHint text="Notas de bitácora, subtareas completadas y proyectos nuevos, en orden. Toca una fila para abrir su proyecto o módulo. Bajo una subtarea completada, titilando, aparece la que sigue." />
         </CardTitle>
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground">Todavía no hay actividad registrada.</p>
         ) : (
-          <ul className="flex flex-col gap-4">
+          <ul className="-mr-1 flex max-h-[34rem] flex-col gap-3 overflow-y-auto pr-1">
             {items.map((item) => {
               if (item.kind === "note") {
                 return (
-                  <li key={item.id} className="border-l-2 border-primary/30 pl-3">
-                    <ParentLink href={item.parentHref} label={item.parentLabel} />
-                    <p className="mt-0.5 whitespace-pre-line text-sm leading-snug">{item.body}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {[item.author, formatDateTime(item.at)].filter(Boolean).join(" · ")}
+                  <RowLink key={item.id} href={item.parentHref} accent="border-primary/30">
+                    <ParentTitle label={item.parentLabel} />
+                    {item.checklistItemText && (
+                      <span className="mt-0.5 flex items-start gap-1 text-xs text-primary/90">
+                        <ListChecks className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+                        <span className={item.checklistItemDone ? "line-through" : undefined}>
+                          {item.checklistItemText}
+                        </span>
+                      </span>
+                    )}
+                    <p className="mt-0.5 line-clamp-4 whitespace-pre-line break-words text-sm leading-snug">
+                      {item.body}
                     </p>
-                  </li>
+                    {item.mentions && item.mentions.length > 0 && (
+                      <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
+                        <AtSign className="h-3 w-3 shrink-0" aria-hidden />
+                        {item.mentions.join(", ")}
+                      </p>
+                    )}
+                    <p className="mt-1 truncate text-xs text-muted-foreground">
+                      {[item.author, item.authorRole, formatDateTime(item.at)].filter(Boolean).join(" · ")}
+                    </p>
+                  </RowLink>
                 );
               }
+
+              if (item.kind === "project") {
+                return (
+                  <RowLink key={item.id} href={item.parentHref} accent="border-primary/30">
+                    <p className="flex items-start gap-1.5 text-sm leading-snug">
+                      <FolderPlus className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
+                      <span className="min-w-0 break-words">
+                        Proyecto nuevo: <span className="font-medium">{item.title}</span>
+                      </span>
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(item.at)}</p>
+                  </RowLink>
+                );
+              }
+
               const showNext = !nextShownFor.has(item.parentKey);
               if (showNext) nextShownFor.add(item.parentKey);
               return (
-                <li key={item.id} className="border-l-2 border-success/40 pl-3">
-                  <ParentLink href={item.parentHref} label={item.parentLabel} />
+                <RowLink key={item.id} href={item.parentHref} accent="border-success/40">
+                  <ParentTitle label={item.parentLabel} />
                   <p className="mt-0.5 flex items-start gap-1.5 text-sm leading-snug">
                     <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" aria-hidden />
-                    <span>
+                    <span className="min-w-0 break-words">
                       Subtarea completada:{" "}
                       <span className="text-muted-foreground line-through">{item.text}</span>
                     </span>
@@ -96,7 +160,7 @@ export function UpdatesFeed({ items, title = "Últimas actualizaciones" }: { ite
                   {showNext && !item.nextText && item.allDone && (
                     <p className="mt-2 text-xs font-medium text-success">✓ Checklist completo.</p>
                   )}
-                </li>
+                </RowLink>
               );
             })}
           </ul>

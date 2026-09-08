@@ -37,6 +37,9 @@ const ACCOUNTS: Account[] = [
   },
 ];
 
+/** Nombres de las personas con cuenta — para @menciones en la bitácora. */
+export const PEOPLE = ACCOUNTS.map((a) => a.profile.name);
+
 const SECRET = process.env.AUTH_SECRET || "rxtrack-dev-secret-cambiar-en-vercel";
 
 const enc = new TextEncoder();

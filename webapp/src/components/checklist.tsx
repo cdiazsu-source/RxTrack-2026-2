@@ -19,7 +19,7 @@ import { HelpHint } from "@/components/help-hint";
 import { toast } from "@/components/ui/toast";
 import { clearDraft, loadDraft, saveDraft } from "@/lib/draft";
 import { cn } from "@/lib/utils";
-import { useCanEdit } from "@/components/access-context";
+import { useCanContribute } from "@/components/access-context";
 
 export type ChecklistItemView = { id: string; text: string; done: boolean; order: number };
 
@@ -35,7 +35,7 @@ function Row({
   /** TDAH — criterio 1: la ÚNICA subtarea pendiente que toca ahora. */
   isNext: boolean;
 }) {
-  const canEdit = useCanEdit();
+  const canEdit = useCanContribute();
   const [editing, setEditing] = useState(false);
   const [pending, start] = useTransition();
   // Optimista: la casilla responde al instante y luego confirma con el servidor.
@@ -200,7 +200,7 @@ export function Checklist({
   items: ChecklistItemView[];
   title?: string;
 }) {
-  const canEdit = useCanEdit();
+  const canEdit = useCanContribute();
   const [showForm, setShowForm] = useState(false);
   const sorted = [...items].sort((a, b) => a.order - b.order);
   const done = sorted.filter((i) => i.done).length;

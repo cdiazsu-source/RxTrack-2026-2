@@ -171,6 +171,9 @@ model ChecklistItem {
   done        Boolean    @default(false)
   order       Int
 
+  /// Notas de bitácora que el autor vinculó a esta subtarea.
+  notes ProjectNote[] @relation("NoteChecklistItem")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -263,10 +266,19 @@ model ProjectNote {
   author     String
   authorRole String?
 
+  /// Subtarea del checklist a la que se refiere la nota, si el autor la vinculó.
+  /// Al borrar la subtarea la nota queda como nota general del proyecto.
+  checklistItemId String?
+  checklistItem   ChecklistItem? @relation("NoteChecklistItem", fields: [checklistItemId], references: [id], onDelete: SetNull)
+
+  /// Nombres de las personas mencionadas ("Cesar" | "Diana"). Sin FK: son 2.
+  mentions String[] @default([])
+
   createdAt DateTime @default(now())
 
   @@index([projectId])
   @@index([createdAt])
+  @@index([checklistItemId])
 }
 
 /// subjectId siempre; moduleId opcional (cross-link blando, como en el borrador).

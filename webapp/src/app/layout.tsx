@@ -5,7 +5,7 @@ import { SiteNav } from "@/components/site-nav";
 import { PwaRegister } from "@/components/pwa-register";
 import { Toaster } from "@/components/ui/toast";
 import { AccessProvider } from "@/components/access-context";
-import { canEdit } from "@/lib/session";
+import { canEdit, canContribute } from "@/lib/session";
 import { listSubjects } from "@/lib/subjects";
 import { prisma } from "@/lib/prisma";
 
@@ -32,8 +32,9 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [editable, subjects, inboxCount] = await Promise.all([
+  const [editable, contributor, subjects, inboxCount] = await Promise.all([
     canEdit(),
+    canContribute(),
     listSubjects(),
     prisma.inboxItem.count({ where: { triagedAt: null } }).catch(() => 0),
   ]);
@@ -42,7 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="es" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <AccessProvider canEdit={editable}>
+        <AccessProvider canEdit={editable} canContribute={contributor}>
           <SiteNav canEdit={editable} subjects={navSubjects} inboxCount={inboxCount} />
           <main className="page-enter mx-auto max-w-6xl px-5 py-8">{children}</main>
           <Toaster />

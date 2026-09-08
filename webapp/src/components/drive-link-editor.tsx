@@ -5,7 +5,7 @@ import { ExternalLink, Link2, Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCanEdit } from "@/components/access-context";
+import { useCanContribute } from "@/components/access-context";
 
 /**
  * Editor de un enlace (carpeta de Drive, PDF). `action` es una server action que
@@ -20,7 +20,7 @@ export function DriveLinkEditor({
   action: (formData: FormData) => Promise<void>;
   label?: string;
 }) {
-  const canEdit = useCanEdit();
+  const canEdit = useCanContribute();
   const [editing, setEditing] = useState(false);
 
   if (editing && canEdit) {

@@ -3,8 +3,9 @@ import type { FeedItem } from "@/components/updates-feed";
 
 /**
  * "Últimas actualizaciones": mezcla notas de bitácora + subtareas completadas
- * (de proyectos Y de módulos), ordenadas por fecha. Para cada subtarea
- * completada calcula la barra del padre y la siguiente pendiente ("lo que sigue").
+ * (de proyectos Y de módulos) + creación de proyectos, ordenado por fecha. Para
+ * cada subtarea completada calcula la barra del padre y la siguiente pendiente
+ * ("lo que sigue"). Cada entrada enlaza a su proyecto/módulo.
  *
  * Si `subjectId` se pasa, filtra a esa asignatura; si no, es el feed cruzado.
  */
@@ -17,7 +18,7 @@ export async function buildFeed(opts: { subjectId?: string; limit?: number }): P
     ? { done: true, OR: [{ project: { subjectId: sid } }, { module: { subjectId: sid } }] }
     : { done: true };
 
-  const [notes, doneItems, subjects] = await Promise.all([
+  const [notes, doneItems, subjects, newProjects] = await Promise.all([
     prisma.projectNote.findMany({
       where: noteWhere,
       orderBy: { createdAt: "desc" },
@@ -26,7 +27,10 @@ export async function buildFeed(opts: { subjectId?: string; limit?: number }): P
         id: true,
         body: true,
         author: true,
+        authorRole: true,
+        mentions: true,
         createdAt: true,
+        checklistItem: { select: { text: true, done: true } },
         project: { select: { id: true, title: true, subject: { select: { id: true } } } },
       },
     }),
@@ -45,6 +49,14 @@ export async function buildFeed(opts: { subjectId?: string; limit?: number }): P
       },
     }),
     prisma.subject.findMany({ select: { id: true, code: true } }),
+    // Solo proyectos creados a mano (isManual): los sembrados por el seed no son
+    // "actividad" y llegarían todos con la misma fecha.
+    prisma.project.findMany({
+      where: sid ? { isManual: true, subjectId: sid } : { isManual: true },
+      orderBy: { createdAt: "desc" },
+      take: 15,
+      select: { id: true, title: true, subjectId: true, createdAt: true },
+    }),
   ]);
 
   const codeOf = new Map(subjects.map((s) => [s.id, s.code]));
@@ -74,6 +86,10 @@ export async function buildFeed(opts: { subjectId?: string; limit?: number }): P
     id: n.id,
     body: n.body,
     author: n.author,
+    authorRole: n.authorRole,
+    mentions: n.mentions,
+    checklistItemText: n.checklistItem?.text ?? null,
+    checklistItemDone: n.checklistItem?.done ?? false,
     at: n.createdAt.toISOString(),
     parentKey: `p:${n.project.id}`,
     parentLabel: `${codeOf.get(n.project.subject.id) ?? ""} · ${n.project.title}`,
@@ -104,7 +120,17 @@ export async function buildFeed(opts: { subjectId?: string; limit?: number }): P
     };
   });
 
-  return [...noteItems, ...checkItems]
+  const projectItems: FeedItem[] = newProjects.map((p) => ({
+    kind: "project" as const,
+    id: `project-${p.id}`,
+    title: p.title,
+    at: p.createdAt.toISOString(),
+    parentKey: `p:${p.id}`,
+    parentLabel: `${codeOf.get(p.subjectId) ?? ""} · ${p.title}`,
+    parentHref: `/${p.subjectId}/proyectos/${p.id}`,
+  }));
+
+  return [...noteItems, ...checkItems, ...projectItems]
     .sort((a, b) => +new Date(b.at) - +new Date(a.at))
     .slice(0, limit);
 }

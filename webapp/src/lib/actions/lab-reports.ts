@@ -3,7 +3,7 @@
 import type { LabReportStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { blockedForRead } from "@/lib/session";
+import { blockedForRead, blockedForContribute } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
 
@@ -65,7 +65,7 @@ export async function setLabReportGrade(id: string, formData: FormData) {
 }
 
 export async function setLabReportDriveUrl(id: string, formData: FormData) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   const driveUrl = String(formData.get("driveUrl") ?? "").trim() || null;
   await prisma.labReport.update({ where: { id }, data: { driveUrl } });
   revalidateAll();

@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { blockedForRead } from "@/lib/session";
+import { blockedForContribute } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
 
@@ -39,7 +39,7 @@ async function subjectIdOfItem(itemId: string): Promise<string | null> {
 }
 
 export async function addChecklistItem(parent: ChecklistParent, formData: FormData) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   const text = String(formData.get("text") ?? "").trim();
   if (!text) return;
 
@@ -63,7 +63,7 @@ export async function addChecklistItem(parent: ChecklistParent, formData: FormDa
 }
 
 export async function toggleChecklistItem(itemId: string, done: boolean) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   await prisma.checklistItem.update({ where: { id: itemId }, data: { done } });
   const sid = await subjectIdOfItem(itemId);
   if (sid) await touchSubject(sid);
@@ -71,7 +71,7 @@ export async function toggleChecklistItem(itemId: string, done: boolean) {
 }
 
 export async function updateChecklistItem(itemId: string, formData: FormData) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   const text = String(formData.get("text") ?? "").trim();
   if (!text) return;
   await prisma.checklistItem.update({ where: { id: itemId }, data: { text } });
@@ -79,13 +79,13 @@ export async function updateChecklistItem(itemId: string, formData: FormData) {
 }
 
 export async function deleteChecklistItem(itemId: string) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   await prisma.checklistItem.delete({ where: { id: itemId } });
   revalidateAll();
 }
 
 export async function moveChecklistItem(itemId: string, dir: "up" | "down") {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   const item = await prisma.checklistItem.findUnique({
     where: { id: itemId },
     select: { moduleId: true, projectId: true, labReportId: true },

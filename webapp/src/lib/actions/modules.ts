@@ -3,7 +3,7 @@
 import type { ModuleStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { blockedForRead } from "@/lib/session";
+import { blockedForRead, blockedForContribute } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
 
@@ -21,7 +21,7 @@ export async function setModuleStatus(moduleId: string, status: ModuleStatus) {
 }
 
 export async function setModuleDriveUrl(moduleId: string, formData: FormData) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   const driveUrl = String(formData.get("driveUrl") ?? "").trim();
   await prisma.module.update({ where: { id: moduleId }, data: { driveUrl: driveUrl || null } });
   revalidateAll();

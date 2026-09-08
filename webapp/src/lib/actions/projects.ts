@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import type { ProjectStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { blockedForRead } from "@/lib/session";
+import { blockedForRead, blockedForContribute } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
 
@@ -50,7 +50,7 @@ export async function updateProject(projectId: string, formData: FormData) {
 }
 
 export async function setProjectDriveUrl(projectId: string, formData: FormData) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   const driveUrl = String(formData.get("driveUrl") ?? "").trim();
   await prisma.project.update({ where: { id: projectId }, data: { driveUrl: driveUrl || null } });
   revalidateAll();

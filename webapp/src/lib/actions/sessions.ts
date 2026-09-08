@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { blockedForRead } from "@/lib/session";
+import { blockedForContribute } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
 import { parseDateInput } from "@/lib/utils";
@@ -25,7 +25,7 @@ function readSession(formData: FormData) {
 }
 
 export async function addSession(moduleId: string, formData: FormData) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   const d = readSession(formData);
   if (!d.topic && !d.content && !d.transcript) return;
 
@@ -38,7 +38,7 @@ export async function addSession(moduleId: string, formData: FormData) {
 }
 
 export async function updateSession(sessionId: string, formData: FormData) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   const d = readSession(formData);
   const session = await prisma.session.update({
     where: { id: sessionId },
@@ -50,14 +50,14 @@ export async function updateSession(sessionId: string, formData: FormData) {
 }
 
 export async function setSessionSlidesUrl(sessionId: string, formData: FormData) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   const url = String(formData.get("driveUrl") ?? "").trim();
   await prisma.session.update({ where: { id: sessionId }, data: { slidesUrl: url || null } });
   revalidateAll();
 }
 
 export async function deleteSession(sessionId: string) {
-  if (await blockedForRead()) return;
+  if (await blockedForContribute()) return;
   await prisma.session.delete({ where: { id: sessionId } });
   revalidateAll();
 }

@@ -2,13 +2,27 @@
 
 import { createContext, useContext } from "react";
 
-/** true = perfil "full" (edita todo). false = perfil "read" (solo lectura). */
-const CanEditContext = createContext(false);
+/**
+ * - `canEdit`: perfil "full" (Cesar). Edita todo.
+ * - `canContribute`: cualquier sesión válida (incluye "read" / Diana). Solo abre
+ *   las áreas colaborativas: enlaces de Drive, checklists, sesiones/transcripciones.
+ */
+type Access = { canEdit: boolean; canContribute: boolean };
 
-export function AccessProvider({ canEdit, children }: { canEdit: boolean; children: React.ReactNode }) {
-  return <CanEditContext.Provider value={canEdit}>{children}</CanEditContext.Provider>;
+const AccessCtx = createContext<Access>({ canEdit: false, canContribute: false });
+
+export function AccessProvider({
+  canEdit,
+  canContribute,
+  children,
+}: Access & { children: React.ReactNode }) {
+  return <AccessCtx.Provider value={{ canEdit, canContribute }}>{children}</AccessCtx.Provider>;
 }
 
 export function useCanEdit() {
-  return useContext(CanEditContext);
+  return useContext(AccessCtx).canEdit;
+}
+
+export function useCanContribute() {
+  return useContext(AccessCtx).canContribute;
 }
