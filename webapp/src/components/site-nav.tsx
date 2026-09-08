@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Inbox, Layers, LogOut } from "lucide-react";
+import { CalendarDays, Eye, Inbox, Layers, LogOut } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { logout } from "@/lib/actions/auth";
+import { startViewAs, stopViewAs } from "@/lib/actions/view-as";
 import { SubjectSwitcher, type SwitcherSubject } from "@/components/subject-switcher";
 import { SearchDialog } from "@/components/search-dialog";
 import { QuickCapture } from "@/components/quick-capture";
@@ -17,10 +18,16 @@ export function SiteNav({
   canEdit,
   subjects,
   inboxCount,
+  realFull = false,
+  viewingAs = false,
 }: {
   canEdit: boolean;
   subjects: SwitcherSubject[];
   inboxCount: number;
+  /** Nivel real "full" (Cesar), aunque esté viendo como Diana. */
+  realFull?: boolean;
+  /** Cesar está en modo "ver como Diana". */
+  viewingAs?: boolean;
 }) {
   const pathname = usePathname();
   if (pathname === "/login") return null;
@@ -68,11 +75,40 @@ export function SiteNav({
           </span>
           <SearchDialog />
           <QuickCapture />
-          {!canEdit && (
-            <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
-              Lectura
-            </span>
+
+          {viewingAs ? (
+            <form action={stopViewAs}>
+              <button
+                type="submit"
+                className="press inline-flex items-center gap-1.5 rounded-full bg-warning px-2.5 py-1 text-xs font-semibold text-warning-foreground"
+                title="Volver a tu vista de Cesar"
+              >
+                <Eye className="h-3.5 w-3.5" />
+                Viendo como Diana — volver
+              </button>
+            </form>
+          ) : (
+            <>
+              {!canEdit && (
+                <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+                  Lectura
+                </span>
+              )}
+              {realFull && (
+                <form action={startViewAs}>
+                  <button
+                    type="submit"
+                    className="press inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                    title="Ver la interfaz como la ve Diana"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Ver como Diana</span>
+                  </button>
+                </form>
+              )}
+            </>
           )}
+
           <form action={logout}>
             <button
               type="submit"

@@ -2,17 +2,35 @@ import { cookies } from "next/headers";
 
 import { type AccessLevel, SESSION_COOKIE, verifyToken } from "@/lib/auth";
 
+/** Cookie de "ver como Diana": Cesar baja su nivel efectivo a "read" para
+ *  revisar la interfaz tal como la ve ella. */
+export const VIEW_AS_COOKIE = "rxtrack_view_as";
+
 export type Session =
-  | { authed: true; level: AccessLevel; name: string }
+  | { authed: true; level: AccessLevel; name: string; viewingAs: boolean }
   | { authed: false };
 
-/** Sesión actual (server components / server actions). */
+/** Sesión actual (server components / server actions). Aplica "ver como Diana". */
 export async function getSession(): Promise<Session> {
   const profile = await verifyToken(cookies().get(SESSION_COOKIE)?.value);
-  return profile ? { authed: true, level: profile.level, name: profile.name } : { authed: false };
+  if (!profile) return { authed: false };
+  const viewingAs = profile.level === "full" && cookies().get(VIEW_AS_COOKIE)?.value === "read";
+  return {
+    authed: true,
+    level: viewingAs ? "read" : profile.level,
+    name: viewingAs ? "Diana" : profile.name,
+    viewingAs,
+  };
 }
 
-/** ¿La sesión puede editar? Solo el perfil "full". */
+/** Nivel REAL del token, sin aplicar "ver como Diana". Para saber si mostrar el
+ *  botón de vista previa y para permitir salir de ella. */
+export async function realLevel(): Promise<AccessLevel | null> {
+  const profile = await verifyToken(cookies().get(SESSION_COOKIE)?.value);
+  return profile?.level ?? null;
+}
+
+/** ¿La sesión puede editar? Solo el perfil "full" (y no en modo vista). */
 export async function canEdit(): Promise<boolean> {
   const s = await getSession();
   return s.authed && s.level === "full";

@@ -5,7 +5,7 @@ import { SiteNav } from "@/components/site-nav";
 import { PwaRegister } from "@/components/pwa-register";
 import { Toaster } from "@/components/ui/toast";
 import { AccessProvider } from "@/components/access-context";
-import { canEdit, canContribute } from "@/lib/session";
+import { canEdit, canContribute, getSession, realLevel } from "@/lib/session";
 import { listSubjects } from "@/lib/subjects";
 import { prisma } from "@/lib/prisma";
 
@@ -32,19 +32,29 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [editable, contributor, subjects, inboxCount] = await Promise.all([
+  const [editable, contributor, session, realLvl, subjects, inboxCount] = await Promise.all([
     canEdit(),
     canContribute(),
+    getSession(),
+    realLevel(),
     listSubjects(),
     prisma.inboxItem.count({ where: { triagedAt: null } }).catch(() => 0),
   ]);
   const navSubjects = subjects.map((s) => ({ id: s.id, code: s.code, name: s.name }));
+  const viewingAs = session.authed && session.viewingAs;
+  const realFull = realLvl === "full";
 
   return (
     <html lang="es" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
         <AccessProvider canEdit={editable} canContribute={contributor}>
-          <SiteNav canEdit={editable} subjects={navSubjects} inboxCount={inboxCount} />
+          <SiteNav
+            canEdit={editable}
+            subjects={navSubjects}
+            inboxCount={inboxCount}
+            realFull={realFull}
+            viewingAs={viewingAs}
+          />
           <main className="page-enter mx-auto max-w-6xl px-5 py-8">{children}</main>
           <Toaster />
           <PwaRegister />

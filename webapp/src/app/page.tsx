@@ -1,10 +1,11 @@
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
+import { getSession, canEdit } from "@/lib/session";
 import { listSubjects } from "@/lib/subjects";
 import { getSubjectProgress } from "@/lib/queries";
 import { buildFeed } from "@/lib/feed";
+import { TasksPanel, type TaskView, type TaskSubjectRef } from "@/components/tasks-panel";
 import { tickStreak } from "@/lib/actions/semester";
 import { pct, semesterProgress, nextStreakMilestone } from "@/lib/progress";
 import { relativeDays, urgencyOf, daysFromToday } from "@/lib/relative-time";
@@ -19,9 +20,9 @@ import { cn } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function SemesterPage() {
-  const [session, subjects] = await Promise.all([getSession(), listSubjects()]);
+  const [session, subjects, canManageTasks] = await Promise.all([getSession(), listSubjects(), canEdit()]);
 
-  const [progressBySubject, meta, feed, allDates, streakDays] = await Promise.all([
+  const [progressBySubject, meta, feed, allDates, streakDays, taskRows, taskModules] = await Promise.all([
     Promise.all(subjects.map((s) => getSubjectProgress(s.id))),
     prisma.semesterMeta.findUnique({ where: { id: "singleton" } }),
     buildFeed({ limit: 18 }),
@@ -31,7 +32,25 @@ export default async function SemesterPage() {
       select: { id: true, name: true, date: true, subject: { select: { id: true, code: true } } },
     }),
     tickStreak().catch(() => 0),
+    prisma.assignedTask.findMany({ orderBy: [{ status: "asc" }, { createdAt: "desc" }] }),
+    prisma.module.findMany({ orderBy: { order: "asc" }, select: { id: true, title: true, subjectId: true } }),
   ]);
+
+  const tasks: TaskView[] = taskRows.map((t) => ({
+    id: t.id,
+    title: t.title,
+    detail: t.detail,
+    status: t.status,
+    subjectId: t.subjectId,
+    moduleId: t.moduleId,
+  }));
+  const taskSubjects: TaskSubjectRef[] = subjects.map((s) => ({
+    id: s.id,
+    code: s.code,
+    name: s.name,
+    modules: taskModules.filter((m) => m.subjectId === s.id).map((m) => ({ id: m.id, title: m.title })),
+  }));
+  const showTasks = canManageTasks || tasks.some((t) => t.status !== "HECHA");
 
   const semPct = pct(semesterProgress(progressBySubject));
   const showStreak = meta?.showStreak ?? true;
@@ -51,6 +70,8 @@ export default async function SemesterPage() {
       )}
 
       <ResumeBanner route={meta?.resumeRoute ?? null} label={meta?.resumeLabel ?? null} note={meta?.resumeNote ?? null} />
+
+      {showTasks && <TasksPanel tasks={tasks} canManage={canManageTasks} subjects={taskSubjects} />}
 
       <div className="grid gap-4 md:grid-cols-[auto_1fr]">
         <Card>

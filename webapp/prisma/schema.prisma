@@ -431,6 +431,31 @@ model InboxItem {
   @@index([triagedAt])
 }
 
+enum TaskStatus {
+  PENDIENTE
+  EN_CURSO
+  HECHA
+}
+
+/// Tarea que Cesar le asigna a Diana (p. ej. "extraer el texto de las
+/// diapositivas de la clase 3", "transcribir el audio con Buzz"). subjectId /
+/// moduleId son enlaces blandos (sin FK), como en KeyDate.
+model AssignedTask {
+  id        String     @id @default(cuid())
+  title     String
+  detail    String?    @db.Text
+  status    TaskStatus @default(PENDIENTE)
+  assignee  String     @default("Diana")
+  subjectId String?
+  moduleId  String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  doneAt    DateTime?
+
+  @@index([status])
+}
+
 /// Tarjeta de repaso con repetición espaciada (SM-2). Se puede generar
 /// automáticamente desde el glosario y las fórmulas, o crear a mano.
 /// front/back en Markdown.
