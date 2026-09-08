@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import type { FeedItem } from "@/components/updates-feed";
+import { SESSION_STATUS_LABEL, SESSION_STATUS_NEXT } from "@/lib/session-status";
 
 /**
  * "Últimas actualizaciones": mezcla notas de bitácora + subtareas completadas
- * (de proyectos Y de módulos) + creación de proyectos, ordenado por fecha. Para
- * cada subtarea completada calcula la barra del padre y la siguiente pendiente
- * ("lo que sigue"). Cada entrada enlaza a su proyecto/módulo.
+ * (de proyectos Y de módulos) + creación de proyectos + apuntes de clase
+ * trabajados, ordenado por fecha. Cada entrada enlaza a su proyecto/módulo y
+ * dice "qué sigue".
  *
  * Si `subjectId` se pasa, filtra a esa asignatura; si no, es el feed cruzado.
  */
@@ -18,7 +19,7 @@ export async function buildFeed(opts: { subjectId?: string; limit?: number }): P
     ? { done: true, OR: [{ project: { subjectId: sid } }, { module: { subjectId: sid } }] }
     : { done: true };
 
-  const [notes, doneItems, subjects, newProjects] = await Promise.all([
+  const [notes, doneItems, subjects, newProjects, recentSessions] = await Promise.all([
     prisma.projectNote.findMany({
       where: noteWhere,
       orderBy: { createdAt: "desc" },
@@ -56,6 +57,22 @@ export async function buildFeed(opts: { subjectId?: string; limit?: number }): P
       orderBy: { createdAt: "desc" },
       take: 15,
       select: { id: true, title: true, subjectId: true, createdAt: true },
+    }),
+    // Apuntes de clase con actividad reciente.
+    prisma.session.findMany({
+      where: sid ? { module: { subjectId: sid } } : {},
+      orderBy: { updatedAt: "desc" },
+      take: 20,
+      select: {
+        id: true,
+        number: true,
+        topic: true,
+        status: true,
+        author: true,
+        updatedAt: true,
+        moduleId: true,
+        module: { select: { title: true, subjectId: true } },
+      },
     }),
   ]);
 
@@ -130,7 +147,22 @@ export async function buildFeed(opts: { subjectId?: string; limit?: number }): P
     parentHref: `/${p.subjectId}/proyectos/${p.id}`,
   }));
 
-  return [...noteItems, ...checkItems, ...projectItems]
+  const sessionItems: FeedItem[] = recentSessions.map((s) => ({
+    kind: "session" as const,
+    id: `session-${s.id}`,
+    number: s.number,
+    topic: s.topic,
+    status: s.status,
+    statusLabel: SESSION_STATUS_LABEL[s.status],
+    nextText: s.status === "REVISADA" ? null : SESSION_STATUS_NEXT[s.status],
+    author: s.author,
+    at: s.updatedAt.toISOString(),
+    parentKey: `m:${s.moduleId}`,
+    parentLabel: `${codeOf.get(s.module.subjectId) ?? ""} · ${s.module.title}`,
+    parentHref: `/${s.module.subjectId}/modulos/${s.moduleId}`,
+  }));
+
+  return [...noteItems, ...checkItems, ...projectItems, ...sessionItems]
     .sort((a, b) => +new Date(b.at) - +new Date(a.at))
     .slice(0, limit);
 }

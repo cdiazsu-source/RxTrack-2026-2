@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Check, ChevronRight } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getSubjectBySlug } from "@/lib/subjects";
-import { canEdit } from "@/lib/session";
+import { canEdit, getSession } from "@/lib/session";
 import { setModuleDriveUrl } from "@/lib/actions/modules";
 import { moduleProgress, pct } from "@/lib/progress";
 import { ModuleStatusSelect } from "@/components/module-status-select";
@@ -28,7 +28,7 @@ export default async function ModuleDetailPage({
   const subject = await getSubjectBySlug(params.subject);
   if (!subject) notFound();
 
-  const [mod, editable] = await Promise.all([
+  const [mod, editable, session, modGlossary, modFormulas] = await Promise.all([
     prisma.module.findFirst({
       where: { id: params.moduleId, subjectId: subject.id },
       include: {
@@ -40,6 +40,13 @@ export default async function ModuleDetailPage({
       },
     }),
     canEdit(),
+    getSession(),
+    prisma.glossaryTerm.findMany({ where: { moduleId: params.moduleId }, select: { term: true } }),
+    prisma.formula.findMany({
+      where: { moduleId: params.moduleId },
+      orderBy: { order: "asc" },
+      select: { name: true },
+    }),
   ]);
   if (!mod) notFound();
 
@@ -52,7 +59,9 @@ export default async function ModuleDetailPage({
     transcript: s.transcript,
     slidesUrl: s.slidesUrl,
     author: s.author,
+    status: s.status,
   }));
+  const authorName = session.authed ? session.name : "";
 
   // Progreso del módulo — mismo cálculo que el resto de la app (lib/progress.ts).
   const checklistDone = mod.checklistItems.filter((c) => c.done).length;
@@ -68,9 +77,20 @@ export default async function ModuleDetailPage({
   // TDAH — criterio 1: UNA sola acción siguiente, decidida por el sistema.
   const firstUndone = mod.checklistItems.find((c) => !c.done);
   const labPending = mod.hasLab && mod.labReportStatus !== "ENTREGADO" && mod.labReportStatus !== "CALIFICADO";
+  const pendingSession = mod.sessions.find((s) => s.status !== "REVISADA");
+  const SESSION_NEXT: Record<string, string> = {
+    CRUDA: "falta la transcripción",
+    TRANSCRITA: "falta generar los apuntes Cornell",
+    CORNELL_IA: "falta revisarlos",
+  };
   let nextAction: { label: string; href: string } | null = null;
   if (mod.sessions.length === 0) {
     nextAction = { label: "Escribe los apuntes de la primera sesión", href: "#apuntes" };
+  } else if (pendingSession) {
+    nextAction = {
+      label: `Sesión ${pendingSession.number ?? "?"} — ${SESSION_NEXT[pendingSession.status] ?? "revísala"}`,
+      href: "#apuntes",
+    };
   } else if (firstUndone) {
     nextAction = { label: `Marca la subtarea: ${firstUndone.text}`, href: "#checklist" };
   } else if (labPending) {
@@ -138,7 +158,15 @@ export default async function ModuleDetailPage({
       </details>
 
       <section id="apuntes" className="scroll-mt-24">
-        <SessionNotes moduleId={mod.id} subjectName={subject.name} moduleTitle={mod.title} sessions={sessions} />
+        <SessionNotes
+          moduleId={mod.id}
+          subjectName={subject.name}
+          moduleTitle={mod.title}
+          sessions={sessions}
+          defaultAuthor={authorName}
+          glossary={modGlossary.map((g) => g.term)}
+          formulas={modFormulas.map((f) => f.name)}
+        />
       </section>
 
       <section id="checklist" className="scroll-mt-24">

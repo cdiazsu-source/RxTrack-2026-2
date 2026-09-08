@@ -35,7 +35,20 @@ export function cornellPrompt(opts: {
   topic?: string;
   transcription?: string;
   slides?: string;
+  /** Términos del glosario del módulo (para que respete la terminología). */
+  glossary?: string[];
+  /** Fórmulas del módulo (por si aparecen en la clase). */
+  formulas?: string[];
+  /** Apuntes Cornell de la sesión anterior, para dar continuidad. */
+  previousCornell?: string;
 }): string {
+  const listBlock = (title: string, items?: string[]) =>
+    items && items.length ? `\n${title}:\n${items.map((x) => `- ${x}`).join("\n")}\n` : "";
+
+  const prev = opts.previousCornell?.trim()
+    ? `\nAPUNTES DE LA SESIÓN ANTERIOR (contexto, no los repitas; conéctalos si aplica):\n${opts.previousCornell.trim()}\n`
+    : "";
+
   return (
     `Eres un asistente de estudio experto en ${opts.subjectName}. A partir del ` +
     `material de una clase del módulo "${opts.moduleTitle}"` +
@@ -47,7 +60,12 @@ export function cornellPrompt(opts: {
     `#### 2. Tabla del método Cornell\n\n| Preguntas guía / palabras clave | Notas |\n| --- | --- |\n| ... | ... |\n\n` +
     `#### 3. Resumen sintético (3 a 5 oraciones)\n\n` +
     `#### 4. Tareas, laboratorios y pendientes\n* [ ] ...\n\n` +
-    `--- MATERIAL DE LA CLASE ---\n\n` +
+    `Respeta la terminología del glosario del módulo. Si mencionan una fórmula del ` +
+    `listado, inclúyela en las notas.\n` +
+    listBlock("Glosario del módulo", opts.glossary) +
+    listBlock("Fórmulas del módulo", opts.formulas) +
+    prev +
+    `\n--- MATERIAL DE LA CLASE ---\n\n` +
     `TRANSCRIPCIÓN:\n${opts.transcription?.trim() || "[pega aquí la transcripción de la clase]"}\n\n` +
     `DIAPOSITIVAS / NOTAS:\n${opts.slides?.trim() || "[pega aquí el texto de las diapositivas, si lo tienes]"}\n`
   );

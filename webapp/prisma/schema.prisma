@@ -134,26 +134,38 @@ model Exercise {
 
 /// Sesión de clase = apuntes en formato Cornell + transcripción, todo en Markdown.
 /// Las diapositivas NO se guardan: se enlazan a Drive (slidesUrl).
+/// Etapa del apunte de una clase, para saber "qué falta" de un vistazo.
+enum SessionStatus {
+  CRUDA // apuntes crudos, sin transcripción
+  TRANSCRITA // tiene transcripción, falta generar los apuntes Cornell
+  CORNELL_IA // apuntes Cornell generados con IA, sin revisar
+  REVISADA // revisada y lista para estudiar
+}
+
 model Session {
-  id         String    @id @default(cuid())
+  id         String        @id @default(cuid())
   moduleId   String
-  module     Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  module     Module        @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   number     Int?
   /// Fecha de la clase (no la de guardado).
   date       DateTime?
   topic      String
-  content    String    @db.Text
+  content    String        @db.Text
   /// Transcripción de la clase, en Markdown. Alimenta el prompt de apuntes.
-  transcript String?   @db.Text
+  transcript String?       @db.Text
   /// Enlace a las diapositivas de la clase (carpeta o archivo de Drive).
   slidesUrl  String?
   /// Snapshot de quién del grupo la subió.
   author     String?
+  /// Etapa del apunte. Sube sola al agregar transcripción/Cornell; "REVISADA"
+  /// se marca a mano y ya no baja.
+  status     SessionStatus @default(CRUDA)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([moduleId])
+  @@index([updatedAt])
 }
 
 /// Subtarea. Cuelga de un Module (entregables del temario) O de un Project

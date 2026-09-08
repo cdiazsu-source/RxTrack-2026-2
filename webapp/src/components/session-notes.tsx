@@ -2,9 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import type { SessionStatus } from "@prisma/client";
 import { toast } from "@/components/ui/toast";
 
-import { addSession, deleteSession, setSessionSlidesUrl, updateSession } from "@/lib/actions/sessions";
+import {
+  addSession,
+  deleteSession,
+  setSessionSlidesUrl,
+  setSessionStatus,
+  updateSession,
+} from "@/lib/actions/sessions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,32 +22,37 @@ import { DriveLinkEditor } from "@/components/drive-link-editor";
 import { useCanContribute } from "@/components/access-context";
 import { renderCornell } from "@/lib/markdown-lite";
 import { cornellPrompt } from "@/lib/prompts";
+import {
+  SESSION_STATUS_LABEL,
+  SESSION_STATUS_NEXT,
+  SESSION_STATUS_ORDER,
+  SESSION_STATUS_PILL,
+} from "@/lib/session-status";
 import { cn, formatDate } from "@/lib/utils";
 import { relativeDays } from "@/lib/relative-time";
 import { clearDraft, draftAge, loadDraft, saveDraft } from "@/lib/draft";
 
-// El apunte SIEMPRE lleva un nombre de usuario. Se recuerda el último y se
-// sugieren los ya usados (por ahora solo "Cesar Diaz Suarez").
-const DEFAULT_AUTHOR = "Cesar Diaz Suarez";
+// El apunte SIEMPRE lleva un nombre de usuario. Se precarga con la cuenta que
+// inició sesión (Cesar / Diana), se recuerda el último y se sugieren los usados.
 const LAST_AUTHOR_KEY = "rxtrack:lastAuthor";
 const AUTHORS_KEY = "rxtrack:authors";
 
-function loadKnownAuthors(): string[] {
+function loadKnownAuthors(fallback: string): string[] {
   try {
     const raw = localStorage.getItem(AUTHORS_KEY);
     const parsed: unknown = raw ? JSON.parse(raw) : null;
     const list = Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string" && x.trim() !== "") : [];
-    return list.includes(DEFAULT_AUTHOR) ? list : [DEFAULT_AUTHOR, ...list];
+    return list.includes(fallback) ? list : [fallback, ...list];
   } catch {
-    return [DEFAULT_AUTHOR];
+    return [fallback];
   }
 }
 
-function loadLastAuthor(): string {
+function loadLastAuthor(fallback: string): string {
   try {
-    return localStorage.getItem(LAST_AUTHOR_KEY) || DEFAULT_AUTHOR;
+    return localStorage.getItem(LAST_AUTHOR_KEY) || fallback;
   } catch {
-    return DEFAULT_AUTHOR;
+    return fallback;
   }
 }
 
@@ -49,7 +61,7 @@ function rememberAuthor(name: string): void {
   if (!n) return;
   try {
     localStorage.setItem(LAST_AUTHOR_KEY, n);
-    const known = loadKnownAuthors();
+    const known = loadKnownAuthors(n);
     if (!known.includes(n)) localStorage.setItem(AUTHORS_KEY, JSON.stringify([...known, n]));
   } catch {
     /* noop */
@@ -65,6 +77,7 @@ export type SessionView = {
   transcript: string | null;
   slidesUrl: string | null;
   author: string | null;
+  status: SessionStatus;
 };
 
 function SessionForm({
@@ -73,6 +86,9 @@ function SessionForm({
   moduleTitle,
   session,
   previous,
+  defaultAuthor,
+  glossary,
+  formulas,
   onDone,
 }: {
   moduleId: string;
@@ -81,6 +97,11 @@ function SessionForm({
   session?: SessionView;
   /** Última sesión guardada del módulo — se muestra al empezar una nueva. */
   previous?: SessionView;
+  /** Nombre de la cuenta que inició sesión (Cesar / Diana). */
+  defaultAuthor: string;
+  /** Glosario y fórmulas del módulo, para enriquecer el prompt Cornell. */
+  glossary: string[];
+  formulas: string[];
   onDone: () => void;
 }) {
   const draftKey = session ? `session:${session.id}` : `session:new:${moduleId}`;
@@ -103,9 +124,10 @@ function SessionForm({
     if (dt?.value && !(session?.topic ?? "")) setTopic(dt.value);
     const dtr = loadDraft(transcriptKey);
     if (dtr?.value && !(session?.transcript ?? "")) setTranscript(dtr.value);
-    // Usuario: obligatorio. En una sesión nueva se precarga el último usado.
-    setKnownAuthors(loadKnownAuthors());
-    if (!session) setAuthor((a) => a || loadLastAuthor());
+    // Usuario: obligatorio. En una sesión nueva se precarga la cuenta (o el
+    // último nombre usado en este navegador).
+    setKnownAuthors(loadKnownAuthors(defaultAuthor));
+    if (!session) setAuthor((a) => a || loadLastAuthor(defaultAuthor));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -205,7 +227,15 @@ function SessionForm({
       {showPrompt && (
         <PromptBox
           rows={10}
-          text={cornellPrompt({ subjectName, moduleTitle, topic, transcription: transcript })}
+          text={cornellPrompt({
+            subjectName,
+            moduleTitle,
+            topic,
+            transcription: transcript,
+            glossary,
+            formulas,
+            previousCornell: session ? undefined : previous?.content,
+          })}
         />
       )}
       <Textarea
@@ -261,14 +291,23 @@ function SessionArticle({
   return (
     <article className="rounded-md border border-border p-4">
       <header className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-        <h4 className="text-sm font-semibold">
-          {s.number ? `Sesión ${s.number} — ` : ""}
-          {s.topic}
+        <h4 className="flex items-center gap-2 text-sm font-semibold">
+          <span>
+            {s.number ? `Sesión ${s.number} — ` : ""}
+            {s.topic}
+          </span>
+          <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", SESSION_STATUS_PILL[s.status])}>
+            {SESSION_STATUS_LABEL[s.status]}
+          </span>
         </h4>
         <span className="text-xs text-muted-foreground">
           {[s.date ? formatDate(s.date) : null, s.author].filter(Boolean).join(" · ")}
         </span>
       </header>
+
+      {s.status !== "REVISADA" && (
+        <p className="mb-2 text-xs text-muted-foreground">Sigue: {SESSION_STATUS_NEXT[s.status]}.</p>
+      )}
 
       <div className="relative">
         <div
@@ -312,21 +351,40 @@ function SessionArticle({
       )}
 
       {canEdit && (
-        <div className="mt-3 flex gap-1">
-          <button type="button" onClick={onEdit} className="tap rounded-md text-muted-foreground hover:bg-accent" aria-label="Editar sesión">
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              deleteSession(s.id);
-              toast("Sesión eliminada", "info");
-            }}
-            className="tap rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-            aria-label="Eliminar sesión"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            Etapa
+            <select
+              value={s.status}
+              onChange={(e) => {
+                setSessionStatus(s.id, e.target.value as SessionStatus);
+                toast("Etapa actualizada");
+              }}
+              className="rounded-md border border-input bg-background px-2 py-1 text-xs text-foreground"
+            >
+              {SESSION_STATUS_ORDER.map((st) => (
+                <option key={st} value={st}>
+                  {SESSION_STATUS_LABEL[st]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span className="ml-auto flex gap-1">
+            <button type="button" onClick={onEdit} className="tap rounded-md text-muted-foreground hover:bg-accent" aria-label="Editar sesión">
+              <Pencil className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                deleteSession(s.id);
+                toast("Sesión eliminada", "info");
+              }}
+              className="tap rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              aria-label="Eliminar sesión"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </span>
         </div>
       )}
     </article>
@@ -338,24 +396,34 @@ export function SessionNotes({
   subjectName,
   moduleTitle,
   sessions,
+  defaultAuthor,
+  glossary = [],
+  formulas = [],
 }: {
   moduleId: string;
   subjectName: string;
   moduleTitle: string;
   sessions: SessionView[];
+  defaultAuthor: string;
+  glossary?: string[];
+  formulas?: string[];
 }) {
   const canEdit = useCanContribute();
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const sorted = [...sessions].sort((a, b) => (a.number ?? 0) - (b.number ?? 0) || a.id.localeCompare(b.id));
   const previous = sorted.length ? sorted[sorted.length - 1] : undefined;
+  const ready = sorted.filter((s) => s.status === "REVISADA").length;
 
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
         <CardTitle className="flex items-center gap-1.5">
           Apuntes
-          <span className="font-normal text-muted-foreground">({sorted.length})</span>
+          <span className="font-normal text-muted-foreground">
+            ({sorted.length}
+            {sorted.length > 0 ? ` · ${ready} lista${ready === 1 ? "" : "s"}` : ""})
+          </span>
           <HelpHint k="apuntes" />
         </CardTitle>
         {canEdit && !adding && (
@@ -372,6 +440,9 @@ export function SessionNotes({
             subjectName={subjectName}
             moduleTitle={moduleTitle}
             previous={previous}
+            defaultAuthor={defaultAuthor}
+            glossary={glossary}
+            formulas={formulas}
             onDone={() => setAdding(false)}
           />
         )}
@@ -390,6 +461,9 @@ export function SessionNotes({
               subjectName={subjectName}
               moduleTitle={moduleTitle}
               session={s}
+              defaultAuthor={defaultAuthor}
+              glossary={glossary}
+              formulas={formulas}
               onDone={() => setEditingId(null)}
             />
           ) : (

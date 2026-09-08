@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, AtSign, Check, FolderPlus, ListChecks } from "lucide-react";
+import { ArrowRight, AtSign, Check, FolderPlus, ListChecks, NotebookPen } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
@@ -45,7 +45,22 @@ export type ProjectFeedItem = {
   parentHref: string;
 };
 
-export type FeedItem = NoteFeedItem | CheckFeedItem | ProjectFeedItem;
+export type SessionFeedItem = {
+  kind: "session";
+  id: string;
+  number: number | null;
+  topic: string;
+  status: string;
+  statusLabel: string;
+  nextText: string | null;
+  author: string | null;
+  at: string;
+  parentKey: string;
+  parentLabel: string;
+  parentHref: string;
+};
+
+export type FeedItem = NoteFeedItem | CheckFeedItem | ProjectFeedItem | SessionFeedItem;
 
 /** Cada entrada del feed es un enlace a su proyecto/módulo: toda la fila es
  *  clickeable, no solo el título. */
@@ -82,7 +97,7 @@ export function UpdatesFeed({ items, title = "Últimas actualizaciones" }: { ite
       <CardHeader>
         <CardTitle className="flex items-center gap-1.5">
           {title}
-          <HelpHint text="Notas de bitácora, subtareas completadas y proyectos nuevos, en orden. Toca una fila para abrir su proyecto o módulo. Bajo una subtarea completada, titilando, aparece la que sigue." />
+          <HelpHint text="Notas de bitácora, subtareas completadas, proyectos nuevos y apuntes de clase trabajados, en orden. Toca una fila para abrir su proyecto o módulo. Debajo, titilando, aparece lo que sigue." />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -129,6 +144,33 @@ export function UpdatesFeed({ items, title = "Últimas actualizaciones" }: { ite
                       </span>
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(item.at)}</p>
+                  </RowLink>
+                );
+              }
+
+              if (item.kind === "session") {
+                return (
+                  <RowLink key={item.id} href={item.parentHref} accent="border-primary/30">
+                    <ParentTitle label={item.parentLabel} />
+                    <p className="mt-0.5 flex items-start gap-1.5 text-sm leading-snug">
+                      <NotebookPen className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
+                      <span className="min-w-0 break-words">
+                        {item.number != null ? `Sesión ${item.number} — ` : "Apunte — "}
+                        {item.topic}{" "}
+                        <span className="text-muted-foreground">· {item.statusLabel}</span>
+                      </span>
+                    </p>
+                    <p className="mt-1 truncate text-xs text-muted-foreground">
+                      {[item.author, formatDateTime(item.at)].filter(Boolean).join(" · ")}
+                    </p>
+                    {item.nextText && (
+                      <p className="rx-next mt-2 flex items-start gap-1.5 rounded-md px-2.5 py-2 text-xs font-semibold">
+                        <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
+                        <span>
+                          <span className="text-primary">Sigue:</span> {item.nextText}
+                        </span>
+                      </p>
+                    )}
                   </RowLink>
                 );
               }
