@@ -28,8 +28,8 @@ export function labPracticePrompt(opts: {
     items.length ? `\n${titulo}:\n${items.map((x) => `- ${x}`).join("\n")}\n` : "";
 
   return (
-    `Eres un asistente experto en Farmacotecnia y tecnología farmacéutica. Estoy ` +
-    `en la asignatura ${opts.subjectName}` +
+    `Eres un asistente experto en química farmacéutica y en prácticas de ` +
+    `laboratorio. Estoy en la asignatura ${opts.subjectName}` +
     (opts.moduleTitle ? ` (${opts.moduleTitle})` : "") +
     ` y voy a desarrollar la siguiente práctica de laboratorio. Úsala como ` +
     `contexto para responder lo que te pregunte después.\n\n` +

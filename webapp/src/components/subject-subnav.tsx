@@ -6,9 +6,19 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { visibleSubjectSections } from "@/lib/subject-sections";
 
-export function SubjectSubnav({ slug, sections }: { slug: string; sections: string[] }) {
+export function SubjectSubnav({
+  slug,
+  sections,
+  lockedSection = null,
+}: {
+  slug: string;
+  sections: string[];
+  /** Si la sesión tiene acceso acotado a una sola sección, mostrar solo esa pestaña. */
+  lockedSection?: string | null;
+}) {
   const pathname = usePathname();
-  const items = visibleSubjectSections(sections);
+  const all = visibleSubjectSections(sections);
+  const items = lockedSection ? all.filter((s) => s.segment === lockedSection) : all;
 
   return (
     <nav className="flex flex-wrap gap-1 overflow-x-auto border-b border-border pb-2">

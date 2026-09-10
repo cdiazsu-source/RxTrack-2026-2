@@ -2,10 +2,11 @@
  * Autenticación mínima: una cuenta por persona, sin base de datos.
  * Protege TODO el sitio (middleware.ts): sin cookie válida → /login.
  *
- *  - Cesar (SITE_PASSWORD):      edita todo.
- *  - Diana (SITE_PASSWORD_READ): ve todo, no edita.
+ *  - Cesar (SITE_PASSWORD):        edita todo.
+ *  - Diana (SITE_PASSWORD_READ):   ve todo, no edita.
+ *  - JOSE  (SITE_PASSWORD_JOSE):   solo /aif/laboratorio, con control total ahí.
  *
- * El nombre y el nivel viajan firmados (HMAC-SHA256) en la cookie.
+ * El nombre, el nivel y el alcance viajan firmados (HMAC-SHA256) en la cookie.
  *
  * Este módulo NO importa `next/headers` para poder usarse también en el
  * middleware (Edge). El acceso a cookies vive en src/lib/session.ts.
@@ -15,8 +16,12 @@ export const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 días
 
 export type AccessLevel = "full" | "read";
 
+/** Acceso acotado a UNA sección de UNA asignatura (p. ej. AIF → Laboratorio).
+ *  `subject` y `section` son los segmentos de la URL: `/{subject}/{section}`. */
+export type SubjectScope = { subject: string; section: string };
+
 /** Persona que inició sesión. */
-export type Profile = { name: string; level: AccessLevel };
+export type Profile = { name: string; level: AccessLevel; scope?: SubjectScope | null };
 
 /**
  * Cuentas. La lista vive aquí, no en la base. Para añadir a alguien: otra fila.
@@ -34,6 +39,13 @@ const ACCOUNTS: Account[] = [
     username: "diana",
     password: process.env.SITE_PASSWORD_READ || "diana2026",
     profile: { name: "Diana", level: "read" },
+  },
+  {
+    // Jefe de laboratorio de AIF: control total, PERO solo de /aif/laboratorio.
+    // El middleware reenvía cualquier otra ruta a esa sección.
+    username: "jose",
+    password: process.env.SITE_PASSWORD_JOSE || "AIF",
+    profile: { name: "JOSE", level: "full", scope: { subject: "aif", section: "laboratorio" } },
   },
 ];
 
@@ -71,10 +83,24 @@ export function checkCredentials(username: string, password: string): Profile | 
   return acc.profile;
 }
 
+/** A dónde llevar a la persona tras iniciar sesión: su sección, si su acceso
+ *  está acotado; la portada si no. */
+export function landingPath(profile: Profile): string {
+  return profile.scope ? `/${profile.scope.subject}/${profile.scope.section}` : "/";
+}
+
 /** Token firmado para la cookie de sesión, con el nombre y el nivel de acceso. */
 export async function signToken(profile: Profile): Promise<string> {
   const payload = b64url(
-    enc.encode(JSON.stringify({ v: 2, t: Date.now(), a: profile.level, n: profile.name })).buffer,
+    enc.encode(
+      JSON.stringify({
+        v: 2,
+        t: Date.now(),
+        a: profile.level,
+        n: profile.name,
+        s: profile.scope ?? undefined,
+      }),
+    ).buffer,
   );
   return `${payload}.${await hmac(payload)}`;
 }
@@ -93,7 +119,12 @@ export async function verifyToken(token: string | undefined | null): Promise<Pro
     const level: AccessLevel = json.a === "read" ? "read" : "full";
     const name =
       typeof json.n === "string" && json.n.trim() ? json.n : level === "read" ? "Diana" : "Cesar";
-    return { name, level };
+    const s = json.s;
+    const scope: SubjectScope | null =
+      s && typeof s.subject === "string" && typeof s.section === "string"
+        ? { subject: s.subject, section: s.section }
+        : null;
+    return { name, level, scope };
   } catch {
     return null;
   }

@@ -39,14 +39,20 @@ pregrado de Química Farmacéutica (UNAL). Nace de dos proyectos previos:
 ## Acceso
 
 Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en
-`lib/auth.ts` (edge-safe). La cookie firmada con HMAC lleva `{ name, level }`.
+`lib/auth.ts` (edge-safe). La cookie firmada con HMAC lleva `{ name, level, scope }`.
 
 - `cesar` / `SITE_PASSWORD` — `level: "full"`, edita todo.
 - `diana` / `SITE_PASSWORD_READ` — `level: "read"`, ve todo; no edita.
+- `jose` / `SITE_PASSWORD_JOSE` — `level: "full"` **acotado** por
+  `scope: { subject: "aif", section: "laboratorio" }`: solo ve y edita
+  `/aif/laboratorio`; el `middleware.ts` reenvía cualquier otra ruta ahí.
 
-`getSession()` devuelve `{ authed, level, name }`; `canEdit()` sigue siendo
-`level === "full"`. La portada saluda con `Hola, <name>.`. Añadir personas =
-otra fila en `ACCOUNTS`. `middleware.ts` protege todo salvo `/login`.
+`getSession()` devuelve `{ authed, level, name, viewingAs, scope }`; `canEdit()`
+sigue siendo `level === "full"`. El alcance acotado lo aplica **el middleware**
+(no hay authz por recurso en las server actions). La portada saluda con
+`Hola, <name>.`. Añadir personas = otra fila en `ACCOUNTS` (con `scope` si su
+acceso es parcial). `SiteNav`/`SubjectSubnav` se recortan cuando la sesión tiene
+`scope`. `middleware.ts` protege todo salvo `/login`.
 
 ## Estado
 

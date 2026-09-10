@@ -43,6 +43,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const navSubjects = subjects.map((s) => ({ id: s.id, code: s.code, name: s.name }));
   const viewingAs = session.authed && session.viewingAs;
   const realFull = realLvl === "full";
+  // Sesión con acceso acotado (JOSE): barra de navegación mínima.
+  const scoped = session.authed && !!session.scope;
 
   return (
     <html lang="es" className={`${inter.variable} ${fraunces.variable}`}>
@@ -54,6 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             inboxCount={inboxCount}
             realFull={realFull}
             viewingAs={viewingAs}
+            scoped={scoped}
           />
           <main className="page-enter mx-auto max-w-6xl px-5 py-8">{children}</main>
           <Toaster />

@@ -1,25 +1,28 @@
 import { cookies } from "next/headers";
 
-import { type AccessLevel, SESSION_COOKIE, verifyToken } from "@/lib/auth";
+import { type AccessLevel, type SubjectScope, SESSION_COOKIE, verifyToken } from "@/lib/auth";
 
 /** Cookie de "ver como Diana": Cesar baja su nivel efectivo a "read" para
  *  revisar la interfaz tal como la ve ella. */
 export const VIEW_AS_COOKIE = "rxtrack_view_as";
 
 export type Session =
-  | { authed: true; level: AccessLevel; name: string; viewingAs: boolean }
+  | { authed: true; level: AccessLevel; name: string; viewingAs: boolean; scope: SubjectScope | null }
   | { authed: false };
 
 /** Sesión actual (server components / server actions). Aplica "ver como Diana". */
 export async function getSession(): Promise<Session> {
   const profile = await verifyToken(cookies().get(SESSION_COOKIE)?.value);
   if (!profile) return { authed: false };
-  const viewingAs = profile.level === "full" && cookies().get(VIEW_AS_COOKIE)?.value === "read";
+  // "Ver como Diana" es solo para Cesar (full, sin alcance acotado).
+  const viewingAs =
+    profile.level === "full" && !profile.scope && cookies().get(VIEW_AS_COOKIE)?.value === "read";
   return {
     authed: true,
     level: viewingAs ? "read" : profile.level,
     name: viewingAs ? "Diana" : profile.name,
     viewingAs,
+    scope: profile.scope ?? null,
   };
 }
 

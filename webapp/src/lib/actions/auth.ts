@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { SESSION_COOKIE, SESSION_MAX_AGE, checkCredentials, signToken } from "@/lib/auth";
+import { SESSION_COOKIE, SESSION_MAX_AGE, checkCredentials, landingPath, signToken } from "@/lib/auth";
 
 export async function login(formData: FormData) {
   const username = String(formData.get("username") ?? "");
@@ -20,7 +20,7 @@ export async function login(formData: FormData) {
     maxAge: SESSION_MAX_AGE,
   });
 
-  redirect("/");
+  redirect(landingPath(profile));
 }
 
 export async function logout() {

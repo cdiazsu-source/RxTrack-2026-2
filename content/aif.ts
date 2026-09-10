@@ -457,4 +457,380 @@ export const aif: SubjectContent = {
     { kind: "libro", reference: "Quattrocchi O.A. Introducción a la HPLC. Aplicación y práctica. Artes gráficas Farro. 1992." },
     { kind: "libro", reference: "Gross J.H. Mass Spectrometry. A textbook. 2ª ed. Springer. 2011." },
   ],
+
+  // Laboratorio del Módulo I (Prof. García Castañeda). Logística del cronograma
+  // del grupo G-02 / subgrupo J3 (Cesar + Juan José Erazo Duarte) y guía-tutorial
+  // oficial de laboratorio. Material de referencia: no pasa por `db:seed`.
+  labRules: [
+    "**Dónde y cuándo:** Laboratorio 120, Edificio 500 (Facultad de Ciencias Agrarias). Grupo 2 (G-02): **jueves, 8:00–13:00**.",
+    "**Asistencia mínima 90 %.** Por debajo de ese umbral la asignatura se califica **0.0**, aunque la inasistencia esté justificada (Art. 32, Acuerdo 008 de 2008, UNAL).",
+    "**Trabajo en parejas.** Cesar está en el subgrupo **J3**, con **Juan José Erazo Duarte**.",
+    "**Presentación y EPP:** bata blanca abotonada, zapatos cerrados, cabello recogido, sin uñas largas ni esmalte; gafas de seguridad y guantes según el riesgo de la práctica. En la zona de trabajo no se come, no se bebe y no se manipulan lentes de contacto.",
+    "**Electrodo según el tipo de valoración:** acuosa → electrodo combinado de vidrio con electrolito **KCl** · no acuosa → electrodo combinado de vidrio con electrolito **LiCl** · redox → electrodo combinado de **platino**.",
+    "**Antes de pesar:** consultar la tabla de valorantes, purezas y patrones primarios de la **Práctica 1** (miliequivalente y patrón primario de cada valorante).",
+    "**Montaje de bureta y electrodo combinado:** ver el video de referencia antes de la práctica → https://drive.google.com/file/d/1ZgALwf8Y9CNv9mwTYzvexv16coFV2i1R/view?usp=sharing",
+    "**Plan del subgrupo J3 — Módulo I (semanas 1 a 5):** sem. transición/1 → preparar y estandarizar NaNO₂ 0,1 M + FT-IR (extracción del activo, muestras 5 y 6, pastilla de KBr) + valoración potenciométrica acuosa · sem. 2 → valoración potenciométrica no acuosa + %humedad por pérdida por secado · sem. 3 → valoración redox y completar prácticas faltantes · sem. 4 → completar prácticas faltantes · sem. 5 → **parcial práctico** (Cesar 9:20 a.m., Juan José 9:40 a.m.) + seminario de Instrumentación (potenciometría), asignado a J3.",
+    "**Muestras asignadas al subgrupo J3:** FT-IR/ATR → tableta (muestras 5 y 6), extracción del activo · potenciometría acuosa → **ácido nicotínico** (valoración directa) · potenciometría no acuosa → **acetato de sodio·3H₂O** (USP/ANMAT) · potenciometría redox → **oxalato de sodio** (USP/ANMAT) · %humedad → **sulfato de sodio anhidro** (ANMAT).",
+    "**Residuos y orden:** disponer los residuos químicos según el Sistema de Gestión Ambiental de la Sede (no verter al desagüe sin autorización); dejar la mesa limpia y descontaminada. Salidas de emergencia y duchas de seguridad siempre despejadas.",
+    "**Referencia general:** Manual de Seguridad para Laboratorios, UNAL (División Nacional de Salud Ocupacional): http://www.laboratorios.bogota.unal.edu.co/userfiles/files/MANUAL%20DE%20SEGURIDAD%20LABORATORIOS%2031-10-2012_final(1).pdf",
+  ],
+
+  labPractices: [
+    {
+      number: 1,
+      title: "Preparación y estandarización de soluciones valorantes",
+      moduleSlug: "metodos-electrometricos",
+      fundamento:
+        "La **concentración nominal** de un valorante casi nunca coincide con la real: depende de la pureza del reactivo, de su estabilidad y de la forma de prepararlo. Por eso, antes de usarlo para cuantificar una materia prima, se **estandariza** frente a un **patrón primario** — una sustancia de pureza conocida y alta, estable, no higroscópica y de peso equivalente grande. La estandarización potenciométrica sigue el potencial de la celda con cada adición y ubica el punto de equivalencia por la **primera derivada**.",
+      keyPoints: [
+        "Criterios de patrón primario: pureza ≥ 99,9 %, estable al aire y al secado, no higroscópico ni eflorescente, peso equivalente alto (menos error al pesar), reacción estequiométrica y rápida con el valorante.",
+        "**NaNO₂ 0,1 M:** para 750 mL se pesan ≈ 5,18 g de NaNO₂ (85 % de pureza); si se preparan 250 mL, escalar a ≈ 1,73 g. Disolver en agua destilada, aforar y trasvasar a **botella ámbar rotulada** (el nitrito se oxida con la luz y el aire).",
+        "Estandarización del NaNO₂ frente a **sulfanilamida**: disolver el patrón pesado en 40 mL de agua + 12 mL de HCl concentrado (≈ 3 N) y enfriar; la diazotación es lenta y exotérmica.",
+        "Montaje: vaso con agitación magnética + **electrodo combinado Ag/AgCl // Pt**; la **punta de la bureta debe quedar sumergida** en la solución de sulfanilamida (técnica *dead-stop*, propia de la nitrimetría).",
+        "Esquema de adición: 1,0 mL hasta llegar a 3,0 mL → 0,5 mL hasta 4,0 mL → 0,25 mL hasta el punto final; luego 2–3 adiciones más de 0,5 mL para confirmar potencial constante. **Registrar mV después de cada adición.**",
+        "El punto de equivalencia se toma donde ΔmV/ΔV es máximo (primera derivada), no por color.",
+      ],
+      procedure:
+        "#### Preparación de NaNO₂ 0,1 M\n" +
+        "1. Calcular la masa de NaNO₂ según el volumen a preparar (≈ 5,18 g para 750 mL; ≈ 1,73 g para 250 mL) y su pureza (85 %).\n" +
+        "2. Pesar el NaNO₂ y disolverlo en un poco de agua destilada.\n" +
+        "3. Trasvasar a probeta/matraz y aforar al volumen final con agua destilada.\n" +
+        "4. Pasar a **botella ámbar**, rotular (reactivo, concentración nominal, fecha, responsable) y reservar para estandarizar.\n\n" +
+        "#### Estandarización frente a sulfanilamida\n" +
+        "1. Pesar la masa de sulfanilamida indicada por el docente (patrón primario); anotar el peso exacto.\n" +
+        "2. Disolver en **40 mL de agua destilada + 12 mL de HCl concentrado**; enfriar la solución.\n" +
+        "3. Montar el vaso sobre agitador magnético con el electrodo combinado y la bureta con NaNO₂; **sumergir la punta de la bureta** en la solución.\n" +
+        "4. Titular según el esquema de adición (1,0 → 0,5 → 0,25 mL) registrando el potencial (mV) tras cada adición y el volumen acumulado.\n" +
+        "5. Pasado el punto final, hacer 2–3 adiciones más de 0,5 mL para verificar potencial constante.\n" +
+        "6. Graficar mV vs. V y ΔmV/ΔV vs. V; leer el **volumen de equivalencia** y calcular la concentración real.\n\n" +
+        "#### Tabla de valorantes y patrones primarios (referencia para pesar)\n" +
+        "| Valorante | mequiv (mg) | Pureza / propiedad | Patrón primario | mequiv patrón (mg) |\n" +
+        "| --- | --- | --- | --- | --- |\n" +
+        "| Na₂S₂O₃·5H₂O | 248,18 | 96 % | Dicromato de potasio | 49,0 |\n" +
+        "| KMnO₄ | 31,6 | 98 % | Oxalato de sodio | 67,0 |\n" +
+        "| Ácido perclórico | 100,5 | 70 % p/p; d = 1,6 g/mL | Biftalato de potasio | 204,2 |\n" +
+        "| Ácido clorhídrico | 36,5 | 36,5 % p/p; d = 1,19 g/mL | Carbonato de sodio | 53,0 |\n" +
+        "| Ácido sulfúrico | 49,0 | 98 % p/p; d = 1,8 g/mL | Sulfanilamida | 172,2 |\n" +
+        "| Ácido fosfórico | 32,7 | 85 % p/p; d = 1,7 g/mL | Carbonato de calcio | 100,0 |\n" +
+        "| NaOH | 40,0 | Lentejas | Biftalato de potasio | — |\n" +
+        "| NaNO₂ | 69,0 (g/mol) | 85 % | Sulfanilamida | 172,2 |\n" +
+        "| Edetato disódico·2H₂O | 292,2 (g/mol) | 98 % | — | — |\n",
+      equations: [
+        {
+          name: "Molaridad",
+          expression: "M = #{mmol de soluto|mL de solución}",
+          variables: "mmol de soluto = mg de soluto / peso milimolar",
+          description: "Concentración nominal con la que se prepara el valorante antes de estandarizar.",
+        },
+        {
+          name: "Normalidad real por patrón primario",
+          expression: "N = #{m_{patrón} (mg)|mequiv_{patrón} (mg) · V_{eq} (mL)}",
+          variables:
+            "m_{patrón} = masa pesada del patrón · mequiv_{patrón} = miliequivalente del patrón (tabla) · V_{eq} = volumen de valorante en el punto de equivalencia",
+          description: "Concentración real del valorante tras la estandarización.",
+        },
+      ],
+      dataRequested: [
+        "Masa de NaNO₂ pesada y volumen preparado; concentración nominal.",
+        "Masa exacta del patrón primario (sulfanilamida) en cada réplica.",
+        "Tabla volumen (mL) – potencial (mV) de cada estandarización.",
+        "Volumen de equivalencia por la primera derivada (ΔmV/ΔV).",
+        "Concentración real (M y N) del valorante y su promedio entre réplicas.",
+      ],
+      studyTopics: [
+        "Valoración nitrimétrica (diazotación) y técnica *dead-stop*.",
+        "Criterios y ejemplos de patrones primarios ácido-base, redox y de precipitación.",
+        "Ubicación del punto de equivalencia por primera y segunda derivada.",
+      ],
+    },
+
+    {
+      number: 2,
+      title: "Identificación de un activo por FT-IR en un producto terminado",
+      moduleSlug: "ir",
+      fundamento:
+        "Una molécula absorbe radiación infrarroja cuando la **frecuencia de la radiación coincide con la frecuencia de vibración** de un enlace y esa vibración produce un **cambio en el momento dipolar**. El espectro se interpreta en dos zonas: la **región de grupos funcionales** (4000–1500 cm⁻¹), donde cada banda se asigna a un grupo (O–H, N–H, C=O, C≡N…), y la **región de la huella dactilar** (1500–400 cm⁻¹), que se compara en bloque contra un espectro de referencia para confirmar identidad. En un producto terminado el activo está mezclado con excipientes, así que primero se **extrae** con un disolvente selectivo.",
+      keyPoints: [
+        "Si la tableta tiene recubrimiento, retirarlo **manualmente** antes de macerar.",
+        "Se preparan dos Eppendorf: **T** (macerado total, lectura directa — activo + excipientes) y **E** (para la extracción).",
+        "Disolvente de extracción: **acetona** (disuelve el activo, no los excipientes insolubles); agitar suave 1 min en cabina de extracción.",
+        "Centrifugar el Eppendorf E a **15 000 rpm por 5 min**; tomar solo el **sobrenadante** con pipeta Pasteur, sin arrastrar sólido.",
+        "Evaporar la acetona hasta que aparezca el sólido; raspar suave para eliminar acetona ocluida y pasar el sólido al Eppendorf **Ex**.",
+        "Pastilla: mezclar el sólido con **KBr en proporción 1:300 (mg/mg)**, macerar hasta que no queden cristales visibles de KBr y prensar en el pastillador. El KBr debe estar seco.",
+        "Reporte: tabla comparando el número de onda de la **muestra** vs. **patrón (referencia)** vs. **literatura**, grupo por grupo, en KBr y en ATR si se tomaron ambos.",
+        "La huella dactilar se compara por **superposición visual**: si solo cambia la **intensidad** de las bandas (no su posición), se interpreta como diferencia de concentración, no de identidad.",
+      ],
+      procedure:
+        "#### Extracción del activo\n" +
+        "1. Seleccionar las tabletas necesarias para reunir **100–500 mg de activo** y macerarlas en cápsula de porcelana hasta mezcla homogénea (retirar antes el recubrimiento, si lo hay).\n" +
+        "2. Transferir el macerado a dos Eppendorf de 1,5 mL: uno marcado **T** (total, lectura directa) y otro **E** (extracción).\n" +
+        "3. En cabina de extracción, añadir **acetona** al Eppendorf E, tapar y agitar suave a mano durante **1 minuto**.\n" +
+        "4. Centrifugar el Eppendorf E a **15 000 rpm durante 5 minutos**.\n" +
+        "5. Con pipeta Pasteur, transferir el **sobrenadante** (sin arrastrar sólido) a un vidrio de reloj.\n" +
+        "6. Dejar evaporar la acetona hasta que aparezca el sólido; raspar suave para retirar la acetona ocluida.\n" +
+        "7. Transferir el sólido a un Eppendorf marcado **Ex**.\n" +
+        "8. Mezclar una fracción del sólido con KBr en proporción **1:300 (mg/mg)**, macerar hasta que no queden cristales visibles de KBr y prensar en el pastillador.\n\n" +
+        "#### Lectura y reporte\n" +
+        "1. Registrar el espectro de la pastilla **T** (activo + excipientes) y el de la pastilla **Ex** (activo extraído). Tomar ATR si el equipo lo permite.\n" +
+        "2. Asignar las bandas de la región de grupos funcionales con la tabla de correlación.\n" +
+        "3. Superponer el espectro Ex con el del patrón y con el de literatura; comparar la huella dactilar y concluir sobre la identidad.\n\n" +
+        "#### Tabla de correlación de grupos funcionales\n" +
+        "| Grupo funcional | Región (cm⁻¹) | Intensidad |\n" +
+        "| --- | --- | --- |\n" +
+        "| C–H (alcanos) | 2850–2970 / 1340–1470 | Fuerte |\n" +
+        "| C–H (alquenos =C–H) | 3010–3095 / 675–995 | Media/Fuerte |\n" +
+        "| C–H (alquinos ≡C–H) | 3300 | Fuerte |\n" +
+        "| C–H (aromáticos) | 3010–3100 / 690–900 | Media/Fuerte |\n" +
+        "| O–H (alcohol/fenol monomérico) | 3590–3650 | Variable |\n" +
+        "| O–H (con puente de hidrógeno) | 3200–3600 | Variable, a veces amplia |\n" +
+        "| O–H (ácido carboxílico) | 2500–2700 | Amplia |\n" +
+        "| N–H (aminas, amidas) | 3300–3500 | Media |\n" +
+        "| C=C (alquenos) | 1610–1680 | Variable |\n" +
+        "| C=C (aromáticos) | 1500–1600 | Variable |\n" +
+        "| C≡C (alquinos) | 2100–2260 | Variable |\n" +
+        "| C–N (aminas, amidas) | 1180–1360 | Fuerte |\n" +
+        "| C≡N (nitrilos) | 2210–2280 | Fuerte |\n" +
+        "| C–O (alcoholes, éteres, ácidos, ésteres) | 1050–1300 | Fuerte |\n" +
+        "| C=O (aldehídos, cetonas, ácidos, ésteres) | 1690–1760 | Fuerte |\n" +
+        "| NO₂ (nitro) | 1500–1570 / 1300–1370 | Fuerte |\n",
+      dataRequested: [
+        "Espectro de la pastilla T (lectura directa) y de la pastilla Ex (activo extraído); espectros ATR si se tomaron.",
+        "Tabla comparativa por grupo funcional: número de onda de la muestra vs. patrón vs. literatura (en KBr y en ATR).",
+        "Imagen de la superposición de espectros muestra / patrón / literatura, con la huella dactilar señalada.",
+        "Conclusión de identidad: ¿el activo del producto coincide con el patrón?",
+      ],
+      studyTopics: [
+        "Vibraciones moleculares (tensión y flexión); condición del cambio de momento dipolar.",
+        "Técnica de pastilla de KBr vs. reflectancia total atenuada (ATR): ventajas y artefactos.",
+        "Interpretación sistemática de espectros IR de fármacos; regiones diagnósticas.",
+      ],
+    },
+
+    {
+      number: 3,
+      title: "Potenciometría en medio acuoso: valoración de ácido nicotínico",
+      moduleSlug: "metodos-electrometricos",
+      fundamento:
+        "El **ácido nicotínico** (niacina, vitamina B₃) es un ácido carboxílico débil **monoprótico**. Se cuantifica por **valoración ácido-base directa** con NaOH previamente estandarizado, en agua, siguiendo el potencial con un **electrodo combinado de vidrio** (electrolito interno KCl). El punto de equivalencia se ubica por la **primera derivada** de la curva mV vs. volumen; con él se calcula la pureza de la materia prima.",
+      keyPoints: [
+        "Analito monoprótico → **peso equivalente = PM / 1 ≈ 123,1 g/eq** (PM del ácido nicotínico ≈ 123,11 g/mol).",
+        "Valorante: NaOH **estandarizado** (usar la N real de la Práctica 1, no la nominal).",
+        "Electrodo combinado de vidrio con electrolito **KCl**; calibrar el potenciómetro con buffers antes de empezar.",
+        "Disolver la materia prima en agua destilada recién hervida y fría (sin CO₂) para no falsear el salto.",
+        "Adiciones más finas cerca del salto de potencial; registrar mV después de cada adición y 2–3 adiciones más pasado el punto final.",
+        "La **guía oficial no trae el ejemplo numérico** de ácido nicotínico: **no se anotan aquí pesos ni volúmenes** — esas tablas se llenan durante la práctica.",
+      ],
+      procedure:
+        "#### Montaje\n" +
+        "1. Calibrar el potenciómetro con soluciones buffer.\n" +
+        "2. Pesar la materia prima (el docente indica el rango); anotar el peso exacto. Disolver en ~50 mL de agua destilada sin CO₂.\n" +
+        "3. Montar el vaso sobre agitador magnético con el electrodo combinado (KCl) y la bureta con NaOH estandarizado.\n\n" +
+        "#### Titulación\n" +
+        "1. Adicionar NaOH en incrementos regulares registrando volumen acumulado y potencial (mV).\n" +
+        "2. Al acercarse el salto de potencial, reducir el incremento (0,1–0,2 mL).\n" +
+        "3. Continuar 2–3 adiciones después del punto final para cerrar la curva.\n" +
+        "4. Graficar mV vs. V y ΔmV/ΔV vs. V; leer el **volumen de equivalencia**.\n\n" +
+        "#### Cálculo\n" +
+        "Con V_eq, la normalidad real del NaOH y el peso equivalente del ácido nicotínico, calcular los mg de analito y el **% de pureza** respecto al peso de muestra.",
+      equations: [
+        {
+          name: "Potencial de la celda en valoración ácido-base",
+          expression: "E_{celda} = L' − 0,059 · pH",
+          variables:
+            "L' = constante de la celda (agrupa potenciales de referencia y de unión) · 0,059 = 2,303·RT/F a 25 °C (V por unidad de pH)",
+          description:
+            "Forma de la ecuación de Nernst para el electrodo de vidrio: el potencial varía ~59 mV por unidad de pH. Vale igual en medio acuoso y no acuoso.",
+        },
+        {
+          name: "Porcentaje de pureza",
+          expression: "%pureza = #{V_{eq} · N_{NaOH} · PEq|m_{muestra} (mg)} × 100",
+          variables:
+            "V_{eq} = volumen de equivalencia (mL) · N_{NaOH} = normalidad real del valorante · PEq ≈ 123,1 mg/meq (ácido nicotínico) · m_{muestra} = masa de materia prima pesada",
+        },
+      ],
+      dataRequested: [
+        "Peso de la materia prima problema.",
+        "Tabla volumen (mL) – potencial (mV) de la titulación.",
+        "Volumen de equivalencia por la primera derivada.",
+        "% de pureza calculado (y comparación con la especificación farmacopeica).",
+      ],
+      studyTopics: [
+        "Peso equivalente en reacciones ácido-base; analitos monopróticos y polipróticos.",
+        "Ecuación de Nernst aplicada al electrodo de vidrio; significado de L' y del factor 0,059.",
+        "Métodos para ubicar el punto final: primera derivada, segunda derivada y método de Gran.",
+      ],
+    },
+
+    {
+      number: 4,
+      title: "Potenciometría en medio no acuoso: valoración de acetato de sodio",
+      moduleSlug: "metodos-electrometricos",
+      fundamento:
+        "El **acetato de sodio** es una base tan débil que **no puede valorarse en agua**: el agua *nivela* las bases débiles y el salto de potencial desaparece. Se titula en **ácido acético glacial** (disolvente poco básico, *diferenciador*) con **ácido perclórico (HClO₄)** como valorante, usando un electrodo combinado de vidrio con electrolito **LiCl**. El agua residual de la muestra se elimina con **anhídrido acético** antes de titular. El punto final se ve como un vire de color (cristal violeta: azul → verde aguamarina) y se confirma por la primera derivada.",
+      keyPoints: [
+        "Trabajar en **vaso seco**: el agua consume HClO₄ y desplaza el punto final.",
+        "Añadir 1–2 mL de **anhídrido acético** y agitar 2 min para neutralizar el agua residual; luego 20 mL de **ácido acético glacial**.",
+        "Indicador visual: 2–3 gotas de **cristal violeta** (vira de azul a verde aguamarina en el punto de equivalencia).",
+        "Valorante: **HClO₄ 0,1 N** en bureta de 5 mL. Esquema: 0,5 mL hasta 1,5 mL → 0,25 mL hasta potencial constante.",
+        "Analito monobásico → **peso equivalente = PM / 1 = 82,04 g/eq** (acetato de sodio anhidro).",
+        "Cálculo de referencia: mg de acetato de sodio = V(HClO₄) · N(HClO₄) · 82,04. Ejemplo: 2,5 mL × 0,1 N × 82,04 ≈ **20,5 mg**.",
+        "Reportar la pureza en **base húmeda (BH)** y en **base seca (BS)**, con el % de humedad de la Práctica 6.",
+      ],
+      procedure:
+        "#### Preparación de la muestra\n" +
+        "1. Pesar ≈ **20,5 mg** de materia prima en un **vaso seco**; anotar el peso exacto.\n" +
+        "2. Añadir **1–2 mL de anhídrido acético** y agitar 2 min.\n" +
+        "3. Añadir **20 mL de ácido acético glacial** y disolver.\n" +
+        "4. Añadir 2–3 gotas de **cristal violeta**.\n\n" +
+        "#### Titulación potenciométrica\n" +
+        "1. Montar el electrodo combinado (electrolito **LiCl**) y la bureta con **HClO₄ 0,1 N**.\n" +
+        "2. Titular añadiendo **0,5 mL** hasta llegar a 1,5 mL, registrando el potencial (mV) tras cada adición.\n" +
+        "3. Seguir con adiciones de **0,25 mL** hasta que el potencial se mantenga constante.\n" +
+        "4. Anotar el volumen del vire de color (azul → verde) y el volumen de equivalencia potenciométrico.\n\n" +
+        "#### Cálculo\n" +
+        "Calcular los mg de acetato de sodio con V_eq · N(HClO₄) · 82,04 y el **% de pureza** en BH; con el % de humedad (Práctica 6), pasar a BS.",
+      equations: [
+        {
+          name: "Miligramos de acetato de sodio",
+          expression: "m_{AS} (mg) = V_{HClO₄} (mL) · N_{HClO₄} · PEq_{AS}",
+          variables: "PEq_{AS} = 82,04 mg/meq (PM / 1) · ejemplo: 2,5 mL × 0,1 N × 82,04 ≈ 20,5 mg",
+        },
+        {
+          name: "Porcentaje de pureza (base húmeda)",
+          expression: "%pureza_{BH} = #{m_{AS} calculada (mg)|m_{muestra} pesada (mg)} × 100",
+          variables: "m_{AS} = mg de acetato de sodio hallados en la titulación",
+        },
+        {
+          name: "Paso de base húmeda a base seca",
+          expression: "%pureza_{BS} = #{%pureza_{BH}|100 − %Humedad} × 100",
+          variables: "%Humedad = pérdida por secado de la materia prima (Práctica 6)",
+        },
+      ],
+      dataRequested: [
+        "Peso de la materia prima (vaso seco).",
+        "Tabla volumen (mL) – potencial (mV); volumen del vire de color.",
+        "Volumen de equivalencia por la primera derivada.",
+        "% de pureza en base húmeda y en base seca.",
+      ],
+      studyTopics: [
+        "Autoprotólisis del ácido acético (Ks) y concepto de disolvente nivelador vs. diferenciador.",
+        "Por qué una base débil requiere medio no acuoso; elección del disolvente y del valorante.",
+        "Función del anhídrido acético y precauciones de manejo del ácido perclórico.",
+      ],
+    },
+
+    {
+      number: 5,
+      title: "Potenciometría redox: valoración de oxalato de sodio con permanganato",
+      moduleSlug: "metodos-electrometricos",
+      fundamento:
+        "El **oxalato de sodio** es el **patrón primario clásico del permanganato de potasio**. En medio ácido y en caliente, el ion oxalato se oxida a **CO₂** (cede 2 electrones) mientras el MnO₄⁻ se reduce a Mn²⁺. El **KMnO₄ es su propio indicador**: la primera gota en exceso tiñe la solución de rosa persistente. El potencial se sigue con un **electrodo de platino** (inerte, mide el potencial redox del par) y el punto de equivalencia se ubica por la primera derivada.",
+      keyPoints: [
+        "Analito → **peso equivalente = PM / 2 = 67,0 g/eq** (2 electrones transferidos por ion oxalato).",
+        "Pesar ≈ **33,5 mg** de materia prima en un vaso cubierto con papel aluminio (protección de la luz).",
+        "Medio: **20–30 mL de agua + 6 mL de H₂SO₄ 9 N**; calentar a **60–70 °C** con agitación (la reacción oxalato–permanganato es muy lenta en frío).",
+        "Valorante: **KMnO₄ estandarizado** (N real de la Práctica 1). Bureta protegida de la luz.",
+        "Esquema: añadir hasta 4 mL, luego **0,25 mL** hasta el punto final (incoloro → **rosa** persistente ~30 s).",
+        "Cálculo de referencia: mg de oxalato de sodio = V(KMnO₄) · N(KMnO₄) · 67,0. Ejemplo: 5 mL × 0,1 N × 67,0 ≈ **33,5 mg**.",
+        "Electrodo de **platino**: enjuagar y no tocar la superficie; retirar del medio en cuanto se termina la lectura.",
+      ],
+      procedure:
+        "#### Preparación\n" +
+        "1. Pesar ≈ 33,5 mg de materia prima en un vaso cubierto con papel aluminio; anotar el peso exacto.\n" +
+        "2. Añadir 20–30 mL de agua destilada y **6 mL de H₂SO₄ 9 N**.\n" +
+        "3. Calentar a **60–70 °C** sobre plancha con agitación magnética.\n\n" +
+        "#### Titulación\n" +
+        "1. Montar el electrodo de platino y la bureta con KMnO₄ estandarizado.\n" +
+        "2. Añadir KMnO₄ hasta ~4 mL registrando volumen y potencial (mV); esperar a que cada adición se decolore antes de seguir.\n" +
+        "3. Continuar con adiciones de **0,25 mL** hasta el punto final (rosa persistente) y 2–3 adiciones más para cerrar la curva.\n" +
+        "4. Graficar mV vs. V y ΔmV/ΔV vs. V; leer el **volumen de equivalencia**.\n\n" +
+        "#### Cálculo\n" +
+        "mg de oxalato de sodio = V_eq · N(KMnO₄) · 67,0; **% de pureza** = mg hallados / mg pesados × 100.",
+      equations: [
+        {
+          name: "Peso equivalente del oxalato de sodio",
+          expression: "PEq_{OS} = #{PM|2} = 67,0 mg/meq",
+          variables: "PM del oxalato de sodio = 134,0 g/mol · 2 = electrones transferidos por ion oxalato",
+        },
+        {
+          name: "Miligramos de oxalato de sodio",
+          expression: "m_{OS} (mg) = V_{KMnO₄} (mL) · N_{KMnO₄} · 67,0",
+          variables: "V_{KMnO₄} = volumen de equivalencia · N_{KMnO₄} = normalidad real del permanganato",
+        },
+        {
+          name: "Ecuación de Nernst (par redox)",
+          expression: "E = E° − #{0,059|n} · log Q",
+          variables:
+            "E° = potencial estándar del par · n = electrones intercambiados · Q = cociente de reacción (productos / reactivos)",
+          description: "El electrodo de platino mide E; el salto en el punto de equivalencia refleja el cambio brusco de Q.",
+        },
+      ],
+      dataRequested: [
+        "Peso de la materia prima problema.",
+        "Tabla volumen (mL) – potencial (mV) de la titulación.",
+        "Volumen de equivalencia por la primera derivada; volumen del viraje a rosa.",
+        "% de pureza calculado.",
+      ],
+      studyTopics: [
+        "Peso equivalente en reacciones redox; número de electrones y semirreacciones.",
+        "Por qué la reacción oxalato–permanganato necesita calor y medio ácido fuerte.",
+        "KMnO₄ como autoindicador; electrodos indicadores inertes (Pt) y de referencia.",
+      ],
+    },
+
+    {
+      number: 6,
+      title: "Determinación de %Humedad por pérdida por secado (USP ⟨731⟩): sulfato de sodio anhidro",
+      moduleSlug: "metodos-electrometricos",
+      fundamento:
+        "La **pérdida por secado** mide toda la materia volátil que sale del sólido al calentarlo: agua **no esencial** (adsorbida) y parte del agua **esencial** (de cristalización), más disolventes residuales. Se trabaja con **1–2 g** de muestra y se seca **hasta peso constante**, definido como una diferencia entre dos pesadas consecutivas **≤ 0,50 mg por g de muestra**. El % de humedad permite convertir cualquier resultado de pureza de **base húmeda a base seca**.",
+      keyPoints: [
+        "Secar primero la **cápsula destapada + su tapa** a la temperatura de ensayo (≈ 30 min), enfriar en **desecador** y pesar → **PCV** (peso de cápsula vacía).",
+        "Colocar 1–2 g de muestra, pesar → **PCMH** (cápsula + muestra húmeda).",
+        "Secar **destapada** a **100 °C durante 2 h**, enfriar en desecador y pesar → **PCMS₁**.",
+        "Repetir el secado en tramos de 1 h y volver a pesar (**PCMS₂**, PCMS₃…) hasta **peso constante**.",
+        "Todas las pesadas tras enfriar en desecador: el sólido caliente da lecturas bajas y reabsorbe humedad al aire.",
+        "El sulfato de sodio anhidro es **higroscópico**: minimizar el tiempo de exposición al aire al pesar.",
+      ],
+      procedure:
+        "#### Pérdida por secado\n" +
+        "1. Secar la cápsula destapada y su tapa (misma T del ensayo) ≈ 30 min; enfriar en desecador; pesar → **PCV**.\n" +
+        "2. Colocar 1–2 g de muestra en la cápsula; pesar → **PCMH**.\n" +
+        "3. Llevar la cápsula **destapada** a la estufa a **100 °C por 2 h**.\n" +
+        "4. Enfriar en desecador hasta temperatura ambiente; pesar → **PCMS₁**.\n" +
+        "5. Secar 1 h más; enfriar; pesar → **PCMS₂**. Repetir hasta que la diferencia entre dos pesadas consecutivas sea ≤ 0,50 mg/g de muestra (**peso constante**).\n" +
+        "6. Calcular el % de humedad con la última pesada (PCMS).\n\n" +
+        "#### Uso del resultado\n" +
+        "Con el % de humedad, convertir la pureza obtenida en las valoraciones (Prácticas 3–5) de base húmeda a base seca.",
+      equations: [
+        {
+          name: "Porcentaje de humedad (pérdida por secado)",
+          expression: "%Humedad = #{(PCMH − PCV) − (PCMS − PCV)|PCMH − PCV} × 100",
+          variables:
+            "PCV = peso de la cápsula vacía · PCMH = peso de cápsula + muestra húmeda · PCMS = peso de cápsula + muestra seca a peso constante",
+          description: "El numerador es la masa de agua perdida; el denominador, la masa de muestra húmeda.",
+        },
+        {
+          name: "Masa de muestra en base seca",
+          expression: "BS (mg) = (PCMH − PCV) − m_{agua}",
+          variables: "m_{agua} = (PCMH − PCV) − (PCMS − PCV) = masa perdida en el secado",
+        },
+        {
+          name: "Contenido en base seca",
+          expression: "%contenido_{BS} = #{mg de analito en la muestra|BS (mg)} × 100",
+          variables: "mg de analito = los hallados en la valoración correspondiente",
+        },
+      ],
+      dataRequested: [
+        "PCV, PCMH y cada PCMS (PCMS₁, PCMS₂, …) hasta peso constante.",
+        "Masa de agua perdida y % de humedad calculado.",
+        "% de contenido de la materia prima asociada en base húmeda y en base seca.",
+      ],
+      studyTopics: [
+        "Agua esencial (de cristalización, de constitución) vs. agua no esencial (adsorbida, retenida).",
+        "USP ⟨731⟩ pérdida por secado: condiciones, criterio de peso constante y alternativas (Karl Fischer, termobalanza).",
+        "Diferencia entre resultado en base húmeda y en base seca; cuándo exige cada uno la farmacopea.",
+      ],
+    },
+  ],
 };

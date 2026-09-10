@@ -12,7 +12,7 @@ import { SearchDialog } from "@/components/search-dialog";
 import { QuickCapture } from "@/components/quick-capture";
 
 /** Fecha del último cambio a la app. Actualízala a mano al publicar cambios. */
-const LAST_MODIFIED = "8 sep 2026";
+const LAST_MODIFIED = "10 sep 2026";
 
 export function SiteNav({
   canEdit,
@@ -20,6 +20,7 @@ export function SiteNav({
   inboxCount,
   realFull = false,
   viewingAs = false,
+  scoped = false,
 }: {
   canEdit: boolean;
   subjects: SwitcherSubject[];
@@ -28,9 +29,30 @@ export function SiteNav({
   realFull?: boolean;
   /** Cesar está en modo "ver como Diana". */
   viewingAs?: boolean;
+  /** Sesión con acceso acotado (JOSE): solo marca + salir. */
+  scoped?: boolean;
 }) {
   const pathname = usePathname();
   if (pathname === "/login") return null;
+
+  if (scoped) {
+    return (
+      <header className="site-nav sticky top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
+          <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="press inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Salir</span>
+            </button>
+          </form>
+        </div>
+      </header>
+    );
+  }
 
   const link = (href: string, label: string, Icon: typeof Inbox, badge?: number) => {
     const active = href === "/" ? pathname === "/" : pathname.startsWith(href);

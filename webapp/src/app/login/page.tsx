@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export const dynamic = "force-dynamic";
 
 export default async function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
-  if ((await getSession()).authed) redirect("/");
+  const session = await getSession();
+  if (session.authed) redirect(session.scope ? `/${session.scope.subject}/${session.scope.section}` : "/");
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-6 py-12">
