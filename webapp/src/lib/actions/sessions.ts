@@ -7,6 +7,7 @@ import { blockedForContribute } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
 import { parseDateInput } from "@/lib/utils";
+import { semesterWeekNumber } from "@/lib/academic-week";
 
 async function subjectIdOfModule(moduleId: string) {
   const m = await prisma.module.findUnique({ where: { id: moduleId }, select: { subjectId: true } });
@@ -35,15 +36,16 @@ function nextStatus(current: SessionStatus, derived: SessionStatus): SessionStat
 }
 
 function readSession(formData: FormData) {
-  const numRaw = String(formData.get("number") ?? "").trim();
-  const number = numRaw ? Math.max(1, Math.round(Number(numRaw))) : null;
+  const date = parseDateInput(formData.get("date"));
   return {
     topic: String(formData.get("topic") ?? "").trim(),
     content: String(formData.get("content") ?? ""),
     transcript: String(formData.get("transcript") ?? "").trim() || null,
     slidesText: String(formData.get("slidesText") ?? "").trim() || null,
-    number: Number.isFinite(number as number) ? number : null,
-    date: parseDateInput(formData.get("date")),
+    // El número de sesión ya no se escribe a mano: sale solo de la semana del
+    // semestre a la que cae `date` (ver lib/academic-week.ts).
+    number: semesterWeekNumber(date),
+    date,
     author: String(formData.get("author") ?? "").trim() || null,
   };
 }

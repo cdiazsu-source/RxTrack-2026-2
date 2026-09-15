@@ -46,6 +46,16 @@ export function dateInputValue(date: Date | null | undefined): string {
   return date ? date.toISOString().slice(0, 10) : "";
 }
 
+/** "2026-09-13" de hoy, en hora local del navegador (para precargar <input
+ *  type="date"> sin que un `toISOString()` en UTC lo corra un día). */
+export function todayInputValue(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export const MODULE_STATUS_LABEL: Record<string, string> = {
   NO_VISTO: "No visto",
   EN_PROGRESO: "En progreso",

@@ -28,9 +28,10 @@ import {
   SESSION_STATUS_ORDER,
   SESSION_STATUS_PILL,
 } from "@/lib/session-status";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, todayInputValue } from "@/lib/utils";
 import { relativeDays } from "@/lib/relative-time";
 import { clearDraft, draftAge, loadDraft, saveDraft } from "@/lib/draft";
+import { semesterWeekNumber } from "@/lib/academic-week";
 
 // El apunte SIEMPRE lleva un nombre de usuario. Se precarga con la cuenta que
 // inició sesión (Cesar / Diana), se recuerda el último y se sugieren los usados.
@@ -123,6 +124,10 @@ function SessionForm({
   const [topic, setTopic] = useState(session?.topic ?? "");
   const [author, setAuthor] = useState(session?.author ?? "");
   const [knownAuthors, setKnownAuthors] = useState<string[]>([]);
+  // Sin sesión existente, precargamos hoy: la fecha ya casi nunca hay que
+  // tocarla y el número de semana sale solo de ahí (ver lib/academic-week.ts).
+  const [date, setDate] = useState(session?.date ? session.date.slice(0, 10) : todayInputValue());
+  const weekNumber = semesterWeekNumber(date || null);
 
   useEffect(() => {
     // Apuntes: el borrador se ofrece con botón (puede diferir mucho del guardado).
@@ -173,7 +178,7 @@ function SessionForm({
         <div className="rounded-md border border-border bg-muted/40 p-2.5">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Sesión anterior</p>
           <p className="mt-0.5 text-sm font-medium leading-snug">
-            {previous.number != null ? `N.º ${previous.number} — ` : ""}
+            {previous.number != null ? `Semana ${previous.number} — ` : ""}
             {previous.topic}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
@@ -194,16 +199,11 @@ function SessionForm({
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2">
-        <Input
-          name="number"
-          type="number"
-          min={1}
-          placeholder="N.º"
-          defaultValue={session?.number ?? (previous?.number != null ? previous.number + 1 : "")}
-          className="w-20"
-        />
-        <Input name="date" type="date" defaultValue={session?.date ? session.date.slice(0, 10) : ""} className="w-40" />
+      <div className="flex flex-wrap items-center gap-2">
+        <Input name="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-40" />
+        <span className="rounded-md bg-muted px-2 py-1.5 text-xs font-medium text-muted-foreground">
+          {weekNumber != null ? `Semana ${weekNumber}` : "Sin fecha → sin semana"}
+        </span>
         <Input
           name="author"
           list="rxtrack-authors"
@@ -333,7 +333,7 @@ function SessionArticle({
       <header className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
         <h4 className="flex items-center gap-2 text-sm font-semibold">
           <span>
-            {s.number ? `Sesión ${s.number} — ` : ""}
+            {s.number ? `Semana ${s.number} — ` : ""}
             {s.topic}
           </span>
           <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", SESSION_STATUS_PILL[s.status])}>
