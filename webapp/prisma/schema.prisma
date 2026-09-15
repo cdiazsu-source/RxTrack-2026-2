@@ -359,19 +359,41 @@ model KeyDate {
 }
 
 /// Sistema de evaluación (los pesos suman 100). grade opcional -> proyección de nota.
+/// Cesar y Diana llevan seguimiento independiente: cada quien tiene su propia
+/// fila por componente (mismo name/weight/order, `owner` distinto).
 model EvaluationItem {
   id        String  @id @default(cuid())
   subjectId String
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   name      String
   weight    Int
+  /// Nota manual. Si el componente tiene `quizzes`, esta nota se ignora: la
+  /// nota real es el promedio simple de los quizzes (ver QuizGrade).
   grade     Float?
   order     Int
+  /// "Cesar" | "Diana".
+  owner     String  @default("Cesar")
+  quizzes   QuizGrade[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([subjectId])
+  @@index([subjectId, owner])
+}
+
+/// Nota individual de un quiz (p. ej. "Quices de laboratorio"), con fecha
+/// opcional. Todos pesan igual: la nota del componente es su promedio simple.
+model QuizGrade {
+  id               String         @id @default(cuid())
+  evaluationItemId String
+  evaluationItem   EvaluationItem @relation(fields: [evaluationItemId], references: [id], onDelete: Cascade)
+  date             DateTime?
+  grade            Float
+
+  createdAt DateTime @default(now())
+
+  @@index([evaluationItemId])
 }
 
 model BibliographyItem {

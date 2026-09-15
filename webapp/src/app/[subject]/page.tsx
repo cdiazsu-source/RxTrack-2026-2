@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
 import { getSubjectBySlug } from "@/lib/subjects";
 import { getModulesWithProgress } from "@/lib/queries";
 import { pct } from "@/lib/progress";
@@ -25,9 +26,16 @@ export default async function SubjectDashboard({ params }: { params: { subject: 
   const subject = await getSubjectBySlug(params.subject);
   if (!subject) notFound();
 
+  const session = await getSession();
+  const owner = session.authed ? session.name : "Cesar";
+
   const [modules, evaluation, keyDates] = await Promise.all([
     getModulesWithProgress(subject.id),
-    prisma.evaluationItem.findMany({ where: { subjectId: subject.id }, orderBy: { order: "asc" } }),
+    prisma.evaluationItem.findMany({
+      where: { subjectId: subject.id, owner },
+      orderBy: { order: "asc" },
+      include: { quizzes: { orderBy: { date: "asc" } } },
+    }),
     prisma.keyDate.findMany({ where: { subjectId: subject.id, date: { not: null } }, orderBy: { date: "asc" } }),
   ]);
 

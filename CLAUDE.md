@@ -29,7 +29,8 @@ pregrado de Química Farmacéutica (UNAL). Nace de dos proyectos previos:
 3. **El temario es fuente de verdad editada por personas.** Vive en
    `content/[code].ts`, no en la app. `npm run db:seed` lo sincroniza y **nunca**
    sobrescribe avance: `Module.status`, `ChecklistItem.done`, `Session`,
-   `KeyDate.date`, `EvaluationItem.grade`, notas, ni filas con `fromContent=false`.
+   `KeyDate.date`, `EvaluationItem.grade`/`QuizGrade`, notas, ni filas con
+   `fromContent=false`.
 4. **La IA no se llama desde el backend.** `lib/prompts.ts` arma prompts; la
    persona los copia. Cada ⓘ dice explícitamente qué NO hace la app.
 5. **Seguridad de texto.** El contenido rico (apuntes Cornell, fórmulas) se
@@ -42,7 +43,10 @@ Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en
 `lib/auth.ts` (edge-safe). La cookie firmada con HMAC lleva `{ name, level, scope }`.
 
 - `cesar` / `SITE_PASSWORD` — `level: "full"`, edita todo.
-- `diana` / `SITE_PASSWORD_READ` — `level: "read"`, ve todo; no edita.
+- `diana` / `SITE_PASSWORD_READ` — `level: "read"`: ve todo, y además puede
+  editar checklist, enlaces de Drive, sesiones/transcripciones y **su propia
+  nota de evaluación** (`canContribute()`, ver abajo). El resto queda solo para
+  `cesar` (`canEdit()`).
 - `jose` / `SITE_PASSWORD_JOSE` — `level: "full"` **acotado** por
   `scope: { subject: "aif", section: "laboratorio" }`: solo ve y edita
   `/aif/laboratorio`; el `middleware.ts` reenvía cualquier otra ruta ahí.
@@ -54,8 +58,20 @@ sigue siendo `level === "full"`. El alcance acotado lo aplica **el middleware**
 acceso es parcial). `SiteNav`/`SubjectSubnav` se recortan cuando la sesión tiene
 `scope`. `middleware.ts` protege todo salvo `/login`.
 
+**Evaluación, por persona.** `EvaluationItem` tiene `owner: "Cesar" | "Diana"`:
+cada quien tiene su propia fila por componente (mismo `name`/`weight`/`order`,
+nota aparte) — son dos seguimientos independientes del mismo curso. Estructura
+(agregar/borrar componente, `addEvaluationItem`/`deleteEvaluationItem`) sigue
+siendo solo de Cesar y crea/borra la fila de ambos a la vez para no
+desincronizarlas; la nota (`setEvaluationGrade`) la pone cada quien en la suya,
+gateado por dueño (`item.owner === session.name`), no por `canEdit`. Un
+componente puede además tener varios `QuizGrade` (nota + fecha, botón «+
+Quiz»): si los tiene, su nota es el promedio simple de todos y la `grade`
+manual se ignora. `db:seed` empareja por `(subjectId, name, owner)` y nunca
+toca notas ni quizzes existentes.
+
 ## Estado
 
 Fase 0 (andamiaje) y Fase 1 (una asignatura de punta a punta) implementadas.
-Temario cargado en `content/*.ts` desde el programa oficial: **FT2, AIF, FG, AF,
-SPF, FQ2**. **BFC** sigue como `Subject` stub sin temario (`modules: []`).
+Temario cargado en `content/*.ts` desde el programa oficial, las **7 asignaturas**:
+FT2, AIF, FG, AF, SPF, BFC (sin laboratorio). FQ2 se retiró en 2026-2 (no se cursa).

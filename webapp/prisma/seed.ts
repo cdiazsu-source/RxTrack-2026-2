@@ -7,7 +7,8 @@
  *   - Subject:  no toca attendanceMissed, weeklyGoal, driveUrl.
  *   - Module:   no toca status, driveUrl, notesUrl, labReportStatus. Solo módulos
  *               con fromContent=true.
- *   - KeyDate:  no toca `date`.  EvaluationItem: no toca `grade`.
+ *   - KeyDate:  no toca `date`.  EvaluationItem: no toca `grade` ni sus quizzes;
+ *               crea una fila por (name, owner) — Cesar y Diana llevan nota aparte.
  *   - Project:  no toca status, driveUrl, bitácora ni checklist. Solo isManual=false.
  *   - Glosario/Fórmula/Bibliografía: se emparejan por texto; si renombras algo en
  *     el content se crea una fila nueva y la vieja se queda (seguro: solo agrega).
@@ -27,6 +28,9 @@ neonConfig.webSocketConstructor = ws;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaNeon(pool);
 const prisma = new PrismaClient({ adapter });
+
+/** Cesar y Diana llevan seguimiento de notas independiente del mismo curso. */
+const EVAL_OWNERS = ["Cesar", "Diana"];
 
 async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number) {
   const subjectData = {
@@ -162,19 +166,22 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
     }
   }
 
-  // --- Evaluación: emparejar por (subjectId, name). NUNCA se toca `grade`. ---
+  // --- Evaluación: emparejar por (subjectId, name, owner). NUNCA se toca
+  //     `grade`. Cesar y Diana tienen cada quien su propia fila. ---
   const evals = content.evaluation ?? [];
-  for (let i = 0; i < evals.length; i++) {
-    const e = evals[i];
-    const existing = await prisma.evaluationItem.findFirst({
-      where: { subjectId: subject.id, name: e.name },
-      select: { id: true },
-    });
-    const data = { weight: e.weight, order: i };
-    if (existing) {
-      await prisma.evaluationItem.update({ where: { id: existing.id }, data });
-    } else {
-      await prisma.evaluationItem.create({ data: { subjectId: subject.id, name: e.name, ...data } });
+  for (const owner of EVAL_OWNERS) {
+    for (let i = 0; i < evals.length; i++) {
+      const e = evals[i];
+      const existing = await prisma.evaluationItem.findFirst({
+        where: { subjectId: subject.id, name: e.name, owner },
+        select: { id: true },
+      });
+      const data = { weight: e.weight, order: i };
+      if (existing) {
+        await prisma.evaluationItem.update({ where: { id: existing.id }, data });
+      } else {
+        await prisma.evaluationItem.create({ data: { subjectId: subject.id, name: e.name, owner, ...data } });
+      }
     }
   }
 
@@ -232,7 +239,12 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
 
   const evalKeep = (content.evaluation ?? []).map((e) => e.name);
   await prisma.evaluationItem.deleteMany({
-    where: { subjectId: subject.id, grade: null, name: { notIn: evalKeep.length ? evalKeep : ["__none__"] } },
+    where: {
+      subjectId: subject.id,
+      grade: null,
+      quizzes: { none: {} },
+      name: { notIn: evalKeep.length ? evalKeep : ["__none__"] },
+    },
   });
 
   const dateKeep = (content.keyDates ?? []).map((d) => d.name);

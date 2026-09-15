@@ -16,7 +16,7 @@ export const HELP: Record<string, string> = {
   "meta-semanal":
     "Una frase con lo que quieres lograr esta semana en esta materia. Texto libre, la escribes y editas tú. No sale del temario ni la toca el seed; es solo un recordatorio.",
   evaluacion:
-    "Componentes de la nota y su peso. El nombre y el peso vienen de `evaluation[]` en `content/<code>.ts` (los pesos deben sumar 100); el `db:seed` los actualiza. La NOTA (0 a 5) de cada componente la registras tú y el seed nunca la borra. Con las notas puestas calcula acumulada y proyección.",
+    "Componentes de la nota y su peso. El nombre y el peso vienen de `evaluation[]` en `content/<code>.ts` (los pesos deben sumar 100); el `db:seed` los actualiza. Cesar y Diana ven y editan CADA UNO su propia nota — son seguimientos independientes del mismo curso. La NOTA (0 a 5) de cada componente la registras tú, a mano, o como el promedio de varios quices sueltos (botón «+ Quiz»: uno por uno, con su fecha; todos pesan igual). El seed nunca borra notas ni quices. Con las notas puestas calcula acumulada y proyección.",
   "proximas-fechas":
     "Las fechas de esta asignatura que ya tienen día puesto, ordenadas. Se ponen/editan en la pestaña «Fechas». Aquí solo se muestran.",
 
