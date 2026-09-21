@@ -38,6 +38,57 @@ export const ft2: SubjectContent = {
       hasLab: true,
       labProtocol:
         "Reglamento del laboratorio, normas para el desarrollo de las prácticas, formato de presentación de informes y asignación de los productos que se abordarán durante el semestre.",
+      exercises: [
+        {
+          question: [
+            "**Opción múltiple.** Una dispersión coloidal se caracteriza por:",
+            "",
+            "A) No presentar superficies limitantes",
+            "B) Separarse por diálisis o ultrafiltración",
+            "C) Tener tamaño de partícula menor a 1 nm",
+            "D) Ser invisible a cualquier microscopio",
+          ].join("\n"),
+          solution: [
+            "**Respuesta: B.**",
+            "",
+            "Las dispersiones coloidales **sí tienen superficies limitantes** (a diferencia de las dispersiones moleculares/soluciones verdaderas, que no las tienen) y su rango de tamaño es 1 nm – 1 µm, visible por microscopía electrónica (SEM) y separable por diálisis o ultrafiltración.",
+            "",
+            "A es la trampa clásica: es al revés, las coloidales sí presentan superficies limitantes. C describe a la dispersión molecular. D es falso: son visibles por SEM.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Aplicación.** Clasifique cada uno de estos sistemas farmacéuticos según su combinación de fase dispersa / fase dispersante (S = sólido, L = líquido, G = gas):",
+            "",
+            "1. Supositorio",
+            "2. Loción de calamina",
+            "3. Aerosol de un inhalador",
+            "4. Aceite de hígado de bacalao emulsionado en agua",
+            "5. Icopor (poliestireno expandido)",
+          ].join("\n"),
+          solution: [
+            "1. **Supositorio → S/S** (partículas sólidas de fármaco dispersas en una base sólida).",
+            "2. **Calamina → S/L** (óxido de zinc, sólido, disperso en un vehículo líquido: suspensión).",
+            "3. **Aerosol de inhalador → S/G o L/G** (partículas sólidas o gotas líquidas de fármaco dispersas en un gas propelente).",
+            "4. **Aceite de hígado de bacalao en agua → L/L** (emulsión: una fase líquida dispersa en otra líquida inmiscible).",
+            "5. **Icopor → G/S** (espuma sólida: gas atrapado en una matriz sólida continua).",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Definición — diferenciación.** Diferencie los pares de términos **monodisperso / polidisperso** e **incoherente / coherente**, y dé un ejemplo farmacéutico de cada categoría del segundo par.",
+          ].join("\n"),
+          solution: [
+            "**Monodisperso**: las partículas de la fase dispersa tienen un tamaño prácticamente uniforme. **Polidisperso**: el tamaño varía dentro de la misma muestra; a menor índice de polidispersidad, más uniforme (y más predecible) es el sistema.",
+            "",
+            "**Incoherente**: no hay una red estructural entre las partículas — cada una se mueve de forma relativamente independiente. Ejemplo: una **suspensión** o una **emulsión** sin gelificante.",
+            "",
+            "**Coherente**: existe una red tridimensional que da estructura y consistencia al sistema. Ejemplo: un **gel** o una **base para ungüento**.",
+            "",
+            "Los dos pares son ejes de clasificación **independientes**: un sistema puede ser, por ejemplo, polidisperso e incoherente a la vez (una suspensión mal controlada), o monodisperso y coherente (un gel con partículas uniformes).",
+          ].join("\n"),
+        },
+      ],
     },
     {
       slug: "tensioactivos-hlb",
@@ -47,6 +98,121 @@ export const ft2: SubjectContent = {
       hasLab: true,
       labProtocol:
         "Determinación de propiedades de tensioactivos (poder emulsificante, humectante, gelificante, solubilizante y efecto de electrolitos). Comportamiento de interfases sólido-líquido: mojado, flotación y extensión frente a distintos sólidos.",
+      exercises: [
+        {
+          question: [
+            "**Opción múltiple.** Según la interfase en la que actúa, un tensioactivo ejerce respectivamente su poder en las interfases L-L, L-S y L-G como:",
+            "",
+            "A) Afrógeno, emulsificante, espumante",
+            "B) Humectante, antiespumante, detergente",
+            "C) Emulsificante, humectante, afrógeno",
+            "D) Solubilizante, antiespumante, humectante",
+          ].join("\n"),
+          solution: [
+            "**Respuesta: C.**",
+            "",
+            "L-L → **emulsificante** (O/W o W/O) y solubilizante/microemulsificante.",
+            "L-S → **humectante**.",
+            "L-G → **afrógeno** (forma espuma), antiespumante y detergente.",
+            "",
+            "Memoriza la relación interfase→poder directamente, no solo la lista de nombres: es la trampa más repetida en el parcial.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Cálculo — HLB de mezcla.** Necesitas un HLB de 12 para emulsionar una fase oleosa. Dispones de Span 80 (HLB 4.3) y Tween 80 (HLB 15). ¿Qué porcentaje de cada uno debes usar?",
+          ].join("\n"),
+          solution: [
+            "#### Planteamiento",
+            "HLB_mezcla = (HLB_A × %A + HLB_B × %B) / 100, con %A + %B = 100.",
+            "",
+            "#### Despeje",
+            "%Tween80 = (HLB_mezcla − HLB_Span80) / (HLB_Tween80 − HLB_Span80) × 100",
+            "%Tween80 = (12 − 4.3) / (15 − 4.3) × 100 ≈ **72 %**",
+            "%Span80 = 100 − 72 = **28 %**",
+            "",
+            "#### Verificación",
+            "(4.3 × 0.28) + (15 × 0.72) = 1.20 + 10.8 = **12.0** ✓",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Aplicación — formulación.** Vas a formular una emulsión O/W (aceite en agua). ¿Qué rango de HLB debe tener el tensioactivo (o la mezcla) y qué tipo de tensioactivo evitarías si necesitas compatibilidad amplia de pH?",
+          ].join("\n"),
+          solution: [
+            "Rango de HLB: **8–16** (emulsificante O/W según la escala de Griffin).",
+            "",
+            "Evitarías los tensioactivos **iónicos** (aniónicos o catiónicos): su carga los hace sensibles al pH y a los electrolitos del medio, lo que puede desestabilizar la emulsión. Los tensioactivos **no iónicos** son más compatibles en un rango amplio de pH.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Cálculo — coeficiente de extensión.** La tensión superficial del agua es 72.0 din/cm; la de una loción oleosa con tensioactivo al 5 % es 35.2 din/cm; la tensión interfacial loción-agua es 4.2 din/cm. Calcule el coeficiente de extensión S de la loción sobre el agua e interprete el signo.",
+          ].join("\n"),
+          solution: [
+            "#### Fórmula",
+            "S = γ_agua − (γ_loción + γ_interfacial)",
+            "",
+            "#### Cálculo",
+            "S = 72.0 − (35.2 + 4.2) = 72.0 − 39.4 = **32.6 din/cm**",
+            "",
+            "#### Interpretación",
+            "**S > 0**: la loción se extiende espontáneamente sobre el agua — la adhesión (loción-agua) predomina sobre la cohesión interna de la loción.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Aplicación.** Dos excipientes de tableteo frente al agua: estearato de magnesio (ángulo de contacto 121°) y lactosa (ángulo de contacto 30°). ¿Cuál se moja mejor y por qué se usa el estearato de magnesio como lubricante y no como agente humectante?",
+          ].join("\n"),
+          solution: [
+            "La **lactosa** se moja mejor: su ángulo de contacto es pequeño (30°), muy por debajo de 90°, lo que indica buena afinidad por el agua (hidrofilia).",
+            "",
+            "El **estearato de magnesio** tiene un ángulo de contacto mayor a 90° (121°), lo que lo clasifica como **hidrofóbico**: repele el agua en vez de dejarse mojar por ella. Por eso se usa como **lubricante** (evita que el polvo se adhiera a los punzones/matrices) y no como humectante, que requeriría justo lo contrario.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**V/F con justificación.** La CMC de un tensioactivo no iónico es mayor que la de uno iónico con la misma longitud de cadena hidrofóbica.",
+          ].join("\n"),
+          solution: [
+            "**Falso.**",
+            "",
+            "Es **menor**. El tensioactivo no iónico no tiene carga en su grupo hidrofílico, por lo que no sufre la repulsión electrostática que dificulta el acercamiento de las cabezas polares en el iónico. Esto facilita la micelización a una concentración más baja (menor CMC) y además permite micelas de mayor tamaño.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**V/F con justificación.** Un liposoma es una monocapa formada por autoensamblaje de moléculas anfifílicas, igual que una micela.",
+          ].join("\n"),
+          solution: [
+            "**Falso.**",
+            "",
+            "Los liposomas están formados por **bicapas** lipídicas (como la membrana celular), no por monocapas. Las micelas sí son estructuras de **monocapa** (las colas hidrofóbicas apuntan hacia el centro, lejos del agua). No confundir ambas estructuras aunque las dos se autoensamblen a partir de moléculas anfifílicas.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Definición — diferenciación.** Diferencie el soluto tipo I y el soluto tipo IIA en términos de exceso de concentración superficial (Γ₂) y efecto sobre la tensión superficial.",
+          ].join("\n"),
+          solution: [
+            "**Soluto tipo I**: exceso de concentración superficial **negativo** (Γ₂ < 0) — el soluto evita la interfase y prefiere el seno de la solución. **Aumenta** la tensión superficial. Ejemplo: electrolitos, sales inorgánicas.",
+            "",
+            "**Soluto tipo IIA**: exceso **positivo** (Γ₂ > 0) — se concentra fuertemente en la interfase. **Disminuye** mucho la tensión superficial, con un efecto más marcado que el tipo II. Son los tensioactivos.",
+            "",
+            "El signo de Γ₂ se deduce del signo de dγ/dc en la isoterma de Gibbs: dγ/dc > 0 → Γ₂ < 0 (tipo I); dγ/dc < 0 → Γ₂ > 0 (tipo II/IIA).",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Definición.** Defina brevemente el **parámetro de empaquetamiento** de un tensioactivo y explique qué predice.",
+          ].join("\n"),
+          solution: [
+            "Es una relación geométrica, P = v / (a₀ · lc), entre el volumen de la cola hidrofóbica (v), el área óptima de la cabeza polar (a₀) y la longitud de la cadena hidrofóbica extendida (lc).",
+            "",
+            "**Predice el tipo de agregado** que formará el tensioactivo en solución: valores bajos (P ≤ 1/3) dan micelas esféricas; valores intermedios, micelas cilíndricas o bicapas curvas (vesículas); P ≈ 1, bicapas planas; P > 1, micelas invertidas (estructuras W/O) — es decir, también predice si el tensioactivo favorece emulsiones O/W (cabeza grande, P pequeño) o W/O (cola dominante, P grande).",
+          ].join("\n"),
+        },
+      ],
     },
     {
       slug: "coloides-reologia",
@@ -98,11 +264,28 @@ export const ft2: SubjectContent = {
   glossary: [
     { term: "Sistema heterodisperso", moduleSlug: "introduccion", definition: "Sistema formado por **dos o más fases**, en el que una fase (dispersa) se encuentra distribuida dentro de otra (dispersante o continua); incluye suspensiones, emulsiones y sistemas semisólidos." },
     { term: "Sistema polifásico", moduleSlug: "introduccion", definition: "Sistema compuesto por **más de una fase** físicamente distinguible (sólida, líquida o gaseosa)." },
+    { term: "Fase dispersa", moduleSlug: "introduccion", definition: "Sustancia fraccionada en pequeñas partículas dentro de un sistema heterodisperso; también llamada **fase interna o discontinua**." },
+    { term: "Fase dispersante", moduleSlug: "introduccion", definition: "Medio **homogéneo y continuo** en el que se distribuyen las partículas de la fase dispersa; también llamada fase externa." },
+    { term: "Monodisperso / polidisperso", moduleSlug: "introduccion", definition: "**Monodisperso**: partículas de tamaño prácticamente uniforme. **Polidisperso**: partículas de tamaños variados; a menor índice de polidispersidad, mayor homogeneidad del sistema." },
+    { term: "Incoherente / coherente", moduleSlug: "introduccion", definition: "**Incoherente**: sistema sin red estructural entre partículas (suspensiones, emulsiones). **Coherente**: con una red tridimensional que le da estructura (geles, bases para ungüento)." },
     { term: "Tensioactivo", moduleSlug: "tensioactivos-hlb", definition: "Sustancia que **reduce la tensión superficial o interfacial** entre dos fases, favoreciendo procesos como la emulsificación, humectación o solubilización." },
     { term: "HLB (Balance Hidrófilo-Lipófilo)", moduleSlug: "tensioactivos-hlb", definition: "Valor numérico (0-20) que indica la **afinidad relativa** de un tensioactivo por la fase acuosa u oleosa; valores bajos favorecen emulsiones A/O y valores altos O/A." },
     { term: "Tensión interfacial", moduleSlug: "tensioactivos-hlb", definition: "**Fuerza por unidad de longitud** que actúa en la interfase entre dos fases inmiscibles, tendiendo a minimizar el área de contacto entre ellas." },
     { term: "Ángulo de contacto", moduleSlug: "tensioactivos-hlb", definition: "Ángulo formado entre la superficie de un sólido y la tangente a la superficie de un líquido en el punto de contacto; indica el **grado de mojado**." },
-    { term: "Adsorción sólido-líquido", moduleSlug: "tensioactivos-hlb", definition: "**Acumulación de moléculas** (p. ej. un tensioactivo) en la interfase entre un sólido y un líquido." },
+    { term: "Adsorción sólido-líquido", moduleSlug: "tensioactivos-hlb", definition: "**Acumulación de moléculas** (p. ej. un tensioactivo) en la interfase entre un sólido y un líquido; es la base física del punto de mojado." },
+    { term: "Trabajo de adhesión (Wa)", moduleSlug: "tensioactivos-hlb", definition: "Energía necesaria para **separar 1 cm² de la interfase** entre dos líquidos inmiscibles (o un líquido y un sólido); ocurre entre moléculas de naturaleza química diferente." },
+    { term: "Trabajo de cohesión (Wc)", moduleSlug: "tensioactivos-hlb", definition: "Energía necesaria para **separar 1 cm² de una columna** de un único líquido homogéneo; ocurre entre moléculas de la misma naturaleza." },
+    { term: "Coeficiente de extensión (S)", moduleSlug: "tensioactivos-hlb", definition: "S = Wa − Wc. Si **S>0** el líquido se extiende espontáneamente sobre el sustrato; si **S<0** se repliega en gota (de-wetting)." },
+    { term: "Isoterma de adsorción de Gibbs", moduleSlug: "tensioactivos-hlb", definition: "Relaciona el **exceso de concentración superficial** de un soluto con la variación de la tensión superficial respecto a su concentración (dγ/dc)." },
+    { term: "Soluto tipo I", moduleSlug: "tensioactivos-hlb", definition: "Soluto **excluido de la interfase** (exceso de concentración superficial negativo); **aumenta** la tensión superficial. Ejemplo: electrolitos inorgánicos." },
+    { term: "Soluto tipo II / IIA", moduleSlug: "tensioactivos-hlb", definition: "Soluto que **se concentra en la interfase** (exceso positivo) y **disminuye** la tensión superficial; el tipo IIA (tensioactivos) tiene un efecto mucho más fuerte que el tipo II." },
+    { term: "CMC (concentración micelar crítica)", moduleSlug: "tensioactivos-hlb", definition: "Concentración mínima de tensioactivo a partir de la cual **empiezan a formarse micelas** en solución." },
+    { term: "Micela", moduleSlug: "tensioactivos-hlb", definition: "Estructura **autoensamblada** de moléculas de tensioactivo en solución acuosa, formada por encima de la CMC (esférica, cilíndrica, laminar)." },
+    { term: "Temperatura de Krafft", moduleSlug: "tensioactivos-hlb", definition: "Temperatura **mínima** a la que la solubilidad de un tensioactivo iónico alcanza la CMC y pueden formarse micelas; por debajo permanece en forma cristalina no disuelta." },
+    { term: "Punto de enturbiamiento (cloud point)", moduleSlug: "tensioactivos-hlb", definition: "Análogo al de Krafft pero para tensioactivos **no iónicos**: al subir la temperatura por encima de este punto, las cadenas de óxido de etileno se deshidratan y la solución se enturbia." },
+    { term: "Parámetro de empaquetamiento (P)", moduleSlug: "tensioactivos-hlb", definition: "Relación geométrica (v / a₀·lc) que **predice el tipo de agregado** que forma un tensioactivo: micela esférica, cilíndrica, bicapa o micela invertida." },
+    { term: "Cotensioactivo", moduleSlug: "tensioactivos-hlb", definition: "Compuesto con cierto carácter tensioactivo (p. ej. alcoholes de cadena corta) que **no es tensioactivo por sí mismo** pero ajusta el parámetro de empaquetamiento y estabiliza interfases." },
+    { term: "Cristales líquidos liotrópicos", moduleSlug: "tensioactivos-hlb", definition: "Fases ordenadas (hexagonales, laminares) que forman los tensioactivos a **concentración alta**, como paso intermedio entre la micela esférica y la bicapa completa." },
     { term: "Sistema coloidal", moduleSlug: "coloides-reologia", definition: "Sistema disperso en el que el **tamaño de partícula** de la fase dispersa está aproximadamente entre 1 nm y 1 µm." },
     { term: "Coloide liofílico / liofóbico", moduleSlug: "coloides-reologia", definition: "**Liofílico**: coloide con afinidad por el medio de dispersión, se dispersa espontáneamente. **Liofóbico**: coloide sin afinidad por el medio, requiere estabilización externa." },
     { term: "Doble capa eléctrica", moduleSlug: "coloides-reologia", definition: "Distribución de cargas eléctricas alrededor de una partícula coloidal cargada, formada por una **capa fija** y una **capa difusa** de iones de signo contrario." },
@@ -180,6 +363,42 @@ export const ft2: SubjectContent = {
       moduleSlug: "tensioactivos-hlb",
       derivation:
         "Describe el **equilibrio de tensiones superficiales e interfaciales** en el punto donde se encuentran las tres fases (sólido, líquido y vapor) cuando una gota de líquido reposa sobre una superficie sólida. Al despejar cos θ se obtiene una medida cuantitativa de qué tan bien moja el líquido al sólido: cuanto **menor el ángulo de contacto** (cos θ más cercano a 1), mejor es el mojado del sólido por el vehículo — relevante para dispersar polvos hidrófobos en un vehículo acuoso.\nγ_{SV} = tensión interfacial sólido-vapor (energía superficial del sólido seco) — mN/m (SI) o dyn/cm (cgs).\nγ_{SL} = tensión interfacial sólido-líquido — mN/m (SI) o dyn/cm (cgs).\nγ_{LV} = tensión superficial líquido-vapor (del líquido frente al aire) — mN/m (SI) o dyn/cm (cgs).\nθ = ángulo de contacto, medido entre la superficie sólida y la tangente a la gota en el punto de contacto — grados (°) o radianes; su coseno es adimensional.",
+    },
+    {
+      name: "Coeficiente de extensión de Harkins",
+      expression: "S = W_{a} − W_{c} = γ_{w} − (γ_{o} + γ_{ow})",
+      variables: "W_{a} = trabajo de adhesión · W_{c} = trabajo de cohesión · γ_{w} = tensión superficial del agua · γ_{o} = tensión superficial del aceite/loción · γ_{ow} = tensión interfacial aceite-agua",
+      description: "Predice si un líquido se **extiende espontáneamente** sobre otro (o sobre un sólido) comparando el trabajo de adhesión con el de cohesión.",
+      moduleSlug: "tensioactivos-hlb",
+      derivation:
+        "Compara la energía que favorece que el líquido se **adhiera** a un sustrato distinto (Wa) frente a la que lo mantiene **cohesionado** consigo mismo (Wc). Si Wa > Wc, la adhesión gana y S resulta positivo: el líquido se extiende espontáneamente formando una película. Si Wc > Wa, S es negativo y el líquido prefiere replegarse en una gota (de-wetting) antes que extenderse.\nS = coeficiente de extensión — din/cm (cgs) o mN/m (SI).\nW_{a} = trabajo de adhesión entre las dos fases — din/cm o mN/m.\nW_{c} = trabajo de cohesión del líquido que se extiende — din/cm o mN/m.\nγ_{w} = tensión superficial de la fase acuosa — din/cm o mN/m.\nγ_{o} = tensión superficial de la fase oleosa/loción — din/cm o mN/m.\nγ_{ow} = tensión interfacial entre ambas fases — din/cm o mN/m.\n**S>0**: se extiende espontáneamente. **S≈0**: forma una lente plana. **S<0**: se repliega en gota.",
+    },
+    {
+      name: "Ecuación de Young-Dupré (trabajo de adhesión)",
+      expression: "W_{a} = γ_{LV}(1 + cos θ)",
+      variables: "W_{a} = trabajo de adhesión sólido-líquido · γ_{LV} = tensión superficial líquido-vapor · θ = ángulo de contacto",
+      description: "Combina la ecuación de Young con la definición de trabajo de adhesión para relacionar el **ángulo de contacto** directamente con la energía de mojado.",
+      moduleSlug: "tensioactivos-hlb",
+      derivation:
+        "Se obtiene sustituyendo la ecuación de Young (γ_{SV} = γ_{SL} + γ_{LV} cos θ) en la definición de trabajo de adhesión sólido-líquido (W_{a} = γ_{SV} + γ_{LV} − γ_{SL}). El resultado deja el trabajo de adhesión en función solo de γ_{LV} y θ, ambos medibles directamente.\nθ = 0° (**mojado total**) → W_{a} máximo = 2γ_{LV}.\nθ = 180° (**sin mojado**) → W_{a} = 0.\nA **menor ángulo de contacto, mayor trabajo de adhesión** y mejor mojado del sólido por el vehículo.",
+    },
+    {
+      name: "Isoterma de adsorción de Gibbs (solución diluida)",
+      expression: "Γ_{2} = −#{c|RT} × (dγ/dc)",
+      variables: "Γ_{2} = concentración superficial en exceso del soluto · c = concentración del soluto · R = constante de los gases · T = temperatura absoluta · dγ/dc = variación de la tensión superficial con la concentración",
+      description: "Predice si un soluto se **concentra en la interfase** (adsorción positiva) o la **evita** (adsorción negativa) según cómo cambia la tensión superficial con su concentración.",
+      moduleSlug: "tensioactivos-hlb",
+      derivation:
+        "Relaciona el exceso de concentración de un soluto en la interfase (respecto al seno de la solución) con la pendiente de la tensión superficial frente a la concentración. Si dγ/dc es **negativo** (la tensión superficial baja al subir la concentración), Γ_{2} resulta **positivo**: el soluto se concentra en la interfase — así se comportan los solutos tipo II y IIA (tensioactivos). Si dγ/dc es **positivo**, Γ_{2} es **negativo**: el soluto evita la interfase y prefiere el seno de la solución — así se comportan los solutos tipo I (electrolitos).\nΓ_{2} = concentración superficial en exceso — mol/área.\nc = concentración del soluto en el seno de la solución — mol/L.\nR = constante de los gases — 8.314 J/(mol·K).\nT = temperatura absoluta — K.\ndγ/dc = pendiente de la tensión superficial respecto a la concentración — (din/cm)/(mol/L).",
+    },
+    {
+      name: "Parámetro de empaquetamiento",
+      expression: "P = #{v|a_{0} × l_{c}}",
+      variables: "v = volumen de la cola hidrofóbica · a_{0} = área óptima del grupo hidrofílico (cabeza polar) · l_{c} = longitud de la cadena hidrofóbica extendida",
+      description: "Predice, a partir de la **geometría molecular** del tensioactivo, qué tipo de agregado formará (micela esférica, cilíndrica, bicapa o micela invertida).",
+      moduleSlug: "tensioactivos-hlb",
+      derivation:
+        "Compara el volumen que ocupa la cola hidrofóbica con el volumen de un cono definido por el área de la cabeza polar y la longitud de la cadena extendida. Cuanto más pequeño P, más se parece la molécula a un cono con base ancha (cabeza grande frente a cola) y forma agregados muy curvados (micelas esféricas); cuanto más cerca de 1, más cilíndrica es la forma efectiva y forma bicapas planas; por encima de 1 la cola domina y se favorecen micelas invertidas (estructuras A/O).\nP ≤ 1/3 → **micelas esféricas**. 1/3–1/2 → **micelas cilíndricas**. 1/2–1 → **vesículas / bicapas curvas**. ≈1 → **bicapas planas**. >1 → **micelas invertidas** (W/O).\nLos **cotensioactivos** (p. ej. alcoholes de cadena corta) no son tensioactivos por sí mismos, pero modifican a_{0} o v y ajustan P hacia valores cercanos a 1, favoreciendo microemulsiones. Al seguir subiendo la concentración de tensioactivo aparecen los **cristales líquidos liotrópicos** (hexagonales, laminares) como paso intermedio hacia la bicapa completa.",
     },
     {
       name: "Concentración porcentual (p/v, p/p, v/v)",
