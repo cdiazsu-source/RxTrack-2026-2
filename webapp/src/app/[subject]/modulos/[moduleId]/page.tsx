@@ -17,7 +17,7 @@ import { HelpHint } from "@/components/help-hint";
 import { ExercisesPanel } from "@/components/exercises-panel";
 import { ResourcesPanel } from "@/components/resources-panel";
 import { LabPanel } from "@/components/lab-panel";
-import { inlineLite } from "@/lib/markdown-lite";
+import { inlineLite, renderCornell } from "@/lib/markdown-lite";
 
 export const dynamic = "force-dynamic";
 
@@ -169,6 +169,23 @@ export default async function ModuleDetailPage({
           dangerouslySetInnerHTML={{ __html: inlineLite(mod.description) }}
         />
       </details>
+
+      {/* Desarrollo: capítulo extenso y pedagógico del módulo — lectura opcional. */}
+      {mod.chapter && (
+        <details className="group rounded-lg border border-border bg-card [&_summary]:list-none">
+          <summary className="flex cursor-pointer items-center justify-between gap-2 p-4 text-sm font-medium">
+            <span className="flex items-center gap-1.5">
+              Desarrollo del módulo
+              <HelpHint k="modulo-desarrollo" />
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" aria-hidden />
+          </summary>
+          <div
+            className="cornell border-t border-border p-4 pt-3 text-sm leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: renderCornell(mod.chapter) }}
+          />
+        </details>
+      )}
 
       <section id="apuntes" className="scroll-mt-24">
         <SessionNotes

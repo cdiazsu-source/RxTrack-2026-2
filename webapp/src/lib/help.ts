@@ -27,6 +27,8 @@ export const HELP: Record<string, string> = {
     "Estado del módulo (lo marcas tú; no se calcula) + enlace a su carpeta de Drive (lo pones tú; la app solo lo abre) + «Empieza por aquí», que el sistema decide solo: apunte sin revisar → subtarea pendiente → informe de lab → marcar dominado.",
   "modulo-descripcion":
     "Resumen del tema. Sale de `modules[].description` en `content/<code>.ts` y el `db:seed` lo reescribe en cada corrida: NO lo edites aquí, edítalo en el archivo del content.",
+  "modulo-desarrollo":
+    "Explicación extensa y pedagógica del módulo completo — como un capítulo de libro, con analogías. Sale de `modules[].chapter` en `content/<code>.ts` y el `db:seed` lo reescribe en cada corrida: NO lo edites aquí. Es material de lectura opcional, no reemplaza los apuntes de cada sesión.",
   apuntes:
     "Un apunte por clase, con tres campos independientes (cada uno guarda borrador local en cada tecla): «Apuntes» (Cornell, Markdown), «Transcripción» (texto del audio) y «Diapositivas / Notas de clase» (texto de las diapositivas o el PDF; suele llegar después). La «Etapa» (Crudos → Transcrita → Cornell IA → Revisada) sube sola al agregar transcripción/Cornell; «Revisada» la marcas tú y ya no baja. Los dos botones de prompt solo arman texto para tu IA: uno extrae el texto de las diapositivas, otro redacta los apuntes Cornell.",
   checklist:

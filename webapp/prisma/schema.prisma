@@ -96,6 +96,8 @@ model Module {
   notesUrl        String?
   labProtocol     String?          @db.Text
   labReportStatus LabReportStatus?
+  /// Desarrollo pedagógico extenso del módulo (content/<code>.ts: modules[].chapter).
+  chapter         String?          @db.Text
   /// false = creado dentro de la app; el resync del seed lo ignora.
   fromContent     Boolean          @default(true)
 

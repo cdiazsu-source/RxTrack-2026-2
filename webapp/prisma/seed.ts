@@ -71,6 +71,7 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
         order: i,
         hasLab: m.hasLab ?? false,
         labProtocol: m.labProtocol ?? null,
+        chapter: m.chapter ?? null,
         fromContent: true,
       },
       update: {
@@ -79,6 +80,7 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
         order: i,
         hasLab: m.hasLab ?? false,
         labProtocol: m.labProtocol ?? null,
+        chapter: m.chapter ?? null,
       },
     });
     moduleIdBySlug.set(m.slug, row.id);

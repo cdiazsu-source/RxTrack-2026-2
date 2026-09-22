@@ -32,6 +32,14 @@ export interface ModuleContent {
    * del arreglo es el orden en que aparecen.
    */
   exercises?: ExerciseContent[];
+  /**
+   * Desarrollo extenso y pedagógico del módulo completo, en Markdown
+   * (markdown-lite: `#### encabezado`, listas, `**negrita**`, `> analogía`,
+   * y bloques ` ```formula ` con el markup de fórmulas). Es material de
+   * lectura — un capítulo de libro para ese módulo — no un resumen; se
+   * muestra plegado en su propia sección en la página del módulo.
+   */
+  chapter?: string;
 }
 
 export interface GlossaryContent {
