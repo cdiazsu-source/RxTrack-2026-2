@@ -37,7 +37,7 @@ export async function generateFlashcards(subjectId: string) {
   }
 
   for (const f of formulas) {
-    const back = [`\`${f.expression.replace(/\n/g, " ")}\``, f.description].filter(Boolean).join("\n\n");
+    const back = [`\`\`\`formula\n${f.expression}\n\`\`\``, f.description].filter(Boolean).join("\n\n");
     await prisma.flashcard.upsert({
       where: { source_sourceId: { source: "FORMULA", sourceId: f.id } },
       create: {
