@@ -1191,6 +1191,48 @@ export const ft2: SubjectContent = {
         "7. A A3/B3 adicionar 5 mL de electrolito 2 (Na₂HPO₄ 2 %), agitar y observar; repetir con otros 5 mL.\n" +
         "8. Agitar y dejar en reposo 15 min.\n" +
         "9. Medir volumen de sedimento, aspecto del sobrenadante y del sedimento (Tablas 16–17), vueltas para redispersar y tiempo para sedimentar 5 mL.",
+      flowcharts: [
+        {
+          title: "Actividad 3A — Efecto de la carga del sólido disperso",
+          definition: [
+            "flowchart TD",
+            'A["⚖️ Pesar 3,0 g de subnitrato de bismuto (III)<br/>en un mortero de porcelana"] --> B["💧 Añadir 2 mL de propilenglicol<br/>mezclar hasta distribución completa"]',
+            'B --> C["💧 Añadir 5 mL de agua desionizada<br/>homogenizar hasta papilla homogénea"]',
+            'C --> D["💧 Añadir 10 mL más de agua desionizada<br/>dispersar y transvasar a probeta de 50 mL<br/>(lavar el mortero, arrastrar TODO el sólido)"]',
+            'D --> E{"🔁 ¿Ya preparaste las 16 muestras?<br/>BL · A1–A5 · B1–B5 · C1–C5"}',
+            'E -- No, falta alguna --> A',
+            'E -- Sí, ya están todas --> F["🧪 Añadir a cada probeta el volumen de electrolito<br/>de la Tabla 11 (NaCl / AlCl3 / Na2HPO4)<br/>y completar a volumen con agua"]',
+            'F --> G["🌀 Marcar la probeta, agitar bien<br/>y dejar en reposo 15 min"]',
+            'G --> H["👁️ A los 15 min: medir volumen de sedimento,<br/>aspecto del sobrenadante y si es compacto o suelto"]',
+            'H --> I["🔄 Invertir la probeta 180° las veces necesarias<br/>para redispersar — contar el número de vueltas"]',
+            'I --> J["⏱️ Agitar de nuevo y cronometrar<br/>el tiempo para sedimentar 5 mL"]',
+            'J --> K["📊 Calcular F, β y velocidad de sedimentación<br/>(hoja de datos) y graficar contra mM"]',
+          ].join("\n"),
+        },
+        {
+          title: "Actividad 3B — Comunicación de carga con un humectante cargado",
+          definition: [
+            "flowchart TD",
+            'A["⚖️ Pesar 2,5 g de azufre<br/>en un mortero de porcelana"] --> B{"🧴 ¿Qué humectante<br/>vas a usar?"}',
+            'B -- Aerosol OT (aniónico) --> C1["💧 Añadir 1 mL de Aerosol OT<br/>mezclar bien"]',
+            'B -- Cloruro de benzalconio (catiónico) --> C2["💧 Añadir 1 mL de cloruro de benzalconio<br/>mezclar bien"]',
+            'C1 --> D["💧 Añadir 5 mL de agua desionizada → papilla<br/>luego 10 mL más, dispersar<br/>y pasar a probeta de 50 mL (llevar a 40 mL)"]',
+            "C2 --> D",
+            'D --> E["🔁 Repetir el proceso por triplicado<br/>marcar como N.° 1, 2 y 3<br/>(A1–A3 con Aerosol OT, o B1–B3 con benzalconio)"]',
+            'E --> F{"¿Cuál de las tres<br/>probetas es esta?"}',
+            'F -- Es la N.° 1 (blanco) --> G1["💧 Completar a 50 mL con agua desionizada<br/>— sin electrolito"]',
+            'F -- Es la N.° 2 --> G2["🧪 Añadir 5 mL de CaCl2 2 %<br/>agitar y observar<br/>añadir otros 5 mL más"]',
+            'F -- Es la N.° 3 --> G3["🧪 Añadir 5 mL de Na2HPO4 2 %<br/>agitar y observar<br/>añadir otros 5 mL más"]',
+            "G1 --> H[\"🌀 Agitar y dejar en reposo 15 min\"]",
+            "G2 --> H",
+            "G3 --> H",
+            'H --> I["👁️ Medir volumen de sedimento,<br/>aspecto del sobrenadante y del sedimento"]',
+            'I --> J["🔄 Contar vueltas de 180°<br/>para redispersar"]',
+            'J --> K["⏱️ Cronometrar el tiempo<br/>para sedimentar 5 mL"]',
+            'K --> L["📊 Calcular F, β y velocidad de sedimentación<br/>y comparar A1–A3 contra B1–B3"]',
+          ].join("\n"),
+        },
+      ],
       equations: [
         {
           name: "Velocidad de sedimentación",

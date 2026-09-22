@@ -124,6 +124,12 @@ export interface LabPracticeContent {
   /** Preparación para el quiz de la práctica: preguntas con su respuesta,
    *  de una en una en la app (igual que `exercises` de un módulo). */
   quizQuestions?: ExerciseContent[];
+  /**
+   * Diagrama(s) de flujo del procedimiento, en sintaxis de mermaid.js
+   * (`flowchart TD ...`). Uno por procedimiento distinto dentro de la
+   * práctica (p. ej. una actividad A y otra B con pasos diferentes).
+   */
+  flowcharts?: { title: string; definition: string }[];
 }
 
 export interface SubjectContent {

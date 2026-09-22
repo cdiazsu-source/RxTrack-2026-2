@@ -11,6 +11,7 @@ import { PromptBox } from "@/components/prompt-box";
 import { labPracticePrompt } from "@/lib/prompts";
 import { inlineLite, renderCornell } from "@/lib/markdown-lite";
 import { renderFormula } from "@/lib/formula-markup";
+import { MermaidDiagram } from "@/components/mermaid-diagram";
 import type { ExerciseContent, LabPracticeContent } from "@/lib/subject-content";
 
 /** Preparación para el quiz de la práctica: de una pregunta en una, con
@@ -135,6 +136,17 @@ function PracticeItem({
 
         <SectionLabel>Procedimiento</SectionLabel>
         <div className="cornell mt-1 text-sm" dangerouslySetInnerHTML={{ __html: renderCornell(p.procedure) }} />
+
+        {p.flowcharts && p.flowcharts.length > 0 && (
+          <>
+            <SectionLabel>Diagrama de flujo</SectionLabel>
+            <div className="mt-1 flex flex-col gap-3">
+              {p.flowcharts.map((f, i) => (
+                <MermaidDiagram key={i} title={f.title} definition={f.definition} />
+              ))}
+            </div>
+          </>
+        )}
 
         {p.equations && p.equations.length > 0 && (
           <>
