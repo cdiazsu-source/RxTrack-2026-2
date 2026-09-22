@@ -41,6 +41,13 @@ const ACCOUNTS: Account[] = [
     profile: { name: "Diana", level: "read" },
   },
   {
+    // Sin fallback en código: la contraseña vive solo en .env (local, sin
+    // trackear) y en la variable de entorno del mismo nombre en Vercel.
+    username: "paula",
+    password: process.env.SITE_PASSWORD_PAULA || "",
+    profile: { name: "Paula", level: "read" },
+  },
+  {
     // Jefe de laboratorio de AIF: control total, PERO solo de /aif/laboratorio.
     // El middleware reenvía cualquier otra ruta a esa sección.
     username: "jose",
@@ -79,7 +86,7 @@ async function hmac(data: string): Promise<string> {
 export function checkCredentials(username: string, password: string): Profile | null {
   const u = username.trim().toLowerCase();
   const acc = ACCOUNTS.find((a) => a.username === u);
-  if (!acc || password !== acc.password) return null;
+  if (!acc || !acc.password || password !== acc.password) return null;
   return acc.profile;
 }
 
