@@ -101,6 +101,14 @@ export interface LabPracticeContent {
   moduleSlug?: string | null;
   /** Por qué se hace la práctica y qué se busca demostrar. Admite `**negrita**`. */
   fundamento: string;
+  /**
+   * Desarrollo pedagógico extenso de la práctica, en Markdown (markdown-lite,
+   * con `> analogía` y bloques ` ```formula `): contextualiza con analogías,
+   * profundiza el fundamento (sin acrónimos sin explicar) y describe el
+   * resultado esperado. Es lectura opcional — no reemplaza `fundamento`
+   * (que sigue siendo el resumen corto) ni `procedure`.
+   */
+  desarrollo?: string;
   /** Todo lo esencial para desarrollarla: reactivos clave, pasos críticos,
    *  criterios de clasificación, precauciones. Un elemento por viñeta. */
   keyPoints: string[];

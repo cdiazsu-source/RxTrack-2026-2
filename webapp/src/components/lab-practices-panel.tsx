@@ -115,6 +115,19 @@ function PracticeItem({
         <SectionLabel>Fundamento</SectionLabel>
         <p className="mt-1 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: inlineLite(p.fundamento) }} />
 
+        {p.desarrollo && (
+          <details className="group/dev mt-3 rounded-lg border border-primary/30 bg-primary/[0.03]">
+            <summary className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm font-medium text-primary [&::-webkit-details-marker]:hidden">
+              Desarrollo pedagógico de la práctica (contexto, analogías y resultado esperado)
+              <ChevronRight className="h-4 w-4 shrink-0 transition-transform group-open/dev:rotate-90" aria-hidden />
+            </summary>
+            <div
+              className="cornell border-t border-primary/20 p-3 pt-2 text-sm"
+              dangerouslySetInnerHTML={{ __html: renderCornell(p.desarrollo) }}
+            />
+          </details>
+        )}
+
         <SectionLabel>Lo que necesitas saber</SectionLabel>
         <div className="mt-1">
           <Bullets items={p.keyPoints} />
