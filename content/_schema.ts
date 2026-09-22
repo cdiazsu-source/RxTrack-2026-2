@@ -113,6 +113,9 @@ export interface LabPracticeContent {
   dataRequested: string[];
   /** Temas de consulta previos (opcional). */
   studyTopics?: string[];
+  /** Preparación para el quiz de la práctica: preguntas con su respuesta,
+   *  de una en una en la app (igual que `exercises` de un módulo). */
+  quizQuestions?: ExerciseContent[];
 }
 
 export interface SubjectContent {

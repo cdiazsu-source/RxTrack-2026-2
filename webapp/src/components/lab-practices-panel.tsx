@@ -2,15 +2,64 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Sparkles } from "lucide-react";
+import { ChevronRight, Eye, Sparkles } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { HelpHint } from "@/components/help-hint";
 import { PromptBox } from "@/components/prompt-box";
 import { labPracticePrompt } from "@/lib/prompts";
 import { inlineLite, renderCornell } from "@/lib/markdown-lite";
 import { renderFormula } from "@/lib/formula-markup";
-import type { LabPracticeContent } from "@/lib/subject-content";
+import type { ExerciseContent, LabPracticeContent } from "@/lib/subject-content";
+
+/** Preparación para el quiz de la práctica: de una pregunta en una, con
+ *  respuesta oculta hasta pulsar "Ver respuesta". Solo lectura — el quiz vive
+ *  en el content, no en la base de datos. */
+function QuizPreview({ questions }: { questions: ExerciseContent[] }) {
+  const [idx, setIdx] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const total = questions.length;
+  const current = questions[idx];
+  if (!current) return null;
+
+  const go = (next: number) => {
+    setIdx(next);
+    setRevealed(false);
+  };
+
+  return (
+    <div className="mt-1 rounded-lg border border-border bg-muted/20 p-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">
+        Pregunta {idx + 1}/{total}
+      </p>
+      <div className="cornell mt-1 text-sm" dangerouslySetInnerHTML={{ __html: renderCornell(current.question) }} />
+
+      {revealed ? (
+        <div className="mt-2 border-t border-border pt-2">
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Respuesta</p>
+          <div className="cornell text-sm" dangerouslySetInnerHTML={{ __html: renderCornell(current.solution) }} />
+        </div>
+      ) : (
+        <Button variant="outline" size="sm" className="mt-2" onClick={() => setRevealed(true)}>
+          <Eye className="h-3.5 w-3.5" />
+          Ver respuesta
+        </Button>
+      )}
+
+      {total > 1 && (
+        <div className="mt-3 flex items-center justify-between">
+          <Button variant="ghost" size="sm" disabled={idx === 0} onClick={() => go(idx - 1)}>
+            Anterior
+          </Button>
+          <Button variant="ghost" size="sm" disabled={idx >= total - 1} onClick={() => go(idx + 1)}>
+            Siguiente
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Bullets({ items }: { items: string[] }) {
   return (
@@ -111,6 +160,13 @@ function PracticeItem({
             <div className="mt-1">
               <Bullets items={p.studyTopics} />
             </div>
+          </>
+        )}
+
+        {p.quizQuestions && p.quizQuestions.length > 0 && (
+          <>
+            <SectionLabel>Quiz de preparación ({p.quizQuestions.length} preguntas)</SectionLabel>
+            <QuizPreview questions={p.quizQuestions} />
           </>
         )}
 

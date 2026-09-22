@@ -787,6 +787,96 @@ export const ft2: SubjectContent = {
         "Aspectos generales, propiedades y aplicaciones tecnológicas de los agentes tensioactivos.",
         "Propiedades de los tensioactivos: poder emulsificante, humectante, solubilizante, viscosante, gelificante; interacción por cargas; número de agua; punto de enturbiamiento.",
       ],
+      quizQuestions: [
+        {
+          question: "¿Cuáles son las cinco propiedades tecnológicas del tensioactivo que evalúa esta práctica?",
+          solution: "Efecto **viscosante**, efecto **gelificante**, poder **humectante**, poder **solubilizante** y poder **emulsificante**.",
+        },
+        {
+          question: "El lauril éter sulfato de sodio (LESS) comercial viene al 28 %. ¿Cuántos mL del comercial se necesitan para preparar 100 mL de una dispersión al 5 %? (usa C₁V₁ = C₂V₂)",
+          solution: "V₁ = (C₂×V₂)/C₁ = (5×100)/28 ≈ **17.9 mL** del comercial, llevados a 100 mL con agua.",
+        },
+        {
+          question: "¿Por qué se debe agitar suavemente al preparar/disolver la dispersión de LESS y al añadir el NaCl?",
+          solution: "Para **no generar espuma**, que interferiría con la medición de viscosidad y con la apariencia del sistema.",
+        },
+        {
+          question: "Describe el patrón esperado de viscosidad al ir añadiendo NaCl en incrementos de 3,0 g hasta 15,0 g acumulados.",
+          solution: "La viscosidad **sube hasta un máximo** (crecimiento de micelas cilíndricas/gusaniformes que se entrelazan) y luego **cae** (salting-out: deshidratación y ruptura de la red micelar) — la clásica \"curva de sal\".",
+        },
+        {
+          question: "¿Por qué se mide la viscosidad por triplicado en cada punto de la curva de NaCl?",
+          solution: "Para tener una medida más confiable (reduce el error/variabilidad de la lectura) en cada concentración de sal antes de graficar.",
+        },
+        {
+          question: "En el efecto gelificante, ¿qué reacción química forma el gel, y con qué reactivos?",
+          solution: "Una **saponificación**: ácido esteárico + hidróxido de sodio (NaOH) forman **estearato de sodio** (un jabón), que gelifica el vehículo.",
+        },
+        {
+          question: "¿Por qué la solución de NaOH debe estar a la misma temperatura que la dispersión de ácido esteárico antes de mezclarlas?",
+          solution: "Para evitar que el ácido esteárico se solidifique/precipite bruscamente por choque térmico, y para que la saponificación y la gelificación ocurran de forma homogénea en todo el sistema.",
+        },
+        {
+          question: "Nombra los tres vehículos usados en las formulaciones EG1, EG2 y EG3 del efecto gelificante.",
+          solution: "EG1 = **etanol**, EG2 = **glicerina**, EG3 = **agua**.",
+        },
+        {
+          question: "En el efecto gelificante, ¿cuántos gramos de ácido esteárico y de NaOH se usan en cada formulación (EG1/EG2/EG3)?",
+          solution: "**2,0 g** de ácido esteárico y **0,35 g** de NaOH en cada una — solo cambia el vehículo.",
+        },
+        {
+          question: "¿Qué variables se comparan entre el sistema de azufre pulverizado en agua sola y en ARLACEL®/SPAN 20® para evaluar el poder humectante?",
+          solution: "**Velocidad de sedimentación**, **volumen del sedimento** y **aspecto** del sedimento y del sobrenadante.",
+        },
+        {
+          question: "¿Qué resultado esperarías si el ARLACEL®/SPAN 20® mejora la humectación del azufre frente al agua sola?",
+          solution: "El azufre humectado se dispersaría mejor y **sedimentaría más lento** (menor velocidad de sedimentación), con un sedimento más uniforme — en vez de flotar o formar grumos que no se mojan.",
+        },
+        {
+          question: "En el poder solubilizante (primera parte), ¿qué se adiciona gota a gota y hasta qué volumen máximo, y qué se busca observar como punto final?",
+          solution: "Se adiciona **Polisorbato 80/20** en porciones de **0,1 mL** (máximo 1,0 mL) hasta que el sistema bifásico (aceite + agua) se vuelve **monofásico y transparente**.",
+        },
+        {
+          question: "¿Cuál es la diferencia entre la primera y la segunda parte del ensayo de poder solubilizante, y qué compara?",
+          solution: "En la primera parte el tensioactivo se añade sobre la mezcla aceite+agua ya formada; en la segunda, primero se mezcla el aceite con el tensioactivo y luego se añade el agua en porciones. Compara el efecto del **orden de adición** sobre la solubilización.",
+        },
+        {
+          question: "En el poder emulsificante, ¿qué fase se adiciona sobre cuál, y en qué estado (agitando o no)?",
+          solution: "Se adiciona la **fase acuosa sobre la fase oleosa**, agitando de forma **constante**.",
+        },
+        {
+          question: "¿Por qué ambas fases (oleosa y acuosa) se calientan al baño maría a la misma temperatura antes de mezclarlas en el poder emulsificante?",
+          solution: "Para evitar la **solidificación prematura** de los componentes de la fase oleosa (ceras, ácidos grasos) al entrar en contacto con una fase más fría, lo que daría una emulsión mal formada.",
+        },
+        {
+          question: "¿Por qué se usa espátula de plástico y agitación suave en los pasos donde puede generarse espuma?",
+          solution: "Para **minimizar la introducción de aire/espuma** en el sistema, que alteraría la apariencia y las mediciones.",
+        },
+        {
+          question: "Escribe la fórmula de la velocidad de sedimentación usada en esta práctica y qué representa cada término.",
+          solution: "v_sed = 1/t, donde **t** es el tiempo (s) que tarda la fase dispersa en sedimentar; a mayor tiempo, **menor** velocidad de sedimentación.",
+        },
+        {
+          question: "Si en esta práctica el tensioactivo emulsiona dos fases líquidas, ¿en qué interfase y con qué \"poder\" está actuando?",
+          solution: "Interfase **líquido-líquido (L-L)**, actuando como **emulsificante**.",
+        },
+        {
+          question: "V/F con justificación: en el ensayo de efecto viscosante, entre más NaCl se añada, siempre mayor será la viscosidad.",
+          solution: "**Falso.** La viscosidad sube solo hasta un máximo; superado cierto punto (cerca de los 15,0 g acumulados), el exceso de sal produce *salting-out* y la viscosidad cae.",
+        },
+        {
+          question: "¿Qué instrumento se usa para medir la viscosidad en el efecto viscosante, y con qué frecuencia de medición?",
+          solution: "**Viscosímetro rotacional**, midiendo **por triplicado** en cada punto de NaCl.",
+        },
+        {
+          question: "En el poder solubilizante, ¿qué significa que el sistema pase de \"bifásico\" a \"monofásico transparente\"?",
+          solution: "Que el aceite (salicilato de metilo o aceite de eucalipto), antes visible como fase separada en el agua, quedó completamente **solubilizado dentro de micelas** del tensioactivo — ya no hay dos fases visibles.",
+        },
+        {
+          question: "¿Qué relación tiene el estearato de sodio formado en el efecto gelificante con la clasificación de tensioactivos del Módulo 2?",
+          solution: "Es un **tensioactivo aniónico** (jabón) formado *in situ*; su capacidad de gelificar el vehículo (red que atrapa el líquido, sistema coherente) es una aplicación directa de cómo un tensioactivo puede modificar la estructura física de una formulación.",
+        },
+      ],
     },
 
     {
@@ -849,6 +939,92 @@ export const ft2: SubjectContent = {
         "Comportamiento de la interfase sólido–líquido.",
         "Factores que afectan la humectación de un sólido.",
         "Capacidad humectante de tensioactivos, polioles e hidrocoloides; mecanismo de cada tipo.",
+      ],
+      quizQuestions: [
+        {
+          question: "¿Cuáles son los tres sólidos de trabajo en esta práctica y qué los diferencia entre sí?",
+          solution: "**Hidróxido de aluminio, sulfadiazina y azufre** — tienen polaridad y mojabilidad (afinidad por el agua) distintas.",
+        },
+        {
+          question: "Define, en tus propias palabras, qué es el \"punto de mojado\" de un sólido.",
+          solution: "El volumen de agua necesario para humectar completamente un sólido, alcanzado cuando forma una **masa blanda sin flujo** (no líquida) sobre el vidrio.",
+        },
+        {
+          question: "En la actividad 2A, ¿cómo se adiciona el agua y con qué se mezcla?",
+          solution: "**Gota a gota desde una bureta**, mezclando con espátula tras cada adición, verificando que se absorba antes de seguir añadiendo.",
+        },
+        {
+          question: "¿Por qué el punto de mojado se normaliza a 100 g de sólido en vez de reportarse directamente para la masa pesada (2,0 g)?",
+          solution: "Para poder **comparar** el punto de mojado entre distintos sólidos y agentes humectantes de forma estandarizada, sin importar la masa exacta usada.",
+        },
+        {
+          question: "¿Cuáles son los tres agentes humectantes de la actividad 2A, y cuánto se usa de cada uno?",
+          solution: "**Propilenglicol** (0,4 g), **Span 20** (0,4 g) y **goma acacia** (0,4 g de una dispersión al 20 %).",
+        },
+        {
+          question: "Escribe la fórmula del punto de mojado (PM) e indica qué representa.",
+          solution: "PM = (mL de agua para humectar el sólido / masa de sólido en g) × 100 — **mL de agua que humectarían por completo 100 g** de ese sólido.",
+        },
+        {
+          question: "Escribe la fórmula del % de reducción del punto de mojado y explica qué mide.",
+          solution: "%Red PM = [(PM sin agente humectante − PM con agente humectante) / PM sin agente humectante] × 100. Mide **cuánto mejora** (reduce) el punto de mojado el agente — a mayor %, más efectivo.",
+        },
+        {
+          question: "Si el punto de mojado del azufre solo es de 150 mL/100 g y con Span 20 baja a 90 mL/100 g, calcula el % de reducción del punto de mojado.",
+          solution: "%Red PM = (150−90)/150 × 100 = **40 %**.",
+        },
+        {
+          question: "En la actividad 2B, ¿qué se hace antes de pesar los 250 mg de sólido, y por qué?",
+          solution: "Se **macera el sólido para homogenizar el tamaño de partícula** — así todas las muestras espolvoreadas tienen una distribución de tamaño comparable.",
+        },
+        {
+          question: "¿Cómo se espolvorea el sólido sobre el líquido en la actividad 2B, y qué cuidado hay que tener con la probeta?",
+          solution: "**Lenta y suavemente** sobre la superficie; **no golpear la probeta** (evita perturbar el proceso de penetración/flotación que se quiere observar).",
+        },
+        {
+          question: "Explica la escala de clasificación 0–4 de la actividad 2B.",
+          solution: "Clasifica según el **tiempo de penetración**: 0 = no penetra en 15 minutos, hasta 4 = penetra en 2–3 minutos (mayor número = penetración más rápida = mejor humectación).",
+        },
+        {
+          question: "¿Qué significan las letras D, S y F al describir el comportamiento del sólido espolvoreado?",
+          solution: "**D** = queda en dispersión (dentro del líquido). **S** = se va al fondo (sedimenta, se moja). **F** = queda en flotación (no se moja, permanece en superficie).",
+        },
+        {
+          question: "Si un sólido espolvoreado sobre agua queda clasificado como \"F\" con puntaje 0, ¿qué indica sobre su humectabilidad?",
+          solution: "Que es **muy hidrofóbico**: no logra ser mojado por el agua en absoluto durante los 15 minutos de observación, y permanece flotando.",
+        },
+        {
+          question: "¿Cuál es la diferencia central entre lo que evalúa la actividad 2A y lo que evalúa la 2B?",
+          solution: "2A cuantifica el **punto de mojado** añadiendo agua/aditivo AL sólido; 2B evalúa cualitativamente (0-4 + D/S/F) el comportamiento al espolvorear el sólido SOBRE el líquido (agua o solución de aditivo).",
+        },
+        {
+          question: "En la actividad 2B, segunda parte, ¿a qué concentración se preparan las soluciones de aditivo (propilenglicol, Tween 80, goma acacia)?",
+          solution: "Al **0,4 %**.",
+        },
+        {
+          question: "¿Por qué en la 2B se usa Tween 80 como aditivo en vez de Span 20 (que sí se usa en la 2A)?",
+          solution: "Porque en la 2B el aditivo se disuelve en la **fase acuosa**, y Tween 80 es hidrófilo (HLB alto, soluble en agua); Span 20 es más lipófilo (HLB bajo) y no serviría para preparar una solución acuosa de trabajo.",
+        },
+        {
+          question: "¿Qué comparación permite hacer esta práctica sobre \"dónde\" se coloca el agente humectante (en el sólido vs. en el líquido)?",
+          solution: "Si es más efectivo añadir el humectante **directamente al sólido** (2A) o **disolverlo en el líquido** en el que se dispersa el sólido (2B), para lograr mejor/más rápida humectación.",
+        },
+        {
+          question: "Menciona el mecanismo de acción de cada tipo de agente usado: un tensioactivo (Span 20/Tween 80), un poliol (propilenglicol) y un hidrocoloide (goma acacia).",
+          solution: "El **tensioactivo** reduce la tensión interfacial sólido-líquido (adsorción en la interfase). El **poliol** favorece la humectación por afinidad, sin actuar principalmente por reducción de tensión superficial. El **hidrocoloide** forma una película/dispersión viscosa alrededor de las partículas que facilita su incorporación al medio acuoso.",
+        },
+        {
+          question: "¿Qué tabla de esta práctica recoge las propiedades fisicoquímicas de los tres sólidos (estructura, polaridad, solubilidad, ángulo de contacto…) que hay que investigar antes del ensayo?",
+          solution: "La **Tabla 5**.",
+        },
+        {
+          question: "Un sólido con ángulo de contacto pequeño frente al agua, ¿tendría un punto de mojado (PM) esperado alto o bajo, comparado con uno de ángulo de contacto grande?",
+          solution: "**Bajo** (mejor humectación, se moja con menos agua) — ángulo de contacto pequeño indica buena afinidad por el agua, consistente con necesitar menos volumen para alcanzar el punto de mojado.",
+        },
+        {
+          question: "¿Cuál es el fundamento fisicoquímico común detrás de las actividades 2A y 2B?",
+          solution: "El comportamiento en la **interfase sólido-líquido**: qué tan fácil un líquido reemplaza al aire en la superficie de un sólido y se extiende sobre/dentro de él, gobernado por la tensión interfacial sólido-líquido y el efecto de agentes que la modifican.",
+        },
       ],
     },
 
@@ -921,6 +1097,100 @@ export const ft2: SubjectContent = {
         "Propiedades eléctricas de las interfaces. Potencial zeta.",
         "Efecto de los electrolitos sobre las fuerzas de repulsión eléctrica en una interfase sólido–líquido.",
         "Floculación, velocidad de sedimentación y volumen de sedimentación.",
+      ],
+      quizQuestions: [
+        {
+          question: "¿Qué mide el \"volumen de sedimentación\" (F) y cómo se calcula?",
+          solution: "F = V_u / V_0, donde **V_u** es el volumen del sedimento (mL) y **V_0** es el volumen total del sistema (mL). Un F cercano a 1 (o mayor) indica un sedimento voluminoso, típico de un sistema bien floculado.",
+        },
+        {
+          question: "¿Qué mide el \"grado de floculación\" (β) y cómo se calcula?",
+          solution: "β = F / F_s, donde **F_s** es el volumen de sedimentación del patrón sin electrolito (blanco, BL). β > 1 indica que la muestra está más floculada que el blanco.",
+        },
+        {
+          question: "¿Cuál es el sólido de trabajo de la actividad 3A, y por qué es relevante que tenga carga superficial?",
+          solution: "**Subnitrato de bismuto (III)**. Su carga superficial determina cómo interactúa con electrolitos de distinta carga (floculación vs. dispersión), que es justo lo que evalúa la práctica.",
+        },
+        {
+          question: "Nombra los tres electrolitos usados en la actividad 3A y sus concentraciones de trabajo.",
+          solution: "**NaCl 0,3 %**, **AlCl₃ 0,1 %** y **Na₂HPO₄ 0,1 %**.",
+        },
+        {
+          question: "¿Por qué antes de dispersar el sólido en agua se le añaden 2 mL de propilenglicol en el mortero?",
+          solution: "Para **humectar previamente** el sólido (evitar que flote o forme grumos al contacto directo con el agua) antes de dispersarlo, facilitando una dispersión homogénea.",
+        },
+        {
+          question: "¿Por qué es importante \"arrastrar TODO el material\" del mortero a la probeta con lavados sucesivos de agua desionizada?",
+          solution: "Para **no perder sólido** en el mortero, lo cual alteraría la cantidad real de sólido disperso en cada muestra y falsearía los resultados entre muestras.",
+        },
+        {
+          question: "¿Cuál es la muestra \"BL\" en la actividad 3A, y qué papel cumple en los cálculos?",
+          solution: "Es el **blanco**: la muestra sin electrolito añadido. Sirve como patrón de referencia para calcular β de cada muestra (F_s = F del blanco).",
+        },
+        {
+          question: "¿Qué tres cosas se observan y registran a los 15 minutos de reposo, en la Tabla 12?",
+          solution: "El **volumen del sedimento** (mL), el **aspecto del sobrenadante** (turbio a translúcido) y si el sedimento es **compacto o suelto**.",
+        },
+        {
+          question: "¿Cómo se evalúa la facilidad de redispersión del sedimento, paso a paso?",
+          solution: "Se tapa la probeta con la mano, se invierte con un giro de **180°** y se regresa a su posición original; se repite las veces necesarias hasta redispersar todo el material, contando el **número de vueltas**.",
+        },
+        {
+          question: "¿Cómo se mide el \"tiempo de sedimentación\" en esta práctica, y cómo se convierte en velocidad de sedimentación?",
+          solution: "Se agita la muestra y se mide el tiempo que tarda el sólido en sedimentar un volumen fijo de **5 mL**; la velocidad de sedimentación es el inverso de ese tiempo (v_sed = 1/t).",
+        },
+        {
+          question: "¿Qué tipo de electrolito (respecto a la carga del sólido) produce floculación, y por qué?",
+          solution: "Uno de **carga opuesta** a la del sólido disperso. Reduce la repulsión electrostática entre partículas (baja el potencial zeta), permitiendo que se agreguen en flóculos laxos.",
+        },
+        {
+          question: "¿Qué tipo de electrolito actúa como dispersante, y qué efecto tiene sobre el sedimento?",
+          solution: "Uno de la **misma carga** que el sólido. Mantiene/refuerza la repulsión electrostática entre partículas, dando un sedimento **compacto y difícil de redispersar** (no floculado).",
+        },
+        {
+          question: "En la actividad 3A, ¿en qué unidad se expresa el eje X de las gráficas de velocidad de sedimentación y de β, y por qué no en \"mL de electrolito añadido\"?",
+          solution: "En **concentración final del electrolito en milimolar (mM)** — permite comparar electrolitos distintos (NaCl, AlCl₃, Na₂HPO₄) en una base común, ya que tienen distinta masa molar y valencia.",
+        },
+        {
+          question: "¿Cuál es el sólido y el humectante A usados en la actividad 3B?",
+          solution: "**Azufre** (sólido neutro, sin carga) humectado con **Aerosol OT** (tensioactivo aniónico).",
+        },
+        {
+          question: "¿Cuál es el humectante B de la actividad 3B, y qué tipo de carga aporta?",
+          solution: "**Cloruro de benzalconio**, un tensioactivo **catiónico**.",
+        },
+        {
+          question: "¿Cuál es el propósito conceptual de la actividad 3B?",
+          solution: "Demostrar que un sólido **neutro** puede adquirir carga superficial efectiva al humectarse con un tensioactivo cargado adsorbido en su superficie — \"**comunicación de carga**\" — y que esa carga adquirida determina su respuesta a los electrolitos, igual que un sólido con carga intrínseca.",
+        },
+        {
+          question: "En la actividad 3B, ¿qué electrolitos se usan y a qué concentración?",
+          solution: "**CaCl₂ al 2 %** y **Na₂HPO₄ al 2 %**.",
+        },
+        {
+          question: "En la actividad 3B, las muestras A1 y B1 no reciben electrolito. ¿Qué función cumplen?",
+          solution: "Son los **blancos de referencia** para cada humectante (A1 para Aerosol OT, B1 para cloruro de benzalconio), usados como patrón para calcular F y β de las muestras con electrolito del mismo grupo.",
+        },
+        {
+          question: "Si el azufre humectado con Aerosol OT (aniónico) se trata con Na₂HPO₄ (anión fosfato, misma carga que el sólido \"cargado\"), ¿esperarías floculación o dispersión? ¿Por qué?",
+          solution: "**Dispersión** — el electrolito tiene la misma carga (negativa) que la superficie comunicada por el Aerosol OT, así que refuerza la repulsión entre partículas en vez de neutralizarla.",
+        },
+        {
+          question: "Y si ese mismo azufre (carga negativa comunicada por Aerosol OT) se trata con CaCl₂ (catión divalente Ca²⁺), ¿esperarías floculación o dispersión? ¿Por qué?",
+          solution: "**Floculación** — el catión Ca²⁺, de carga opuesta a la superficie cargada negativamente, neutraliza/reduce la repulsión electrostática entre partículas, permitiendo que se agreguen.",
+        },
+        {
+          question: "¿Qué ventaja práctica tiene \"comunicar carga\" a un sólido neutro usando un agente humectante con carga, al formular una suspensión?",
+          solution: "Permite **controlar deliberadamente** el comportamiento de floculación/dispersión de un sólido que de otro modo no respondería a electrolitos (por no tener carga propia), dando control sobre la estabilidad física y la resuspendibilidad.",
+        },
+        {
+          question: "¿Qué compara la Tabla 14 de esta práctica, y qué variables incluye?",
+          solution: "Compara un sistema **no floculado**, uno **floculado** y uno **desfloculado**, en: apariencia del sobrenadante, aspecto del sedimento, velocidad de sedimentación, volumen de sedimento y facilidad para redispersar.",
+        },
+        {
+          question: "Explica la diferencia entre un sistema \"floculado\" y uno \"desfloculado\" en velocidad de sedimentación y volumen de sedimento.",
+          solution: "El **floculado** sedimenta rápido (partículas agregadas en flóculos grandes) pero deja un sedimento **voluminoso y suelto**, fácil de redispersar. El **desfloculado** sedimenta lento (partículas individuales), pero forma un sedimento **compacto y pequeño**, difícil de redispersar (apastelamiento).",
+        },
       ],
     },
 
