@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getSession } from "@/lib/session";
+import { landingPath } from "@/lib/auth";
 import { login } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
   const session = await getSession();
-  if (session.authed) redirect(session.scope ? `/${session.scope.subject}/${session.scope.section}` : "/");
+  if (session.authed) redirect(landingPath({ name: session.name, level: session.level, scope: session.scope }));
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-6 py-12">

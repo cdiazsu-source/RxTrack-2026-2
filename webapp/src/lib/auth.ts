@@ -5,6 +5,7 @@
  *  - Cesar (SITE_PASSWORD):        edita todo.
  *  - Diana (SITE_PASSWORD_READ):   ve todo, no edita.
  *  - JOSE  (SITE_PASSWORD_JOSE):   solo /aif/laboratorio, con control total ahí.
+ *  - (cuenta acotada a una asignatura): ve solo /{subject}, no edita.
  *
  * El nombre, el nivel y el alcance viajan firmados (HMAC-SHA256) en la cookie.
  *
@@ -16,9 +17,10 @@ export const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 días
 
 export type AccessLevel = "full" | "read";
 
-/** Acceso acotado a UNA sección de UNA asignatura (p. ej. AIF → Laboratorio).
- *  `subject` y `section` son los segmentos de la URL: `/{subject}/{section}`. */
-export type SubjectScope = { subject: string; section: string };
+/** Acceso acotado a UNA asignatura, opcionalmente a UNA sola sección de ella
+ *  (p. ej. AIF → Laboratorio). `subject` y `section` son los segmentos de la
+ *  URL: `/{subject}/{section}`. Sin `section`, ve toda la asignatura. */
+export type SubjectScope = { subject: string; section?: string };
 
 /** Persona que inició sesión. */
 export type Profile = { name: string; level: AccessLevel; scope?: SubjectScope | null };
@@ -45,7 +47,7 @@ const ACCOUNTS: Account[] = [
     // trackear) y en la variable de entorno del mismo nombre en Vercel.
     username: "paula",
     password: process.env.SITE_PASSWORD_PAULA || "",
-    profile: { name: "Paula", level: "read" },
+    profile: { name: "Paula", level: "read", scope: { subject: "ft2" } },
   },
   {
     // Jefe de laboratorio de AIF: control total, PERO solo de /aif/laboratorio.
@@ -90,10 +92,12 @@ export function checkCredentials(username: string, password: string): Profile | 
   return acc.profile;
 }
 
-/** A dónde llevar a la persona tras iniciar sesión: su sección, si su acceso
- *  está acotado; la portada si no. */
+/** A dónde llevar a la persona tras iniciar sesión: su asignatura (y sección,
+ *  si su acceso está acotado a una sola); la portada si no tiene alcance. */
 export function landingPath(profile: Profile): string {
-  return profile.scope ? `/${profile.scope.subject}/${profile.scope.section}` : "/";
+  if (!profile.scope) return "/";
+  const { subject, section } = profile.scope;
+  return section ? `/${subject}/${section}` : `/${subject}`;
 }
 
 /** Token firmado para la cookie de sesión, con el nombre y el nivel de acceso. */
@@ -128,8 +132,8 @@ export async function verifyToken(token: string | undefined | null): Promise<Pro
       typeof json.n === "string" && json.n.trim() ? json.n : level === "read" ? "Diana" : "Cesar";
     const s = json.s;
     const scope: SubjectScope | null =
-      s && typeof s.subject === "string" && typeof s.section === "string"
-        ? { subject: s.subject, section: s.section }
+      s && typeof s.subject === "string"
+        ? { subject: s.subject, section: typeof s.section === "string" ? s.section : undefined }
         : null;
     return { name, level, scope };
   } catch {
