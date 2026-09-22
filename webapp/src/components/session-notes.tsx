@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 import type { SessionStatus } from "@prisma/client";
 import { toast } from "@/components/ui/toast";
@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HelpHint } from "@/components/help-hint";
 import { PromptBox } from "@/components/prompt-box";
 import { DriveLinkEditor } from "@/components/drive-link-editor";
+import { SymbolToolbar } from "@/components/symbol-toolbar";
 import { useCanContribute } from "@/components/access-context";
 import { renderCornell } from "@/lib/markdown-lite";
 import { cornellPrompt, slidesExtractPrompt } from "@/lib/prompts";
@@ -116,6 +117,7 @@ function SessionForm({
   const transcriptKey = `${draftKey}:transcript`;
   const slidesKey = `${draftKey}:slides`;
   const [content, setContent] = useState(session?.content ?? "");
+  const contentRef = useRef<HTMLTextAreaElement>(null);
   const [transcript, setTranscript] = useState(session?.transcript ?? "");
   const [slidesText, setSlidesText] = useState(session?.slidesText ?? "");
   const [restored, setRestored] = useState<null | { value: string; savedAt: number }>(null);
@@ -252,7 +254,15 @@ function SessionForm({
           })}
         />
       )}
+      <SymbolToolbar
+        targetRef={contentRef}
+        onInsert={(next) => {
+          setContent(next);
+          saveDraft(draftKey, next);
+        }}
+      />
       <Textarea
+        ref={contentRef}
         name="content-visible"
         value={content}
         onChange={(e) => {
