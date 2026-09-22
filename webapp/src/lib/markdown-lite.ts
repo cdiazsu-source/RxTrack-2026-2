@@ -47,6 +47,14 @@ function applyFormulaMath(e: string): string {
     );
 }
 
+// Delimitador del marcador temporal de `código` — caracteres del Área de Uso
+// Privado de Unicode, imposibles de teclear por accidente y que ningún texto
+// real va a contener, así nunca colisiona con dígitos sueltos del contenido
+// (p. ej. "Farmacotecnia 2 —"). Antes se usaba ` N ` (espacio-número-espacio)
+// y SÍ colisionaba con cualquier número suelto del texto, borrándolo.
+const CODE_MARK = "";
+const CODE_MARK_RE = /(\d+)/g;
+
 /** Inline seguro: negrita, cursiva, código, enlaces http(s), <br> literal. */
 export function inlineLite(s: string): string {
   let e = escapeHtml(s);
@@ -54,7 +62,7 @@ export function inlineLite(s: string): string {
   const codes: string[] = [];
   e = e.replace(/`([^`]+)`/g, (_m, c) => {
     codes.push(`<code>${c}</code>`);
-    return ` ${codes.length - 1} `;
+    return `${CODE_MARK}${codes.length - 1}${CODE_MARK}`;
   });
   e = e.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   e = e.replace(/\*(.+?)\*/g, "<em>$1</em>");
@@ -65,7 +73,7 @@ export function inlineLite(s: string): string {
     return `<a href="${url}" target="_blank" rel="noreferrer" class="md-link">${text}</a>`;
   });
   e = e.replace(/&lt;br&gt;/g, "<br>");
-  e = e.replace(/ (\d+) /g, (_m, n) => codes[Number(n)] ?? "");
+  e = e.replace(CODE_MARK_RE, (_m, n) => codes[Number(n)] ?? "");
   return e;
 }
 
