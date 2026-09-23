@@ -22,8 +22,9 @@ export type AccessLevel = "full" | "read";
  *  URL: `/{subject}/{section}`. Sin `section`, ve toda la asignatura. */
 export type SubjectScope = { subject: string; section?: string };
 
-/** Persona que inició sesión. */
-export type Profile = { name: string; level: AccessLevel; scope?: SubjectScope | null };
+/** Persona que inició sesión. Con `scope`, la cuenta solo ve esas asignaturas
+ *  (una o varias — p. ej. Paula ve ft2 y fg); sin `scope`, ve todo el sitio. */
+export type Profile = { name: string; level: AccessLevel; scope?: SubjectScope[] | null };
 
 /**
  * Cuentas. La lista vive aquí, no en la base. Para añadir a alguien: otra fila.
@@ -45,16 +46,18 @@ const ACCOUNTS: Account[] = [
   {
     // Sin fallback en código: la contraseña vive solo en .env (local, sin
     // trackear) y en la variable de entorno del mismo nombre en Vercel.
+    // Mismo nivel de acceso que Diana ("read" + colaboración), acotado a
+    // Farmacotecnia 2 y Farmacología General.
     username: "paula",
     password: process.env.SITE_PASSWORD_PAULA || "",
-    profile: { name: "Paula", level: "read", scope: { subject: "ft2" } },
+    profile: { name: "Paula", level: "read", scope: [{ subject: "ft2" }, { subject: "fg" }] },
   },
   {
     // Jefe de laboratorio de AIF: control total, PERO solo de /aif/laboratorio.
     // El middleware reenvía cualquier otra ruta a esa sección.
     username: "jose",
     password: process.env.SITE_PASSWORD_JOSE || "AIF",
-    profile: { name: "JOSE", level: "full", scope: { subject: "aif", section: "laboratorio" } },
+    profile: { name: "JOSE", level: "full", scope: [{ subject: "aif", section: "laboratorio" }] },
   },
 ];
 
@@ -92,12 +95,12 @@ export function checkCredentials(username: string, password: string): Profile | 
   return acc.profile;
 }
 
-/** A dónde llevar a la persona tras iniciar sesión: su asignatura (y sección,
- *  si su acceso está acotado a una sola); la portada si no tiene alcance. */
+/** A dónde llevar a la persona tras iniciar sesión: la primera asignatura (y
+ *  sección, si aplica) de su alcance; la portada si no tiene alcance. */
 export function landingPath(profile: Profile): string {
-  if (!profile.scope) return "/";
-  const { subject, section } = profile.scope;
-  return section ? `/${subject}/${section}` : `/${subject}`;
+  const first = profile.scope?.[0];
+  if (!first) return "/";
+  return first.section ? `/${first.subject}/${first.section}` : `/${first.subject}`;
 }
 
 /** Token firmado para la cookie de sesión, con el nombre y el nivel de acceso. */
@@ -130,12 +133,18 @@ export async function verifyToken(token: string | undefined | null): Promise<Pro
     const level: AccessLevel = json.a === "read" ? "read" : "full";
     const name =
       typeof json.n === "string" && json.n.trim() ? json.n : level === "read" ? "Diana" : "Cesar";
-    const s = json.s;
-    const scope: SubjectScope | null =
-      s && typeof s.subject === "string"
-        ? { subject: s.subject, section: typeof s.section === "string" ? s.section : undefined }
+    // `s` puede venir como arreglo (formato actual) o como un solo objeto
+    // (cookies emitidas antes de soportar varias asignaturas por cuenta) —
+    // se normaliza a arreglo para no invalidar sesiones ya activas.
+    const raw = json.s;
+    const entries: unknown[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
+    const scope: SubjectScope[] | null =
+      entries.length > 0
+        ? entries
+            .filter((e): e is { subject: string; section?: unknown } => !!e && typeof (e as { subject?: unknown }).subject === "string")
+            .map((e) => ({ subject: e.subject, section: typeof e.section === "string" ? e.section : undefined }))
         : null;
-    return { name, level, scope };
+    return { name, level, scope: scope && scope.length > 0 ? scope : null };
   } catch {
     return null;
   }

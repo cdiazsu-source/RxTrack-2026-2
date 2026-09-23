@@ -8,8 +8,9 @@ const PUBLIC_FILE = /\.(?:svg|png|ico|webmanifest|js|json|txt|woff2?|map)$/;
 /**
  * Todo el sitio requiere sesión. Sin cookie válida → /login.
  *
- * Una sesión con `scope` (p. ej. JOSE → aif/laboratorio) solo puede ver ESA
- * sección: cualquier otra ruta la reenvía ahí.
+ * Una sesión con `scope` (p. ej. JOSE → aif/laboratorio; Paula → ft2 y fg)
+ * solo puede ver esas asignaturas/secciones: cualquier otra ruta la reenvía
+ * a la primera de su alcance.
  */
 export async function middleware(req: NextRequest) {
   const profile = await verifyToken(req.cookies.get(SESSION_COOKIE)?.value);
@@ -21,14 +22,14 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (profile.scope) {
+  if (profile.scope && profile.scope.length > 0) {
     const { pathname } = req.nextUrl;
-    const home = landingPath(profile); // p. ej. "/aif/laboratorio"
+    const homes = profile.scope.map((s) => (s.section ? `/${s.subject}/${s.section}` : `/${s.subject}`));
     const allowed =
-      PUBLIC_FILE.test(pathname) || pathname === home || pathname.startsWith(`${home}/`);
+      PUBLIC_FILE.test(pathname) || homes.some((home) => pathname === home || pathname.startsWith(`${home}/`));
     if (!allowed) {
       const url = req.nextUrl.clone();
-      url.pathname = home;
+      url.pathname = landingPath(profile);
       url.search = "";
       return NextResponse.redirect(url);
     }

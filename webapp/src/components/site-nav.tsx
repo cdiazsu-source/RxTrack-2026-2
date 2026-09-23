@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { CalendarDays, Eye, Inbox, Layers, LogOut } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import type { SubjectScope } from "@/lib/auth";
 import { logout } from "@/lib/actions/auth";
 import { startViewAs, stopViewAs } from "@/lib/actions/view-as";
 import { SubjectSwitcher, type SwitcherSubject } from "@/components/subject-switcher";
@@ -20,7 +21,7 @@ export function SiteNav({
   inboxCount,
   realFull = false,
   viewingAs = false,
-  scoped = false,
+  scope = null,
 }: {
   canEdit: boolean;
   subjects: SwitcherSubject[];
@@ -29,26 +30,49 @@ export function SiteNav({
   realFull?: boolean;
   /** Cesar está en modo "ver como Diana". */
   viewingAs?: boolean;
-  /** Sesión con acceso acotado (JOSE): solo marca + salir. */
-  scoped?: boolean;
+  /** Sesión con acceso acotado (JOSE, Paula): solo marca + sus asignaturas + salir. */
+  scope?: SubjectScope[] | null;
 }) {
   const pathname = usePathname();
   if (pathname === "/login") return null;
 
-  if (scoped) {
+  if (scope && scope.length > 0) {
     return (
       <header className="site-nav sticky top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
           <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="press inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Salir</span>
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            {scope.length > 1 && (
+              <nav className="flex items-center gap-1.5">
+                {scope.map((s) => {
+                  const href = s.section ? `/${s.subject}/${s.section}` : `/${s.subject}`;
+                  const label = subjects.find((sub) => sub.id === s.subject)?.code ?? s.subject.toUpperCase();
+                  const active = pathname === href || pathname.startsWith(`${href}/`);
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      className={cn(
+                        "press rounded-md px-2.5 py-1 text-sm font-medium transition-colors",
+                        active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                      )}
+                    >
+                      {label}
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
+            <form action={logout}>
+              <button
+                type="submit"
+                className="press inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Salir</span>
+              </button>
+            </form>
+          </div>
         </div>
       </header>
     );

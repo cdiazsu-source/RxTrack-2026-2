@@ -7,7 +7,7 @@ import { type AccessLevel, type SubjectScope, SESSION_COOKIE, verifyToken } from
 export const VIEW_AS_COOKIE = "rxtrack_view_as";
 
 export type Session =
-  | { authed: true; level: AccessLevel; name: string; viewingAs: boolean; scope: SubjectScope | null }
+  | { authed: true; level: AccessLevel; name: string; viewingAs: boolean; scope: SubjectScope[] | null }
   | { authed: false };
 
 /** Sesión actual (server components / server actions). Aplica "ver como Diana". */

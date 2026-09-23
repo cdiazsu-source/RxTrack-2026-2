@@ -17,9 +17,11 @@ export default async function SubjectLayout({
   const [subject, session] = await Promise.all([getSubjectBySlug(params.subject), getSession()]);
   if (!subject) notFound();
 
-  // Sesión con acceso acotado (JOSE): solo su asignatura, y solo su pestaña.
+  // Sesión con acceso acotado (JOSE, Paula): solo sus asignaturas, y la
+  // pestaña asociada a esa asignatura si la tiene restringida.
   const scope = session.authed ? session.scope : null;
-  if (scope && scope.subject !== params.subject) notFound();
+  const scopeEntry = scope?.find((s) => s.subject === params.subject) ?? null;
+  if (scope && !scopeEntry) notFound();
 
   return (
     <div className="flex flex-col gap-5">
@@ -33,7 +35,7 @@ export default async function SubjectLayout({
       <SubjectSubnav
         slug={subject.id}
         sections={subject.sections}
-        lockedSection={scope?.section ?? null}
+        lockedSection={scopeEntry?.section ?? null}
       />
       {children}
     </div>
