@@ -1,16 +1,18 @@
 import type { SubjectContent } from "./_schema";
 
 /**
- * Farmacología General (UNAL) — desde el programa oficial (Prof. Luis Fernando
- * Ospina Giraldo). Código 2015683. Sin componente de laboratorio.
- * Las fechas de parciales van en la app.
+ * Farmacología General (UNAL) — desde el programa oficial 2026-2S (Prof. Luis
+ * Fernando Ospina Giraldo y Prof. María Helena Arias Marciales). Código
+ * 2015683. Sin componente de laboratorio.
+ * Las fechas exactas de los parciales se ponen en la app (aquí solo la
+ * semana del semestre en que caen, según el programa: `note` en keyDates).
  */
 export const fg: SubjectContent = {
   code: "FG",
   slug: "fg",
   name: "Farmacología General",
   credits: "3",
-  professors: ["Luis Fernando Ospina Giraldo"],
+  professors: ["Luis Fernando Ospina Giraldo", "María Helena Arias Marciales"],
   scheduleTheory: "Lunes 7:00–9:00, Miércoles 14:00–16:00",
   scheduleLab: "",
   totalClasses: 32,
@@ -519,7 +521,10 @@ export const fg: SubjectContent = {
 
     // --- Módulo 2: Farmacodinamia ---
     { term: "Farmacodinamia", moduleSlug: "farmacodinamia", definition: "Estudio de **qué le hace el fármaco al organismo**: sus efectos bioquímicos y fisiológicos y su mecanismo de acción. *(en inglés: **pharmacodynamics**.)*" },
+    { term: "Diana farmacológica (blanco terapéutico)", moduleSlug: "farmacodinamia", definition: "El lugar del organismo donde un fármaco ejerce su acción: un receptor, un canal iónico, una enzima, un transportador o un ácido nucleico, entre otros. *(en inglés: **drug target**.)*" },
     { term: "Mecanismo inespecífico", moduleSlug: "farmacodinamia", definition: "Mecanismo de acción que depende de propiedades fisicoquímicas simples (neutralización, quelación, ósmosis, perturbación de membranas lipídicas) y no de reconocer una molécula diana concreta — no necesita un receptor. *(en inglés: **nonspecific mechanism**.)*" },
+    { term: "Incompatibilidad farmacéutica", moduleSlug: "farmacodinamia", definition: "Interacción puramente fisicoquímica entre dos o más fármacos, fuera del organismo (p. ej. dos soluciones que precipitan al mezclarse en la misma jeringa o bolsa intravenosa) — ocurre antes de que el fármaco entre al cuerpo, a diferencia de las interacciones farmacocinéticas o farmacodinámicas. *(en inglés: **pharmaceutical incompatibility**.)*" },
+    { term: "Interacción farmacocinética", moduleSlug: "farmacodinamia", definition: "Un fármaco altera la absorción, distribución, metabolismo o excreción de otro fármaco coadministrado (p. ej. por inducción o inhibición enzimática), cambiando cuánto de él llega a su sitio de acción. Se desarrolla en profundidad en el Módulo 3. *(en inglés: **pharmacokinetic interaction**.)*" },
     { term: "Receptor acoplado a proteína G", moduleSlug: "farmacodinamia", definition: "Familia de receptores con siete dominios transmembrana que, al activarse, acoplan y activan una proteína G intracelular (transductora, no el receptor mismo), la cual modula enzimas o canales mediante segundos mensajeros. *(en inglés: **G protein-coupled receptor**, abreviado **GPCR**; también llamados receptores \"7TM\" por sus siete pasos transmembrana.)*" },
     { term: "Segundos mensajeros", moduleSlug: "farmacodinamia", definition: "Moléculas intracelulares que amplifican y transmiten la señal iniciada por un receptor de membrana: el adenosín monofosfato cíclico (**AMPc**), el guanosín monofosfato cíclico (**GMPc**), el inositol trifosfato (**IP₃**), el diacilglicerol (**DAG**) y el calcio intracelular (**Ca²⁺**). *(en inglés: **second messengers**.)*" },
     { term: "Curva dosis-respuesta", moduleSlug: "farmacodinamia", definition: "Relación entre la dosis (o concentración) y la magnitud del efecto; sigmoide en escala logarítmica. Define la **potencia** (posición de la curva, dosis efectiva 50 o **DE₅₀**) y la **eficacia** (efecto máximo, el \"techo\" de la curva). *(en inglés: **dose-response curve**.)*" },
@@ -598,10 +603,10 @@ export const fg: SubjectContent = {
   ],
 
   keyDates: [
-    { name: "1er Parcial", weight: "20%" },
-    { name: "2do Parcial", weight: "20%" },
-    { name: "3er Parcial", weight: "20%" },
-    { name: "Evaluación final", weight: "20%" },
+    { name: "1er Parcial", weight: "20%", note: "Semana 4 · Módulo 3 (Farmacocinética)" },
+    { name: "2do Parcial", weight: "20%", note: "Semana 8 · Módulo 5 (Investigación)" },
+    { name: "3er Parcial", weight: "20%", note: "Semana 12 · Módulo 7 (SNC — Sedantes/Hipnóticos/Ansiolíticos)" },
+    { name: "Evaluación final", weight: "20%", note: "Semana 16 · Módulo 8 (Aspectos legales)" },
   ],
 
   projects: [
@@ -610,17 +615,43 @@ export const fg: SubjectContent = {
   ],
 
   bibliography: [
-    { kind: "libro", reference: "Brunton L., Chabner B.A., Knollmann B.C. (Ed.). Goodman & Gilman. Las Bases Farmacológicas de la Terapéutica. Vol. I y II. McGraw-Hill Interamericana. México. 2012." },
-    { kind: "libro", reference: "Hilal-Dandan R., Brunton L. (Ed.). Goodman & Gilman Manual de Farmacología y Terapéutica. 2ª ed. McGraw-Hill Education. México. 2015." },
-    { kind: "libro", reference: "Katzung B.G. (Ed.). Farmacología Básica y Clínica. 12ª ed. McGraw-Hill Interamericana. México. 2013. (y Katzung's Basic & Clinical Pharmacology, T.W. Vanderah, 2024)." },
+    // --- Textos (programa oficial 2026-2S) ---
+    { kind: "libro", reference: "Bakke O.M., Carné Cladellas X., García Alonso F. Ensayos Clínicos con Medicamentos: Fundamentos Básicos, Metodología y Práctica. Mosby Doyma. Barcelona. 1995.", moduleSlug: "investigacion-farmacologia" },
+    { kind: "libro", reference: "Akporiaye E. y col. (Ed. B.G. Katzung). Farmacología Básica y Clínica. 12ª ed. (libro electrónico). McGraw-Hill Interamericana. México. 2013." },
+    { kind: "libro", reference: "Velasco Martín A. y col. Farmacología Clínica y Terapéutica Médica. McGraw-Hill. Madrid. 2004.", moduleSlug: "farmacologia-clinica" },
     { kind: "libro", reference: "Flórez J., Armijo J.A., Mediavilla A. Farmacología Humana. 6ª ed. Elsevier Masson. Barcelona. 2014." },
-    { kind: "libro", reference: "Rang & Dale. Farmacología. M. Dale. 9ª ed. Elsevier. 2020." },
-    { kind: "libro", reference: "Isaza C.A., Machado J.E., Machado M.E. y col. Fundamentos de Farmacología en Terapéutica. 7ª ed. Celsus. Colombia. 2020." },
+    { kind: "libro", reference: "Tobón Marulanda F.Á. Farmacología básica: para el uso responsable de medicamentos. 1ª ed. Ediciones de la U. Bogotá. 2022." },
+    { kind: "libro", reference: "Dale M. Farmacología. 9ª ed. Elsevier. 2020." },
+    { kind: "libro", reference: "Isaza Mejía C.A., Machado Alba J.E., Machado Duque M.E., Gaviria Mendoza A., Castro Rodríguez A., Fuentes González J.A. Fundamentos de Farmacología en Terapéutica. 7ª ed. Celsus. Colombia. 2020." },
+    { kind: "libro", reference: "Hilal-Dandan R., Brunton L. (Ed.). Goodman & Gilman Manual de Farmacología y Terapéutica. 2ª ed. McGraw-Hill Education. México. 2015." },
+    { kind: "libro", reference: "Brunton L., Chabner B.A., Knollman B.C. (Ed.). Goodman & Gilman. Las Bases Farmacológicas de la Terapéutica. Vol. I y II. McGraw-Hill Interamericana. México. 2012." },
+    { kind: "libro", reference: "Wildman R.E.C. (Ed.). Handbook of Nutraceuticals and Functional Foods. 2ª ed. CRC Press. Boca Ratón. 2007." },
+    { kind: "libro", reference: "Hernández I., Moro Sánchez M.Á., Portolés Pérez A. (referencia sin título completo en el programa original). Médica Panamericana. México. 2018." },
+    { kind: "libro", reference: "Delgado Cirilo A., Minguillón Llombart C., Joglar Tamargo J. Introducción a la Química Terapéutica. 2ª ed. Ediciones Díaz de Santos. Madrid. 2003." },
+    { kind: "libro", reference: "Vanderah T.W. (Ed.). Katzung's Basic & Clinical Pharmacology. McGraw Hill. 2024." },
+    { kind: "libro", reference: "Battista E. Lo Esencial en Farmacología. 4ª ed. (Cursos Crash). Elsevier. 2013." },
+    { kind: "libro", reference: "Castillo-García E., Martínez-Solís I. Manual de Fitoterapia. Elsevier Masson. Barcelona. 2007.", moduleSlug: "aspectos-legales" },
+    { kind: "libro", reference: "Parrado R. Medicamentos en el Embarazo. El Manual Universitario. 2012.", moduleSlug: "farmacologia-clinica" },
+    { kind: "libro", reference: "Baños J., Farré M. Principios de Farmacología Clínica. Masson. Barcelona. 2002.", moduleSlug: "farmacologia-clinica" },
     { kind: "libro", reference: "Golan D.E. (Ed.). Principios de Farmacología: Bases Fisiopatológicas del Tratamiento Farmacológico. Lippincott Williams & Wilkins. España. 2012." },
-    { kind: "libro", reference: "Declaración de Helsinki de la AMM. Res. 008430 de 1993 (Min. Salud, Colombia). Ley 84 de 1989 (protección animal)." },
-    { kind: "revista", reference: "British Journal of Pharmacology" },
-    { kind: "revista", reference: "European Journal of Pharmacology" },
-    { kind: "revista", reference: "Trends in Pharmacological Sciences" },
+    { kind: "libro", reference: "Lee A. (Dir.). Reacciones Adversas a los Medicamentos. 1ª ed. Pharma Editores. Barcelona. 2007.", moduleSlug: "farmacologia-clinica" },
+    { kind: "libro", reference: "Vademécum Colombiano de Plantas Medicinales. República de Colombia, Ministerio de la Protección Social. 2008.", moduleSlug: "aspectos-legales" },
+    { kind: "libro", reference: "Lorenzo Fernández P., Moreno González A., Leza Cerro J.C., Lizasoain I. (Directores). Velásquez, Farmacología Básica y Clínica. 17ª ed." },
+
+    // --- Artículo científico recomendado ---
+    { kind: "libro", reference: "Durán Quintana J.A. (2004). Investigación en terapéutica clínica: ensayos clínicos con medicamentos. Educación Médica, 7 (supl1): S/51-S/55.", moduleSlug: "investigacion-farmacologia" },
+
+    // --- Normativas y guías éticas ---
+    { kind: "libro", reference: "Ley 84 de 1989 (Congreso de Colombia): Estatuto Nacional de Protección de los Animales.", moduleSlug: "investigacion-farmacologia" },
+    { kind: "libro", reference: "Resolución 008430 de 1993 (Ministerio de Salud Pública, Colombia): Normas Científicas, Técnicas y Administrativas para la Investigación en Salud.", moduleSlug: "investigacion-farmacologia" },
+    { kind: "libro", reference: "Declaración de Helsinki de la Asociación Médica Mundial (AMM) — Principios Éticos para las Investigaciones Médicas en Seres Humanos. Adoptada por la 75ª Asamblea General, Helsinki, Finlandia, octubre 2024.", moduleSlug: "investigacion-farmacologia" },
+
+    // --- Revistas electrónicas ---
+    { kind: "revista", reference: "American Journal of Pharmacology and Toxicology (Science Publications)" },
     { kind: "revista", reference: "Annual Review of Pharmacology and Toxicology" },
+    { kind: "revista", reference: "Biochemical Pharmacology (Elsevier)" },
+    { kind: "revista", reference: "British Journal of Pharmacology (Wiley-Blackwell)" },
+    { kind: "revista", reference: "European Journal of Pharmacology (Elsevier)" },
+    { kind: "revista", reference: "Trends in Pharmacological Sciences (Elsevier)" },
   ],
 };
