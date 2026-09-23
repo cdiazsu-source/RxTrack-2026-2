@@ -88,6 +88,36 @@ export const ft2: SubjectContent = {
             "Los dos pares son ejes de clasificación **independientes**: un sistema puede ser, por ejemplo, polidisperso e incoherente a la vez (una suspensión mal controlada), o monodisperso y coherente (un gel con partículas uniformes).",
           ].join("\n"),
         },
+        {
+          question: [
+            "**Verdadero o falso, con justificación.** Entre una dispersión molecular y una dispersión coloidal no existen diferencias, ya que en ambos casos se tienen dispersiones translúcidas y no existen superficies limitantes.",
+          ].join("\n"),
+          solution: [
+            "**Falso.**",
+            "",
+            "La dispersión **molecular** es transparente, no tiene superficies limitantes y no es separable de su medio. La dispersión **coloidal** es translúcida, sí presenta superficies limitantes (por eso hay fenómenos de adsorción y tensión superficial) y se puede separar del solvente por diálisis o ultrafiltración.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Verdadero o falso, con justificación.** El perfil de calidad objetivo del producto (QTPP, *Quality Target Product Profile*) es la última etapa del desarrollo de un producto en el enfoque de calidad por diseño (QbD, *Quality by Design*) y está relacionado con la definición de los atributos críticos de los materiales.",
+          ].join("\n"),
+          solution: [
+            "**Falso.**",
+            "",
+            "El QTPP es la **primera** etapa del enfoque QbD: define la calidad deseada del producto (vía de administración, forma farmacéutica, dosis, estabilidad, perfil de liberación). Los atributos críticos de los materiales (CMA, *Critical Material Attributes*) se identifican en una etapa **posterior**, ya con el QTPP definido.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Verdadero o falso, con justificación.** De acuerdo con la clasificación de los sistemas fisicoquímicos, una dispersión líquido-líquido a escala coloidal se considera una suspensión.",
+          ].join("\n"),
+          solution: [
+            "**Falso.**",
+            "",
+            "Una dispersión líquido-líquido es una **emulsión**; a escala coloidal correspondería a una nanoemulsión o microemulsión. La **suspensión** es, por definición, un sólido disperso en un líquido (S/L).",
+          ].join("\n"),
+        },
       ],
       chapter: [
         "#### Por qué este módulo va primero",
@@ -284,6 +314,112 @@ export const ft2: SubjectContent = {
             "Es una relación geométrica, P = v / (a₀ · lc), entre el volumen de la cola hidrofóbica (v), el área óptima de la cabeza polar (a₀) y la longitud de la cadena hidrofóbica extendida (lc).",
             "",
             "**Predice el tipo de agregado** que formará el tensioactivo en solución: valores bajos (P ≤ 1/3) dan micelas esféricas; valores intermedios, micelas cilíndricas o bicapas curvas (vesículas); P ≈ 1, bicapas planas; P > 1, micelas invertidas (estructuras W/O) — es decir, también predice si el tensioactivo favorece emulsiones O/W (cabeza grande, P pequeño) o W/O (cola dominante, P grande).",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Relación de términos.** Relacione cada término con su definición correcta:",
+            "",
+            "**Términos:** 1. Exceso de concentración superficial · 2. Balance hidrófilo-lipófilo (HLB) · 3. Coeficiente de extensión · 4. Ángulo de contacto · 5. Punto de enturbiamiento · 6. Microemulsiones · 7. Concentración micelar crítica (CMC) · 8. Factor de empaquetamiento · 9. Punto de Kraft · 10. Temperatura de inversión de fases",
+            "",
+            "**Definiciones:**",
+            "",
+            "a. Diferencia entre el trabajo de adhesión y el de cohesión de dos líquidos inmiscibles.",
+            "b. Diferencia el comportamiento de moléculas según su capacidad de adsorberse en una superficie.",
+            "c. Temperatura, en tensioactivos no iónicos, a la que se insolubiliza el tensioactivo al deshidratarse sus grupos polietoxilados.",
+            "d. Temperatura, en tensioactivos iónicos, relacionada con el aumento de solubilidad con la temperatura y el descenso de la CMC.",
+            "e. Proporción entre los grupos hidrófilos y lipófilos de un tensioactivo.",
+            "f. Concentración a partir de la cual se forman agregados coloidales que cambian bruscamente las propiedades fisicoquímicas.",
+            "g. Relación geométrica que predice la orientación de un tensioactivo en una interfase.",
+            "h. Se calcula mediante la ecuación de Young.",
+            "i. Temperatura, en tensioactivos no iónicos, a la que una emulsión cambia de O/W a W/O.",
+            "j. Sistemas líquido-líquido termodinámicamente estables que se forman espontáneamente, con ligera agitación.",
+          ].join("\n"),
+          solution: [
+            "| Término | Respuesta | Por qué |",
+            "| --- | --- | --- |",
+            "| 1. Exceso de concentración superficial | **b** | Diferencia solutos que se adsorben en la superficie (Γ₂ > 0, tipo IIA) de los que la evitan (Γ₂ < 0, tipo I). |",
+            "| 2. HLB | **e** | Escala de 0 a 20 según la proporción entre la porción hidrófila y la lipófila. |",
+            "| 3. Coeficiente de extensión | **a** | S = trabajo de adhesión − trabajo de cohesión. |",
+            "| 4. Ángulo de contacto | **h** | Ecuación de Young: γ_SV = γ_SL + γ_LV·cos θ. |",
+            "| 5. Punto de enturbiamiento | **c** | No iónicos: al calentar se deshidratan las cadenas polioxietilenadas y la solución se enturbia. |",
+            "| 6. Microemulsiones | **j** | Termodinámicamente estables, formación espontánea con baja energía. |",
+            "| 7. CMC | **f** | Concentración a la que se forman micelas y cambian bruscamente las propiedades fisicoquímicas. |",
+            "| 8. Factor de empaquetamiento | **g** | Relaciona el volumen de la cola, el área de la cabeza polar y el largo de la cadena. |",
+            "| 9. Punto de Kraft | **d** | Iónicos: la solubilidad sube con la temperatura hasta alcanzar la CMC. |",
+            "| 10. Temperatura de inversión de fases | **i** | No iónicos: la emulsión se invierte de O/W a W/O al cambiar el HLB del tensioactivo con la temperatura. |",
+            "",
+            "**Clave:** 1-b · 2-e · 3-a · 4-h · 5-c · 6-j · 7-f · 8-g · 9-d · 10-i",
+            "",
+            "**Trampa típica:** el punto de enturbiamiento (5) y la temperatura de inversión de fases (10) son ambos de tensioactivos no iónicos — el primero es de la *solución* del tensioactivo, el segundo de la *emulsión*.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Verdadero o falso, con justificación.** Para tensioactivos iónicos, a medida que aumenta la fuerza iónica del medio, disminuye la concentración micelar crítica (CMC).",
+          ].join("\n"),
+          solution: [
+            "**Verdadero.**",
+            "",
+            "El electrolito añadido apantalla la repulsión electrostática entre las cabezas cargadas, lo que facilita el acercamiento de las moléculas y baja la CMC. Ejemplo: dodecilsulfato de sodio a 25 °C pasa de 8.1 mM en agua a 0.5 mM en NaCl 0.40 M.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Verdadero o falso, con justificación.** El valor de la tensión superficial de un líquido está relacionado con las fuerzas intermoleculares que posee; así, a interacciones intermoleculares más fuertes, menor es este valor.",
+          ].join("\n"),
+          solution: [
+            "**Falso.**",
+            "",
+            "Es al revés: a interacciones intermoleculares más fuertes, **mayor** es la tensión superficial. El agua, por sus puentes de hidrógeno, tiene un valor alto: 72.0 din/cm.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Verdadero o falso, con justificación.** Un ángulo de contacto de 45°, generado al poner en contacto una gota de agua sobre la superficie de un sólido, significa que las fuerzas de cohesión de cada material superan a las de adhesión entre ellos y, por lo tanto, el sólido no se deja humectar.",
+          ].join("\n"),
+          solution: [
+            "**Falso.**",
+            "",
+            "θ = 45° es menor a 90°, lo que indica que predominan las fuerzas de **adhesión** y que el sólido **sí se humecta** (mojado parcial). La predominancia de la cohesión y la no humectación corresponden a θ > 90°.",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Analice.** El método de Zisman grafica el coseno del ángulo de contacto (cos θ) de distintos líquidos de prueba frente a la tensión superficial de cada uno, medidos a 20 °C sobre un sólido (por ejemplo polietileno o parafina). Explique, como si usted hubiera hecho la experimentación, a qué corresponde la tensión superficial del eje X, qué significa cada punto graficado, cómo se interpreta la gráfica, y para qué sirve el concepto de tensión superficial crítica.",
+          ].join("\n"),
+          solution: [
+            "#### Experimento",
+            "1. Se toma una serie de **líquidos puros diferentes** (idealmente homólogos, p. ej. n-alcanos) con tensión superficial líquido-aire conocida a 20 °C.",
+            "2. Se deposita una gota de cada líquido sobre la superficie limpia del sólido.",
+            "3. Se mide el ángulo de contacto θ con un goniómetro.",
+            "",
+            "#### Ejes y puntos",
+            "**Eje X:** tensión superficial líquido-aire de cada líquido de prueba (din/cm) — no es la tensión del sólido. **Cada punto:** un líquido distinto; abscisa = su tensión superficial, ordenada = cos θ que forma sobre el sólido.",
+            "",
+            "#### Interpretación",
+            "A menor tensión superficial del líquido, menor θ (cos θ → 1), mejor mojado. Los puntos se ajustan a una recta que se extrapola hasta **cos θ = 1** (θ = 0°, mojado total); la abscisa de ese corte es la **tensión superficial crítica (γc)**. Todo líquido con tensión superficial ≤ γc se extiende completamente sobre el sólido; si es mayor, forma gota.",
+            "",
+            "#### Utilidad",
+            "Predecir la mojabilidad de sólidos (principios activos hidrofóbicos, polvos, empaques) y seleccionar el vehículo o agente humectante adecuado: para humectar un polvo en una suspensión, la tensión superficial del vehículo debe bajarse (con un tensioactivo humectante) hasta un valor ≤ γc del sólido. Por eso el agua (72 din/cm) no moja el polietileno (γc ≈ 31 din/cm).",
+          ].join("\n"),
+        },
+        {
+          question: [
+            "**Cálculo — coeficiente de extensión.** Una dispersión de un tensioactivo en aceite mineral (loción de monolaurato de sorbitán al 5.0 % p/v) se vierte sobre agua a 25 °C. La tensión superficial del agua es 72.0 din/cm, la de la loción oleosa es 45.5 din/cm y la tensión interfacial de la solución oleosa frente al agua es 5.2 din/cm. Calcule el coeficiente de extendido de la loción sobre el agua e interprete el signo del resultado.",
+          ].join("\n"),
+          solution: [
+            "#### Cálculo",
+            "S = γ_agua − (γ_loción + γ_interfacial)",
+            "S = 72.0 − (45.5 + 5.2) = 72.0 − 50.7 = **21.3 din/cm**",
+            "",
+            "#### Verificación por trabajos",
+            "Wa = γ_loción + γ_agua − γ_interfacial = 45.5 + 72.0 − 5.2 = 112.3 din/cm",
+            "Wc = 2 × γ_loción = 2 × 45.5 = 91.0 din/cm",
+            "S = Wa − Wc = 112.3 − 91.0 = **21.3 din/cm** ✓",
+            "",
+            "#### Interpretación",
+            "**S > 0**: el trabajo de adhesión supera al de cohesión, por lo que la loción **se extiende espontáneamente** sobre el agua formando una película continua — el tensioactivo sí actúa como promotor de extensibilidad.",
           ].join("\n"),
         },
       ],
