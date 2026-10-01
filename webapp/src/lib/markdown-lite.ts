@@ -19,7 +19,7 @@
  *   ---                           (regla horizontal)
  * Inline:
  *   **negrita**  *cursiva*  `código`  [texto](https://url)  <br> literal
- *   ![alt](/molecules/nombre.svg)  (imagen; solo rutas propias bajo /molecules/*.svg)
+ *   ![alt](/molecules/nombre.png)  (imagen; solo rutas propias bajo /molecules/*.svg|png)
  */
 
 export function escapeHtml(str: string | null | undefined): string {
@@ -67,10 +67,11 @@ export function inlineLite(s: string): string {
   });
   e = e.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   e = e.replace(/\*(.+?)\*/g, "<em>$1</em>");
-  // ![alt](/molecules/nombre.svg) — imágenes de estructuras químicas. Solo se
-  // aceptan rutas propias bajo /molecules/*.svg (allowlist estricta, nunca una
-  // URL externa ni data:), así que no hay forma de inyectar un origen distinto.
-  e = e.replace(/!\[([^\]]*)\]\((\/molecules\/[a-z0-9_-]+\.svg)\)/gi, (_m, alt, src) => {
+  // ![alt](/molecules/nombre.svg|png) — imágenes de estructuras químicas. Solo
+  // se aceptan rutas propias bajo /molecules/*.svg|png (allowlist estricta,
+  // nunca una URL externa ni data:), así que no hay forma de inyectar un
+  // origen distinto.
+  e = e.replace(/!\[([^\]]*)\]\((\/molecules\/[a-z0-9_-]+\.(?:svg|png))\)/gi, (_m, alt, src) => {
     return `<img src="${src}" alt="${alt}" class="cornell-img" loading="lazy" />`;
   });
   // [texto](url) — url ya escapada; solo aceptamos http/https.

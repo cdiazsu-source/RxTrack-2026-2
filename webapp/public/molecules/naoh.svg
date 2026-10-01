@@ -1,7 +1,0 @@
-<svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Estructura del hidróxido de sodio">
-  <title>NaOH (hidróxido de sodio)</title>
-  <text x="60" y="78" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="600" fill="#7c3aed">Na⁺</text>
-  <line x1="125" y1="70" x2="150" y2="70" stroke="#3f3f46" stroke-width="1.8"/>
-  <text x="118" y="76" text-anchor="end" font-family="sans-serif" font-size="16" font-weight="600" fill="#dc2626">O⁻</text>
-  <text x="158" y="76" text-anchor="start" font-family="sans-serif" font-size="16" fill="#3f3f46">H</text>
-</svg>
