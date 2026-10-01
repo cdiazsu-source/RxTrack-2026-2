@@ -808,7 +808,9 @@ export const aif: SubjectContent = {
       desarrollo: [
         "#### Tipo de valoración, analito y valorante",
         "",
-        "**Tipo de valoración:** nitrimétrica (por diazotación), con punto final eléctrico *dead-stop*. Es una categoría propia — **no** es ácido-base acuosa, ni no acuosa, ni redox clásica — aunque el montaje (vaso + agitación + electrodos + bureta) se parezca al de las demás. **Modalidad: directa** — el NaNO₂ gotea directo sobre la sulfanilamida hasta el punto final; no hay exceso que se valore después (eso sería residual) ni un reactivo intermedio que libere otra especie (eso sería indirecta).",
+        "**Tipo de valoración:** nitrimétrica (por diazotación), con punto final eléctrico *dead-stop*. Es una categoría propia — **no** es ácido-base acuosa, ni no acuosa, ni redox clásica — aunque el montaje (vaso + agitación + electrodos + bureta) se parezca al de las demás. **Por qué no encaja en las otras categorías:** aunque hay un ácido (HNO₂) de por medio, el mecanismo real es una sustitución electrofílica sobre el nitrógeno de la amina (diazotación), no una simple transferencia de H⁺ ni de electrones — por eso es su propia categoría analítica. **Modalidad: directa** — el NaNO₂ gotea directo sobre la sulfanilamida hasta el punto final; no hay exceso que se valore después (eso sería residual) ni un reactivo intermedio que libere otra especie (eso sería indirecta).",
+        "",
+        "**Electrodo: combinado Ag/AgCl // Pt (técnica *dead-stop*).** Aquí el punto final no se detecta por un cambio de pH, sino por la **aparición repentina de HNO₂ libre** (una especie electroactiva) justo después del punto de equivalencia — por eso se necesita un electrodo capaz de registrar ese salto de corriente/potencial en el electrodo de **platino**, no un electrodo de vidrio (que solo mide actividad de H⁺ y no serviría para detectar este tipo de salto).",
         "",
         "| | Analito (sulfanilamida) | Valorante (NaNO₂) |",
         "| --- | --- | --- |",
@@ -1062,7 +1064,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 1 (3 partes — así pregunta el profesor).** Elige la valoración nitrimétrica (sulfanilamida + NaNO₂) de esta práctica.",
             "",
-            "**(a)** Explica la reacción que ocurre en esta valoración y cómo se detecta el punto final.",
+            "**(a)** Indica el **tipo de valoración** (acuosa / no acuosa / redox / nitrimétrica) y por qué; indica qué **electrodo** se usa y por qué. Luego explica la reacción que ocurre y cómo se detecta el punto final.",
             "",
             "**(b)** Con estos datos, calcula la **normalidad real del NaNO₂**:",
             "",
@@ -1080,7 +1082,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **naproxeno** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) La reacción y el punto final",
+            "#### (a) Tipo, electrodo, reacción y punto final",
+            "",
+            "Es una valoración **nitrimétrica** (por diazotación) — no es ácido-base acuosa, ni no acuosa, ni redox clásica, porque el mecanismo real es una **sustitución electrofílica** sobre el nitrógeno de la amina, no una simple transferencia de H⁺ ni de electrones. Electrodo: **combinado Ag/AgCl // Pt** (técnica *dead-stop*), porque el punto final se detecta por la aparición repentina de HNO₂ libre (electroactivo, se depolariza en el platino), no por un cambio de pH.",
             "",
             "```formula",
             "NaNO₂ + HCl → HNO₂ + NaCl",
@@ -1140,7 +1144,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 2.** Misma valoración nitrimétrica (sulfanilamida + NaNO₂).",
             "",
-            "**(a)** ¿Por qué el HNO₂ se genera *in situ* y no se añade ya preparado?",
+            "**(a)** ¿Qué tipo de valoración es esta y por qué no encaja como ácido-base ni como redox? ¿Qué electrodo se usa y por qué? Y ¿por qué el HNO₂ se genera *in situ* y no se añade ya preparado?",
             "",
             "**(b)** Calcula la **normalidad real del NaNO₂** con estos datos:",
             "",
@@ -1158,7 +1162,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **captopril** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) Por qué se genera in situ",
+            "#### (a) Tipo, electrodo y por qué se genera in situ",
+            "",
+            "Es una valoración **nitrimétrica** (por diazotación) — no es ácido-base porque el mecanismo no es una simple transferencia de H⁺, y no es redox clásica porque no hay un cambio de estado de oxidación que se siga directamente; es su propia categoría analítica. Electrodo: **combinado Ag/AgCl // Pt**, porque el punto final se detecta eléctricamente (técnica *dead-stop*) por la aparición de HNO₂ libre, no por un viraje de pH.",
             "",
             "El HNO₂ es inestable: se descompone con facilidad si se concentra o se deja reposar. Generándolo gota a gota a partir de NaNO₂ (estable, en la bureta) + HCl (ya presente en el medio), solo existe la cantidad justa para reaccionar de inmediato con la sulfanilamida disponible — nunca se acumula un exceso que se descomponga antes de reaccionar.",
             "",
@@ -1212,7 +1218,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 3.** Misma valoración nitrimétrica (sulfanilamida + NaNO₂).",
             "",
-            "**(a)** Explica cómo se forma el catión nitrosonio (NO⁺) a partir del HNO₂, y qué papel juega en la reacción.",
+            "**(a)** ¿Qué tipo de valoración es esta (acuosa / no acuosa / redox / nitrimétrica) y por qué? ¿Qué electrodo se usa y por qué? Explica además cómo se forma el catión nitrosonio (NO⁺) a partir del HNO₂, y qué papel juega en la reacción.",
             "",
             "**(b)** Calcula la **normalidad real del NaNO₂** con estos datos:",
             "",
@@ -1230,7 +1236,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **naproxeno** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) Formación del NO⁺",
+            "#### (a) Tipo, electrodo y formación del NO⁺",
+            "",
+            "Es una valoración **nitrimétrica** (por diazotación), categoría propia — no ácido-base ni redox clásica. Electrodo: **combinado Ag/AgCl // Pt**, técnica *dead-stop*: el punto final se detecta por el salto de corriente que produce el HNO₂ libre en el electrodo de platino, no por un cambio de pH.",
             "",
             "```formula",
             "HNO₂ + H⁺ → H₂O + NO⁺",
@@ -1433,7 +1441,9 @@ export const aif: SubjectContent = {
       desarrollo: [
         "#### Tipo de valoración, analito y valorante",
         "",
-        "**Tipo de valoración:** ácido-base en **medio acuoso**. **Modalidad: directa** — el NaOH gotea directo sobre el ácido nicotínico hasta el punto de equivalencia.",
+        "**Tipo de valoración:** ácido-base en **medio acuoso**. **Por qué es acuosa:** el ácido nicotínico es soluble en agua y suficientemente fuerte (pKa ≈ 4,8) para dar un salto de potencial medible frente al NaOH sin necesitar ningún disolvente especial — el caso simple, frente al acetato de sodio de la Práctica 4, que es demasiado débil para valorarse en agua. **Modalidad: directa** — el NaOH gotea directo sobre el ácido nicotínico hasta el punto de equivalencia.",
+        "",
+        "**Electrodo: combinado de vidrio, electrolito interno KCl.** El electrodo de vidrio responde a la **actividad de H⁺** (mide pH), que es justo lo que cambia en una valoración ácido-base. El KCl es el electrolito \"por defecto\" de este electrodo porque es compatible y estable en medio **acuoso** — a diferencia de la Práctica 4 (medio no acuoso), donde el KCl no sería suficientemente soluble y habría que cambiarlo por LiCl.",
         "",
         "| | Analito (ácido nicotínico) | Valorante (NaOH) |",
         "| --- | --- | --- |",
@@ -1567,7 +1577,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 1 (3 partes — así pregunta el profesor).** Elige la valoración ácido-base acuosa de ácido nicotínico.",
             "",
-            "**(a)** Explica la reacción de esta valoración.",
+            "**(a)** Indica el **tipo de valoración** (acuosa / no acuosa / redox / nitrimétrica) y por qué; indica qué **electrodo** se usa y por qué. Luego explica la reacción.",
             "",
             "**(b)** Calcula el **% de pureza** con estos datos:",
             "",
@@ -1586,7 +1596,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **captopril** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) La reacción",
+            "#### (a) Tipo, electrodo y la reacción",
+            "",
+            "Es una valoración **ácido-base en medio acuoso** — el ácido nicotínico es soluble y suficientemente fuerte (pKa ≈ 4,8) para dar un salto medible en agua, sin necesitar un disolvente especial. Electrodo: **combinado de vidrio, electrolito KCl** (responde a actividad de H⁺; el KCl es estable en medio acuoso).",
             "",
             "```formula",
             "HNic + OH⁻ → Nic⁻ + H₂O",
@@ -1641,7 +1653,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 2.** Misma valoración ácido-base acuosa de ácido nicotínico.",
             "",
-            "**(a)** ¿Por qué el salto de potencial es claro aunque el ácido nicotínico sea un ácido débil?",
+            "**(a)** ¿Qué tipo de valoración es esta y qué electrodo se usa (y por qué)? Explica además por qué el salto de potencial es claro aunque el ácido nicotínico sea un ácido débil.",
             "",
             "**(b)** Calcula el **% de pureza** con estos datos:",
             "",
@@ -1660,7 +1672,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **naproxeno** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) Por qué el salto es claro",
+            "#### (a) Tipo, electrodo y por qué el salto es claro",
+            "",
+            "Es una valoración **ácido-base en medio acuoso**. Electrodo: **combinado de vidrio, electrolito KCl** (mide actividad de H⁺, compatible y estable en agua).",
             "",
             "Antes del punto de equivalencia, la mezcla HNic/Nic⁻ amortigua el pH (zona tamponada, el potencial cambia poco). Justo al llegar al punto de equivalencia, todo el analito ya es Nic⁻; ese cambio brusco de \"zona tamponada\" a \"zona sin tampón\" es lo que dispara el salto de potencial, aunque el ácido en sí sea débil.",
             "",
@@ -1712,7 +1726,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 3.** Misma valoración ácido-base acuosa de ácido nicotínico.",
             "",
-            "**(a)** ¿Por qué el nitrógeno del anillo de piridina no interviene en esta neutralización?",
+            "**(a)** ¿Qué tipo de valoración es esta y qué electrodo se usa (y por qué)? ¿Por qué el nitrógeno del anillo de piridina no interviene en esta neutralización?",
             "",
             "**(b)** Calcula el **% de pureza** con estos datos:",
             "",
@@ -1731,7 +1745,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **captopril** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) Por qué el N del anillo no interviene",
+            "#### (a) Tipo, electrodo y por qué el N del anillo no interviene",
+            "",
+            "Es una valoración **ácido-base en medio acuoso**. Electrodo: **combinado de vidrio, electrolito KCl**.",
             "",
             "El ácido nicotínico tiene dos sitios posibles: el –COOH (ácido) y el nitrógeno de la piridina (básico). En esta valoración se está neutralizando el **lado ácido** de la molécula con una base fuerte (NaOH); el nitrógeno del anillo sigue siendo básico pero no tiene ningún H⁺ que cederle al OH⁻ — por eso no participa y η = 1 (solo cuenta el carboxilo).",
             "",
@@ -1791,7 +1807,9 @@ export const aif: SubjectContent = {
       desarrollo: [
         "#### Tipo de valoración, analito y valorante",
         "",
-        "**Tipo de valoración:** ácido-base en **medio no acuoso**. **Modalidad: directa** — el HClO₄ gotea directo sobre el acetato de sodio; lo \"no acuoso\" es el disolvente (ácido acético glacial), no la modalidad.",
+        "**Tipo de valoración:** ácido-base en **medio no acuoso**. **Por qué es no acuosa:** el acetato de sodio es una **base demasiado débil** — en agua, el propio disolvente nivela su fuerza y el salto de potencial desaparece (ver la explicación completa más abajo). Hace falta un disolvente **diferenciador** (ácido acético glacial) para que la valoración sea posible. **Modalidad: directa** — el HClO₄ gotea directo sobre el acetato de sodio; lo \"no acuoso\" es el disolvente, no la modalidad.",
+        "",
+        "**Electrodo: combinado de vidrio, electrolito LiCl.** Sigue siendo un electrodo de vidrio (mide actividad de H⁺/protones, igual que en medio acuoso), pero el **KCl habitual no es suficientemente soluble en ácido acético glacial** y taponaría la unión líquida, dando lecturas erráticas. El **LiCl** sí es soluble en ese disolvente no acuoso, así que mantiene el puente salino funcionando.",
         "",
         "| | Analito (acetato de sodio) | Valorante (HClO₄) |",
         "| --- | --- | --- |",
@@ -1969,7 +1987,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 1 (3 partes — así pregunta el profesor).** Elige la valoración no acuosa de acetato de sodio.",
             "",
-            "**(a)** Explica por qué esta valoración no puede hacerse en agua y escribe la reacción con el HClO₄.",
+            "**(a)** Indica el **tipo de valoración** (acuosa / no acuosa / redox / nitrimétrica) y por qué; indica qué **electrodo** se usa y por qué. Explica por qué esta valoración no puede hacerse en agua y escribe la reacción con el HClO₄.",
             "",
             "**(b)** Calcula el **% de pureza en base húmeda** con estos datos:",
             "",
@@ -1988,7 +2006,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **naproxeno** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) Por qué no se puede en agua, y la reacción",
+            "#### (a) Tipo, electrodo, por qué no se puede en agua, y la reacción",
+            "",
+            "Es una valoración **ácido-base en medio no acuoso**. Electrodo: **combinado de vidrio, electrolito LiCl** (el KCl habitual no es suficientemente soluble en ácido acético glacial).",
             "",
             "El acetato de sodio es la sal de un ácido débil: en agua se comporta como base débil y el agua **nivela** su fuerza, sin dar un salto de potencial medible. En ácido acético glacial, el HClO₄ actúa como ácido extremadamente fuerte vía el catión acetonio:",
             "",
@@ -2042,7 +2062,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 2.** Misma valoración no acuosa de acetato de sodio.",
             "",
-            "**(a)** ¿Qué papel juega el anhídrido acético que se añade antes de disolver la muestra?",
+            "**(a)** ¿Qué tipo de valoración es esta y qué electrodo se usa (y por qué)? ¿Qué papel juega el anhídrido acético que se añade antes de disolver la muestra?",
             "",
             "**(b)** Calcula el **% de pureza en base húmeda** con estos datos:",
             "",
@@ -2061,7 +2081,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **captopril** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) El papel del anhídrido acético",
+            "#### (a) Tipo, electrodo y el papel del anhídrido acético",
+            "",
+            "Es una valoración **ácido-base en medio no acuoso**. Electrodo: **combinado de vidrio, electrolito LiCl** (porque el KCl habitual no es suficientemente soluble en ácido acético glacial y taponaría la unión líquida).",
             "",
             "La muestra y el ácido acético glacial siempre traen algo de agua residual. El agua reacciona con HClO₄ (lo consume) y desplaza el punto final. El anhídrido acético reacciona con esa agua (CH₃CO)₂O + H₂O → 2 CH₃COOH, neutralizándola antes de titular, para que todo el HClO₄ que se añada después reaccione solo con el acetato de sodio.",
             "",
@@ -2111,7 +2133,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 3.** Misma valoración no acuosa de acetato de sodio.",
             "",
-            "**(a)** ¿Por qué el electrodo combinado usa electrolito **LiCl** en vez de KCl en esta valoración?",
+            "**(a)** ¿Qué tipo de valoración es esta y por qué? ¿Por qué el electrodo combinado usa electrolito **LiCl** en vez de KCl en esta valoración?",
             "",
             "**(b)** Calcula el **% de pureza en base húmeda** con estos datos:",
             "",
@@ -2130,7 +2152,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **naproxeno** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) Por qué LiCl y no KCl",
+            "#### (a) Tipo de valoración, y por qué LiCl y no KCl",
+            "",
+            "Es una valoración **ácido-base en medio no acuoso** — el acetato de sodio es una base demasiado débil para dar un salto medible en agua (el disolvente la nivela), así que se usa ácido acético glacial como disolvente diferenciador.",
             "",
             "El KCl del electrodo acuoso habitual es poco soluble en ácido acético glacial (medio no acuoso) y puede taponar la unión líquida, dando lecturas erráticas. El **LiCl** sí es suficientemente soluble en ese disolvente, así que mantiene el puente salino funcionando y el potencial estable durante la valoración.",
             "",
@@ -2188,7 +2212,9 @@ export const aif: SubjectContent = {
       desarrollo: [
         "#### Tipo de valoración, analito y valorante",
         "",
-        "**Tipo de valoración:** **redox** (óxido-reducción). **Modalidad: directa** — el KMnO₄ gotea directo sobre el oxalato de sodio y además actúa como su propio indicador (vira a rosa persistente).",
+        "**Tipo de valoración:** **redox** (óxido-reducción). **Por qué es redox y no ácido-base:** aquí no hay transferencia de protones — hay **transferencia de electrones**: el oxalato cede 2 electrones (se oxida a CO₂) y el permanganato los gana (se reduce a Mn²⁺). **Modalidad: directa** — el KMnO₄ gotea directo sobre el oxalato de sodio y además actúa como su propio indicador (vira a rosa persistente).",
+        "",
+        "**Electrodo: de platino (inerte).** A diferencia de un electrodo de vidrio (que mide pH), el electrodo de **platino no participa químicamente** — solo \"siente\" el potencial del par redox en solución (MnO₄⁻/Mn²⁺) vía la ecuación de Nernst. Un electrodo de vidrio no serviría aquí porque no responde a potencial redox, solo a actividad de H⁺.",
         "",
         "| | Analito (oxalato de sodio) | Valorante (KMnO₄) |",
         "| --- | --- | --- |",
@@ -2357,7 +2383,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 1 (3 partes — así pregunta el profesor).** Elige la valoración redox de oxalato de sodio.",
             "",
-            "**(a)** Escribe las semirreacciones y la reacción global balanceada.",
+            "**(a)** Indica el **tipo de valoración** (acuosa / no acuosa / redox / nitrimétrica) y por qué; indica qué **electrodo** se usa y por qué. Escribe las semirreacciones y la reacción global balanceada.",
             "",
             "**(b)** Calcula el **% de pureza** con estos datos:",
             "",
@@ -2376,7 +2402,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **captopril** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) Semirreacciones y reacción global",
+            "#### (a) Tipo, electrodo, semirreacciones y reacción global",
+            "",
+            "Es una valoración **redox** — hay transferencia de electrones (el oxalato cede, el permanganato gana), no de protones. Electrodo: **de platino (inerte)**, porque no participa químicamente: solo \"siente\" el potencial del par redox MnO₄⁻/Mn²⁺ (ecuación de Nernst); un electrodo de vidrio no sirve aquí porque solo responde a pH.",
             "",
             "```formula",
             "C₂O₄²⁻ → 2CO₂ + 2e⁻",
@@ -2435,7 +2463,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 2.** Misma valoración redox de oxalato de sodio.",
             "",
-            "**(a)** ¿Por qué la reacción arranca lenta incluso en caliente, y por qué luego se acelera sola?",
+            "**(a)** ¿Qué tipo de valoración es esta y qué electrodo se usa (y por qué)? ¿Por qué la reacción arranca lenta incluso en caliente, y por qué luego se acelera sola?",
             "",
             "**(b)** Calcula el **% de pureza** con estos datos:",
             "",
@@ -2454,7 +2482,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **naproxeno** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) Por qué arranca lenta y luego se acelera",
+            "#### (a) Tipo, electrodo, y por qué arranca lenta y luego se acelera",
+            "",
+            "Es una valoración **redox**. Electrodo: **de platino (inerte)**, porque solo registra el potencial del par redox MnO₄⁻/Mn²⁺, no participa en la reacción.",
             "",
             "Al inicio, dos iones de carga negativa (oxalato y permanganato) se repelen, lo que da una barrera de activación alta — por eso es lenta incluso en caliente. Pero el **Mn²⁺** que se va formando actúa como **catalizador** de las siguientes adiciones (reacción autocatalítica): por eso las primeras gotas tardan varios segundos en decolorarse y las últimas, antes del punto final, casi no tardan nada.",
             "",
@@ -2504,7 +2534,7 @@ export const aif: SubjectContent = {
           question: [
             "**Simulacro de examen 3.** Misma valoración redox de oxalato de sodio.",
             "",
-            "**(a)** ¿Por qué el KMnO₄ no necesita un indicador aparte?",
+            "**(a)** ¿Qué tipo de valoración es esta y qué electrodo se usa (y por qué)? ¿Por qué el KMnO₄ no necesita un indicador aparte?",
             "",
             "**(b)** Calcula el **% de pureza** con estos datos:",
             "",
@@ -2523,7 +2553,9 @@ export const aif: SubjectContent = {
             "**(c)** Dibuja la estructura del **captopril** e indica 5 bandas IR/ATR características con su asignación.",
           ].join("\n"),
           solution: [
-            "#### (a) Por qué el KMnO₄ es su propio indicador",
+            "#### (a) Tipo, electrodo, y por qué el KMnO₄ es su propio indicador",
+            "",
+            "Es una valoración **redox**. Electrodo: **de platino (inerte)**, porque mide el potencial del par redox en solución sin participar químicamente — a diferencia de un electrodo de vidrio, que solo responde a pH.",
             "",
             "El ion permanganato (MnO₄⁻) tiene un color púrpura muy intenso; el producto de su reducción, Mn²⁺, es prácticamente incoloro en las concentraciones de la valoración. Mientras queda oxalato sin reaccionar, cada gota de KMnO₄ se reduce de inmediato y la solución permanece incolora. En el punto final, la primera gota en exceso ya no tiene oxalato con quien reaccionar y se queda como MnO₄⁻ libre, tiñendo la solución de **rosa persistente** — por eso no hace falta ningún indicador externo.",
             "",
