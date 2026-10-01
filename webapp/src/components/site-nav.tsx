@@ -13,7 +13,7 @@ import { SearchDialog } from "@/components/search-dialog";
 import { QuickCapture } from "@/components/quick-capture";
 
 /** Fecha del último cambio a la app. Actualízala a mano al publicar cambios. */
-const LAST_MODIFIED = "10 sep 2026";
+const LAST_MODIFIED = "30 sep 2026";
 
 export function SiteNav({
   canEdit,
