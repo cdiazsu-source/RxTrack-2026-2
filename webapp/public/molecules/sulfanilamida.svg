@@ -1,0 +1,9 @@
+<svg viewBox="0 0 240 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Estructura de la sulfanilamida">
+  <title>Sulfanilamida (C6H8N2O2S)</title>
+  <path d="M146,115 L133,137 L107,137 L94,115 L107,93 L133,93 Z" fill="none" stroke="#3f3f46" stroke-width="1.8"/>
+  <circle cx="120" cy="115" r="15" fill="none" stroke="#3f3f46" stroke-width="1"/>
+  <line x1="133" y1="93" x2="133" y2="62" stroke="#3f3f46" stroke-width="1.8"/>
+  <text x="133" y="48" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="600" fill="#2563eb">H₂N</text>
+  <line x1="133" y1="137" x2="133" y2="162" stroke="#3f3f46" stroke-width="1.8"/>
+  <text x="133" y="180" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#3f3f46">SO₂NH₂</text>
+</svg>

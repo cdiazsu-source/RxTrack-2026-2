@@ -206,6 +206,10 @@
   .cornell :where(.cornell-code) {
     @apply my-2 overflow-x-auto rounded-md bg-muted p-3 font-mono text-xs;
   }
+  .cornell :where(.cornell-img) {
+    @apply my-3 block max-w-full rounded-md border border-border bg-white p-2;
+    max-width: min(100%, 320px);
+  }
   .cornell :where(code) {
     @apply rounded bg-muted px-1 py-0.5 font-mono text-[0.85em];
   }
