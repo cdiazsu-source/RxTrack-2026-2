@@ -62,6 +62,43 @@ function QuizPreview({ questions }: { questions: ExerciseContent[] }) {
   );
 }
 
+/** Lista COMPLETA de ejercicios (patrón de examen del profesor): todos
+ *  visibles a la vez, cada uno numerado, con la solución oculta tras un
+ *  botón propio. A diferencia de QuizPreview, no pagina de uno en uno —
+ *  así se ve de entrada cuántos ejercicios hay. */
+function ExamExerciseItem({ index, exercise }: { index: number; exercise: ExerciseContent }) {
+  const [revealed, setRevealed] = useState(false);
+  return (
+    <div className="rounded-lg border border-primary/30 bg-primary/[0.03] p-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">Ejercicio {index + 1}</p>
+      <div className="cornell mt-1 text-sm" dangerouslySetInnerHTML={{ __html: renderCornell(exercise.question) }} />
+      {revealed ? (
+        <div className="mt-2 border-t border-primary/20 pt-2">
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Solución completa
+          </p>
+          <div className="cornell text-sm" dangerouslySetInnerHTML={{ __html: renderCornell(exercise.solution) }} />
+        </div>
+      ) : (
+        <Button variant="outline" size="sm" className="mt-2" onClick={() => setRevealed(true)}>
+          <Eye className="h-3.5 w-3.5" />
+          Ver solución
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function ExamExercises({ exercises }: { exercises: ExerciseContent[] }) {
+  return (
+    <div className="mt-1 flex flex-col gap-3">
+      {exercises.map((ex, i) => (
+        <ExamExerciseItem key={i} index={i} exercise={ex} />
+      ))}
+    </div>
+  );
+}
+
 function Bullets({ items }: { items: string[] }) {
   return (
     <ul className="flex list-disc flex-col gap-1 pl-5 text-sm leading-relaxed marker:text-primary">
@@ -185,6 +222,16 @@ function PracticeItem({
             <div className="mt-1">
               <Bullets items={p.studyTopics} />
             </div>
+          </>
+        )}
+
+        {p.examExercises && p.examExercises.length > 0 && (
+          <>
+            <SectionLabel>
+              Simulacros de examen — patrón del profesor ({p.examExercises.length}{" "}
+              {p.examExercises.length === 1 ? "ejercicio" : "ejercicios"})
+            </SectionLabel>
+            <ExamExercises exercises={p.examExercises} />
           </>
         )}
 

@@ -125,6 +125,16 @@ export interface LabPracticeContent {
    *  de una en una en la app (igual que `exercises` de un módulo). */
   quizQuestions?: ExerciseContent[];
   /**
+   * Ejercicios resueltos siguiendo el patrón de examen de 3 partes del
+   * profesor (reacción detallada de la valoración; datos para calcular
+   * la normalidad real o el % de pureza; estructura del fármaco + 5
+   * bandas IR/ATR). A diferencia de `quizQuestions` (uno a la vez, con
+   * paginación), estos se listan TODOS visibles de una vez en su propia
+   * sección, cada uno con la solución oculta tras "Ver solución" — para
+   * que sean evidentes y se pueda tener muchos sin saturar la página.
+   */
+  examExercises?: ExerciseContent[];
+  /**
    * Diagrama(s) de flujo del procedimiento, en sintaxis de mermaid.js
    * (`flowchart TD ...`). Uno por procedimiento distinto dentro de la
    * práctica (p. ej. una actividad A y otra B con pasos diferentes).
