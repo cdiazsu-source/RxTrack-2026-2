@@ -800,6 +800,8 @@ export const aif: SubjectContent = {
         "",
         "**Estructura del analito.** La sulfanilamida es un anillo bencénico con un grupo **–NH₂** (amina aromática primaria — el que reacciona con el HNO₂) en una posición y un grupo **–SO₂NH₂** (sulfonamida) en posición *para*. Ese grupo sulfonamida es el que históricamente le da actividad antibacteriana como fármaco; aquí se usa solo como **patrón primario** por su alta pureza y estabilidad.",
         "",
+        "**Estructura del valorante.** El NaNO₂ es una sal inorgánica simple: el ion **nitrito (NO₂⁻)**, de geometría angular (resonancia entre dos formas equivalentes N=O), junto con su contraión Na⁺. No reacciona como nitrito directamente — en el medio ácido se convierte primero en **ácido nitroso (HNO₂)**, la especie que de verdad ataca a la amina de la sulfanilamida (ver la reacción más abajo).",
+        "",
         "#### La reacción de diazotación, paso a paso",
         "",
         "La sulfanilamida es una **amina aromática primaria** (–NH₂ unido directo al anillo bencénico). Frente al **ácido nitroso** (HNO₂, generado en el momento a partir de NaNO₂ + HCl), sufre una **nitrosación** que termina en una **sal de diazonio**, estable solo en frío:",
@@ -892,6 +894,46 @@ export const aif: SubjectContent = {
         "Criterios y ejemplos de patrones primarios ácido-base, redox y de precipitación.",
         "Ubicación del punto de equivalencia por primera y segunda derivada.",
       ],
+      quizQuestions: [
+        {
+          question:
+            "¿Qué papel juega el ácido nitroso (HNO₂) en esta valoración, y por qué se **genera en el momento** (NaNO₂ + HCl) en vez de añadirse ya preparado?",
+          solution: [
+            "El HNO₂ es el reactivo que realmente ataca la amina aromática de la sulfanilamida (nitrosación → diazotación). Es una especie **inestable**: se descompone con facilidad, sobre todo al calentarse o concentrarse, dando óxidos de nitrógeno y agua.",
+            "",
+            "Por eso no se prepara ni se guarda como reactivo aparte: se genera **in situ**, gota a gota, a partir de NaNO₂ (estable, es lo que de verdad está en la bureta) y el HCl ya presente en el medio de reacción. Así solo existe la cantidad justa de HNO₂ necesaria para reaccionar de inmediato con la sulfanilamida disponible en ese instante — nunca se acumula un exceso que se descomponga antes de reaccionar.",
+            "",
+            "**Idea clave:** mientras quede sulfanilamida sin reaccionar, el HNO₂ generado se consume casi al instante — esto es justamente lo que hace posible el punto final *dead-stop* (pregunta siguiente).",
+          ].join("\n"),
+        },
+        {
+          question:
+            "¿Por qué el punto final de esta valoración se detecta **eléctricamente** (técnica *dead-stop*, con electrodo combinado Ag/AgCl // Pt) y no con un indicador de color?",
+          solution: [
+            "Mientras quede sulfanilamida sin reaccionar, el HNO₂ que se forma con cada gota de NaNO₂ se consume de inmediato — no hay HNO₂ **libre** en la solución, así que casi no pasa corriente entre los dos electrodos sumergidos (la bureta gotea justo sobre ellos).",
+            "",
+            "En el instante en que **toda** la sulfanilamida ya reaccionó, la primera gota de NaNO₂ en exceso deja HNO₂ libre en el medio. Esa especie es **electroactiva**: se depolariza en el electrodo de platino, lo que dispara un **salto brusco de potencial/corriente**. Ese salto — no un cambio de color — es el punto final.",
+            "",
+            "**Por qué no serviría un indicador visual aquí:** la sulfanilamida y sus productos de diazotación no tienen un cambio de color neto y confiable en este rango — la señal eléctrica es mucho más nítida y reproducible que cualquier indicador disponible para esta reacción.",
+          ].join("\n"),
+        },
+        {
+          question:
+            "**Cálculo.** Se pesan **51,66 mg** de sulfanilamida (patrón primario, mequiv = 172,2 mg/meq) y la titulación con NaNO₂ gasta **V_eq = 3,00 mL**. Calcula la **normalidad real** del NaNO₂.",
+          solution: [
+            "#### Paso 1 — meq de sulfanilamida pesados",
+            "meq = 51,66 mg ÷ 172,2 mg/meq = **0,3000 meq**",
+            "",
+            "#### Paso 2 — meq de NaNO₂ en el punto de equivalencia",
+            "Por el principio de equivalencia, eq(NaNO₂) = eq(sulfanilamida): **0,3000 meq**",
+            "",
+            "#### Paso 3 — Normalidad real",
+            "N = 0,3000 meq ÷ 3,00 mL = **0,1000 N**",
+            "",
+            "**Lectura.** Esta N real (no la nominal con la que se preparó el NaNO₂) es la que debe usarse en cualquier otra práctica donde el NaNO₂ actúe como valorante.",
+          ].join("\n"),
+        },
+      ],
     },
 
     {
@@ -981,6 +1023,51 @@ export const aif: SubjectContent = {
         "Técnica de pastilla de KBr vs. reflectancia total atenuada (ATR): ventajas y artefactos.",
         "Interpretación sistemática de espectros IR de fármacos; regiones diagnósticas.",
       ],
+      quizQuestions: [
+        {
+          question:
+            "Describe la **estructura del naproxeno** por grupos funcionales y, para cada uno, indica la banda IR/ATR que debería aparecer.",
+          solution: [
+            "El naproxeno es ácido (S)-2-(6-metoxinaftalen-2-il)propanoico: un **naftaleno** (anillo aromático bicíclico) con un **metoxilo (–OCH₃)** en un extremo y una cadena **–CH(CH₃)–COOH** (ácido carboxílico) en el otro.",
+            "",
+            "| Grupo funcional | Banda esperada (cm⁻¹) | Por qué |",
+            "| --- | --- | --- |",
+            "| O–H del ácido carboxílico | 2970–3300 (ancha) | Puente de hidrógeno del dímero típico de ácidos carboxílicos — ensancha mucho la banda |",
+            "| C=O del ácido carboxílico | ≈1725 | Tensión del doble enlace C=O, banda fuerte característica de ácidos |",
+            "| C=C aromático (naftaleno) | ≈1605 y ≈1510 | Tensión del anillo aromático; aparecen como pareja |",
+            "| C–O–C del metoxilo (éter aromático) | ≈1230 | Tensión asimétrica del enlace Ar–O–CH₃ |",
+            "| C–H aromático fuera de plano | ≈860 y ≈815 | Reflejan el patrón de sustitución del naftaleno |",
+          ].join("\n"),
+        },
+        {
+          question:
+            "Describe la **estructura del captopril** por grupos funcionales y, para cada uno, indica la banda IR/ATR que debería aparecer.",
+          solution: [
+            "El captopril es ácido (2S)-1-[(2S)-2-metil-3-sulfanilpropanoil]pirrolidina-2-carboxílico: un anillo de **pirrolidina** unido por un enlace **amida** a una cadena corta con un **grupo tiol (–SH)**, y con un **ácido carboxílico libre** en el anillo.",
+            "",
+            "| Grupo funcional | Banda esperada (cm⁻¹) | Por qué |",
+            "| --- | --- | --- |",
+            "| S–H del tiol | ≈2550–2575 | Banda aguda y débil, poco común en otros fármacos — muy diagnóstica |",
+            "| C=O del ácido carboxílico libre | ≈1740–1750 | Tensión del doble enlace C=O |",
+            "| C=O de la amida terciaria (amida I) | ≈1630–1650 | Sin banda N–H acompañante, porque el nitrógeno está dentro del anillo de pirrolidina (amida terciaria) |",
+            "| C–H / C–N del anillo de pirrolidina | ≈1400–1420 | Flexión asociada a la estructura cíclica saturada |",
+            "| C–N de la amida terciaria | ≈1180–1200 | Tensión del enlace C–N del grupo amida |",
+          ].join("\n"),
+        },
+        {
+          question:
+            "Un espectro problema muestra una banda **aguda y débil cerca de 2560 cm⁻¹**, pero **no** muestra el par de bandas entre 1500–1610 cm⁻¹ típico de anillos aromáticos. ¿A cuál de los dos fármacos de esta práctica corresponde, y por qué?",
+          solution: [
+            "Corresponde al **captopril**.",
+            "",
+            "**Por qué la banda a 2560 cm⁻¹ apunta a captopril:** esa es la región diagnóstica del enlace **S–H** del grupo tiol — una banda aguda y débil poco común, que solo tiene el captopril entre los dos fármacos de esta práctica (el naproxeno no tiene azufre en su estructura).",
+            "",
+            "**Por qué la ausencia de bandas 1500–1610 cm⁻¹ confirma que no es naproxeno:** esas bandas corresponden a la tensión C=C de un anillo **aromático** — el naftaleno del naproxeno siempre las muestra. El captopril no tiene ningún anillo aromático (su anillo es la pirrolidina, saturado), así que su espectro nunca las presenta.",
+            "",
+            "**Lectura.** Estas dos observaciones —presencia de S–H y ausencia de aromático— son justamente las más rápidas de usar para distinguir un fármaco del otro, antes incluso de comparar toda la huella dactilar contra el espectro de referencia.",
+          ].join("\n"),
+        },
+      ],
     },
 
     {
@@ -1001,6 +1088,8 @@ export const aif: SubjectContent = {
         "| **Peso equivalente (PE = PM / η)** | **123,1 mg/meq** | **40,00 mg/meq** |",
         "",
         "**Estructura del analito.** El ácido nicotínico (niacina, vitamina B₃) es un anillo de **piridina** (aromático, con un nitrógeno básico que no participa aquí) con un grupo **–COOH** en la posición 3 — ese carboxilo es el único grupo que reacciona en esta valoración.",
+        "",
+        "**Estructura del valorante.** El NaOH es una base fuerte inorgánica simple: el ion **hidróxido (OH⁻)** junto con su contraión Na⁺. Al disociarse por completo en agua, cada mol de NaOH aporta exactamente 1 mol de OH⁻ disponible para neutralizar un ácido — por eso η = 1.",
         "",
         "#### La reacción ácido-base, paso a paso",
         "",
@@ -1074,6 +1163,47 @@ export const aif: SubjectContent = {
         "Ecuación de Nernst aplicada al electrodo de vidrio; significado de L' y del factor 0,059.",
         "Métodos para ubicar el punto final: primera derivada, segunda derivada y método de Gran.",
       ],
+      quizQuestions: [
+        {
+          question:
+            "Escribe la reacción de neutralización entre el ácido nicotínico y el NaOH, e indica por qué su factor de equivalencia η = 1.",
+          solution: [
+            "```formula",
+            "HNic + OH⁻ → Nic⁻ + H₂O",
+            "```",
+            "",
+            "(HNic = ácido nicotínico; Nic⁻ = ion nicotinato, su base conjugada).",
+            "",
+            "**Por qué η = 1.** El ácido nicotínico es un ácido **monoprótico**: su única molécula de –COOH cede exactamente **un** H⁺ en esta reacción. El nitrógeno del anillo de piridina es básico, pero no interviene aquí porque se está neutralizando el lado ácido de la molécula, no el básico. Como η = 1, el peso equivalente coincide numéricamente con el peso molecular: PE = 123,1 mg/meq.",
+          ].join("\n"),
+        },
+        {
+          question:
+            "¿Por qué el punto de equivalencia de esta valoración cae en una zona **ligeramente básica** (pH > 7) y no exactamente en pH = 7?",
+          solution: [
+            "En el punto de equivalencia, todo el ácido nicotínico ya se convirtió en su base conjugada, el ion **nicotinato (Nic⁻)**. Pero el nicotinato, al ser la base conjugada de un ácido **débil**, se **hidroliza parcialmente** en agua:",
+            "",
+            "```formula",
+            "Nic⁻ + H₂O ⇌ HNic + OH⁻",
+            "```",
+            "",
+            "Esa hidrólisis libera un poco de OH⁻, lo que deja la solución **ligeramente básica** en el punto de equivalencia — no neutra. Esto es general para **cualquier** sal de ácido débil con base fuerte (lo mismo pasa, por ejemplo, con el acetato de sodio de la Práctica 4). El electrodo de vidrio detecta este cambio de régimen igual: lo que importa para ubicar el punto final es el **salto brusco** de potencial, no que ese salto ocurra justo en pH = 7.",
+          ].join("\n"),
+        },
+        {
+          question:
+            "**Cálculo.** Se pesan **55,2 mg** de materia prima problema. La N real del NaOH (de su propia estandarización) es **0,1005 N**, y la titulación potenciométrica dio **V_eq = 4,45 mL**. Calcula el % de pureza.",
+          solution: [
+            "#### Paso 1 — mg de ácido nicotínico hallados",
+            "mg = V_eq × N_NaOH × PEq = 4,45 mL × 0,1005 meq/mL × 123,1 mg/meq = **55,05 mg**",
+            "",
+            "#### Paso 2 — % de pureza",
+            "% pureza = 55,05 mg ÷ 55,2 mg × 100 = **99,7 %**",
+            "",
+            "**Lectura.** Un resultado tan cercano a 100 % es el esperado para una materia prima farmacopeica de buena calidad. Recuerda dividir siempre por la masa **pesada en esta réplica** — no por un valor de \"mg encontrados\" reutilizado de otra réplica.",
+          ].join("\n"),
+        },
+      ],
     },
 
     {
@@ -1094,6 +1224,8 @@ export const aif: SubjectContent = {
         "| **Peso equivalente (PE = PM / η)** | **82,04 mg/meq** | **100,46 mg/meq** |",
         "",
         "**Estructura del analito.** El acetato de sodio es una sal simple: el ion **acetato** (CH₃COO⁻, el grupo carboxilato del ácido acético) con su contraión **Na⁺**. No es un fármaco de estructura compleja — se usa aquí como ejemplo de **base débil** que exige medio no acuoso para poder valorarse.",
+        "",
+        "**Estructura del valorante.** El ácido perclórico es un ácido inorgánico fuerte: un átomo de cloro rodeado por 4 oxígenos en geometría tetraédrica (ion **perclorato, ClO₄⁻**) más el H⁺ ionizable. Es uno de los ácidos más fuertes que existen — por eso, en un disolvente poco básico como el ácido acético glacial, actúa como ácido **diferenciado** (ver la reacción más abajo).",
         "",
         "#### La reacción, paso a paso: por qué no se puede hacer en agua",
         "",
@@ -1181,6 +1313,56 @@ export const aif: SubjectContent = {
         "Por qué una base débil requiere medio no acuoso; elección del disolvente y del valorante.",
         "Función del anhídrido acético y precauciones de manejo del ácido perclórico.",
       ],
+      quizQuestions: [
+        {
+          question:
+            "¿Por qué el acetato de sodio no se puede valorar potenciométricamente en agua, y cómo resuelve ese problema usar ácido acético glacial como disolvente?",
+          solution: [
+            "El acetato de sodio es la sal de un ácido débil (ácido acético, pKa ≈ 4,76): en agua se comporta como una **base débil**, porque el ion acetato solo le quita un protón al agua de forma parcial (CH₃COO⁻ + H₂O ⇌ CH₃COOH + OH⁻). El agua, al ser capaz de aceptar o donar protones con bastante facilidad, **nivela** la fuerza efectiva de cualquier base más débil que el OH⁻ — el salto de potencial frente a cualquier ácido se vuelve demasiado pequeño para ubicar un punto de equivalencia confiable.",
+            "",
+            "En **ácido acético glacial**, un disolvente mucho menos básico que el agua, ese problema desaparece: el disolvente ya no compite por aceptar el protón del valorante, así que el HClO₄ se comporta ahí como un ácido **extremadamente fuerte** (diferenciador) y el acetato de sodio sí produce un salto de potencial nítido y medible.",
+          ].join("\n"),
+        },
+        {
+          question:
+            "Escribe la reacción neta entre el acetato de sodio y el HClO₄ en ácido acético glacial, pasando por el catión **acetonio** como intermediario.",
+          solution: [
+            "**Paso 1 — el HClO₄ protona al propio disolvente** (eso es lo que lo vuelve un ácido tan fuerte en este medio):",
+            "",
+            "```formula",
+            "HClO₄ + CH₃COOH → CH₃COOH₂⁺ + ClO₄⁻",
+            "```",
+            "",
+            "**Paso 2 — el catión acetonio (CH₃COOH₂⁺) es el verdadero ácido reactivo frente al acetato:**",
+            "",
+            "```formula",
+            "CH₃COONa + CH₃COOH₂⁺ → 2 CH₃COOH + Na⁺",
+            "```",
+            "",
+            "**Reacción neta de la valoración:**",
+            "",
+            "```formula",
+            "CH₃COONa + HClO₄ → CH₃COOH + NaClO₄",
+            "```",
+          ].join("\n"),
+        },
+        {
+          question:
+            "**Cálculo.** Se pesan **18,9 mg** de acetato de sodio en vaso seco; la titulación con HClO₄ **0,1005 N** gasta **V_eq = 2,30 mL**; la Práctica 6 determinó un % de humedad = **0,40 %**. Calcula el % de pureza en base húmeda (BH) y en base seca (BS).",
+          solution: [
+            "#### Paso 1 — mg de acetato de sodio hallados",
+            "mg = 2,30 mL × 0,1005 meq/mL × 82,04 mg/meq = **18,96 mg**",
+            "",
+            "#### Paso 2 — % de pureza en base húmeda",
+            "% BH = 18,96 mg ÷ 18,9 mg × 100 = **100,3 %**",
+            "",
+            "#### Paso 3 — % de pureza en base seca",
+            "% BS = 100,3 % ÷ (100 − 0,40) × 100 = **100,7 %**",
+            "",
+            "**Lectura.** El paso de BH a BS siempre **sube** un poco el resultado: se le está descontando al denominador el agua que no es analito.",
+          ].join("\n"),
+        },
+      ],
     },
 
     {
@@ -1201,6 +1383,8 @@ export const aif: SubjectContent = {
         "| **Peso equivalente (PE = PM / η)** | **67,0 mg/meq** | **31,60 mg/meq** |",
         "",
         "**Estructura del analito.** El oxalato de sodio es una sal simple: el ion **oxalato** (⁻OOC–COO⁻, el dianión del ácido oxálico — el ácido dicarboxílico más simple) con dos contraiones **Na⁺**.",
+        "",
+        "**Estructura del valorante.** El permanganato de potasio es una sal inorgánica: el ion **permanganato (MnO₄⁻)**, con el manganeso en su estado de oxidación más alto (+7) rodeado por 4 oxígenos en geometría tetraédrica, junto con su contraión K⁺. Es ese Mn⁺⁷, fuertemente oxidante, el que se reduce a Mn²⁺ ganando 5 electrones — y es también lo que le da su color púrpura intenso, la base de su función como autoindicador.",
         "",
         "#### La reacción redox, paso a paso",
         "",
@@ -1285,6 +1469,51 @@ export const aif: SubjectContent = {
         "Peso equivalente en reacciones redox; número de electrones y semirreacciones.",
         "Por qué la reacción oxalato–permanganato necesita calor y medio ácido fuerte.",
         "KMnO₄ como autoindicador; electrodos indicadores inertes (Pt) y de referencia.",
+      ],
+      quizQuestions: [
+        {
+          question:
+            "Escribe las semirreacciones de oxidación y de reducción de esta valoración, y la ecuación global balanceada. Explica por qué hay que multiplicar la primera semirreacción ×5 y la segunda ×2.",
+          solution: [
+            "**Oxidación** (el oxalato cede electrones; el carbono pasa de +3 a +4):",
+            "",
+            "```formula",
+            "C₂O₄²⁻ → 2CO₂ + 2e⁻",
+            "```",
+            "",
+            "**Reducción** (el permanganato gana electrones; el Mn pasa de +7 a +2):",
+            "",
+            "```formula",
+            "MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O",
+            "```",
+            "",
+            "**Por qué ×5 y ×2.** La primera semirreacción libera 2 electrones y la segunda necesita 5. Para que los electrones **cedidos** igualen a los **ganados** (nunca pueden sobrar ni faltar electrones en una reacción redox balanceada), hay que encontrar el mínimo común múltiplo de 2 y 5, que es 10: multiplicando la de oxidación ×5 y la de reducción ×2, ambas quedan en 10 electrones y se pueden sumar cancelándolos:",
+            "",
+            "```formula",
+            "5C₂O₄²⁻ + 2MnO₄⁻ + 16H⁺ → 10CO₂ + 2Mn²⁺ + 8H₂O",
+            "```",
+          ].join("\n"),
+        },
+        {
+          question:
+            "¿Por qué esta valoración requiere calentar la solución, y por qué las primeras gotas de KMnO₄ tardan más en decolorarse que las últimas (antes del punto final)?",
+          solution: [
+            "**Por qué se calienta.** La reacción entre el oxalato y el permanganato es **lenta** incluso en caliente, porque enfrenta a dos especies de carga negativa que se repelen — eso le da una barrera de activación alta. Calentar (60–70 °C) aporta la energía necesaria para que la reacción proceda a una velocidad práctica para el laboratorio.",
+            "",
+            "**Por qué se acelera sola a medida que avanza (autocatálisis).** El **Mn²⁺** que se va formando actúa como **catalizador** de las siguientes adiciones de KMnO₄. Por eso las primeras gotas tardan varios segundos en decolorarse (todavía no hay Mn²⁺ catalizador acumulado) y las últimas, ya cerca del punto final, casi no tardan nada (ya hay bastante Mn²⁺ catalizando la reacción).",
+          ].join("\n"),
+        },
+        {
+          question:
+            "**Cálculo.** Se pesan **31,8 mg** de oxalato de sodio; el KMnO₄ ya estandarizado es **0,0995 N**; la titulación potenciométrica da **V_eq = 4,80 mL**. Calcula el % de pureza.",
+          solution: [
+            "#### Paso 1 — mg de oxalato de sodio hallados",
+            "mg = 4,80 mL × 0,0995 meq/mL × 67,0 mg/meq = **32,00 mg**",
+            "",
+            "#### Paso 2 — % de pureza",
+            "% pureza = 32,00 mg ÷ 31,8 mg × 100 = **100,6 %**",
+          ].join("\n"),
+        },
       ],
     },
 
