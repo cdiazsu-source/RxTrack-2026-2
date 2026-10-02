@@ -210,6 +210,9 @@
     @apply my-3 block max-w-full rounded-md border border-border bg-white p-2;
     max-width: min(100%, 320px);
   }
+  .cornell :where(.cornell-img-wide) {
+    max-width: min(100%, 640px);
+  }
   .cornell :where(code) {
     @apply rounded bg-muted px-1 py-0.5 font-mono text-[0.85em];
   }

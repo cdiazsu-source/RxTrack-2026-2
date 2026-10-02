@@ -72,7 +72,12 @@ export function inlineLite(s: string): string {
   // nunca una URL externa ni data:), así que no hay forma de inyectar un
   // origen distinto.
   e = e.replace(/!\[([^\]]*)\]\((\/molecules\/[a-z0-9_-]+\.(?:svg|png))\)/gi, (_m, alt, src) => {
-    return `<img src="${src}" alt="${alt}" class="cornell-img" loading="lazy" />`;
+    // Los espectros (nombre-ir.svg) llevan ejes, leyenda y texto: necesitan
+    // más ancho que un diagrama de estructura simple, por eso usan una
+    // variante con max-width mayor (ver .cornell-img-wide en globals.css).
+    const isSpectrum = /-ir\.(?:svg|png)$/i.test(src);
+    const cls = isSpectrum ? "cornell-img cornell-img-wide" : "cornell-img";
+    return `<img src="${src}" alt="${alt}" class="${cls}" loading="lazy" />`;
   });
   // [texto](url) — url ya escapada; solo aceptamos http/https.
   e = e.replace(/\[([^\]]+)\]\(([^\s)]+)\)/g, (_m, text, url) => {
