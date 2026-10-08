@@ -66,16 +66,17 @@ model Subject {
   /// Se refresca en cualquier escritura hija -> "hace N días sin tocar esto".
   lastActivityAt     DateTime?
 
-  modules       Module[]
-  projects      Project[]
-  glossary      GlossaryTerm[]
-  formulas      Formula[]
-  keyDates      KeyDate[]
-  evaluation    EvaluationItem[]
-  bibliography  BibliographyItem[]
-  pastMaterials PastMaterial[]
-  flashcards    Flashcard[]
-  labReports    LabReport[]
+  modules        Module[]
+  projects       Project[]
+  glossary       GlossaryTerm[]
+  formulas       Formula[]
+  keyDates       KeyDate[]
+  evaluation     EvaluationItem[]
+  bibliography   BibliographyItem[]
+  pastMaterials  PastMaterial[]
+  flashcards     Flashcard[]
+  labReports     LabReport[]
+  labModuleLinks LabModuleLink[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -225,6 +226,19 @@ model LabReport {
   @@index([subjectId])
 }
 
+/// Enlace (p. ej. al Excel de datos) de una agrupación del laboratorio
+/// ("Módulo I", "Módulo II"…). El nombre viene de content/<code>.ts: labModules[].name.
+model LabModuleLink {
+  id        String   @id @default(cuid())
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  name      String
+  url       String?
+  updatedAt DateTime @updatedAt
+
+  @@unique([subjectId, name])
+}
+
 /// Enlace externo asociado a un módulo (video, artículo, guía).
 model Resource {
   id       String @id @default(cuid())
@@ -364,9 +378,9 @@ model KeyDate {
 /// Cesar y Diana llevan seguimiento independiente: cada quien tiene su propia
 /// fila por componente (mismo name/weight/order, `owner` distinto).
 model EvaluationItem {
-  id        String  @id @default(cuid())
+  id        String      @id @default(cuid())
   subjectId String
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subject   Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   name      String
   weight    Int
   /// Nota manual. Si el componente tiene `quizzes`, esta nota se ignora: la
@@ -374,7 +388,7 @@ model EvaluationItem {
   grade     Float?
   order     Int
   /// "Cesar" | "Diana".
-  owner     String  @default("Cesar")
+  owner     String      @default("Cesar")
   quizzes   QuizGrade[]
 
   createdAt DateTime @default(now())

@@ -12,6 +12,7 @@ import { labPracticePrompt } from "@/lib/prompts";
 import { inlineLite, renderCornell } from "@/lib/markdown-lite";
 import { renderFormula } from "@/lib/formula-markup";
 import { MermaidDiagram } from "@/components/mermaid-diagram";
+import { LabModuleLinkButton } from "@/components/lab-module-link-button";
 import type { ExerciseContent, LabModuleContent, LabPracticeContent } from "@/lib/subject-content";
 
 /** Preparación para el quiz de la práctica: de una pregunta en una, con
@@ -300,6 +301,7 @@ function PracticeItem({
 export function LabPracticesPanel({
   labRules,
   labModules,
+  moduleLinks,
   practices,
   subjectName,
   subjectSummary,
@@ -309,6 +311,8 @@ export function LabPracticesPanel({
 }: {
   labRules: string[];
   labModules: LabModuleContent[];
+  /** Enlace al Excel de cada agrupación, por nombre ("Módulo I" → url). */
+  moduleLinks: Record<string, string | null>;
   practices: LabPracticeContent[];
   subjectName: string;
   subjectSummary: string | null;
@@ -361,6 +365,9 @@ export function LabPracticesPanel({
               {lm.team && lm.team.length > 0 && (
                 <p className="mt-1 text-xs font-medium text-primary">Equipo: {lm.team.join(" · ")}</p>
               )}
+              <div className="mt-2">
+                <LabModuleLinkButton subjectId={subjectSlug} name={lm.name} url={moduleLinks[lm.name] ?? null} />
+              </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
               {lm.rules && lm.rules.length > 0 && (

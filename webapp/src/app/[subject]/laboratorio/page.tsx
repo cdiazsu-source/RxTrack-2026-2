@@ -19,7 +19,7 @@ export default async function LaboratorioPage({ params }: { params: { subject: s
   const labRules = content?.labRules ?? [];
   const labModules = content?.labModules ?? [];
 
-  const [reports, modules] = await Promise.all([
+  const [reports, modules, moduleLinkRows] = await Promise.all([
     prisma.labReport.findMany({
       where: { subjectId: subject.id },
       orderBy: { order: "asc" },
@@ -28,8 +28,10 @@ export default async function LaboratorioPage({ params }: { params: { subject: s
     labPractices.length
       ? prisma.module.findMany({ where: { subjectId: subject.id }, select: { slug: true, title: true } })
       : Promise.resolve([]),
+    prisma.labModuleLink.findMany({ where: { subjectId: subject.id } }),
   ]);
 
+  const moduleLinks = Object.fromEntries(moduleLinkRows.map((l) => [l.name, l.url]));
   const moduleTitleBySlug = Object.fromEntries(modules.map((m) => [m.slug, m.title]));
 
   const items: LabReportView[] = reports.map((r) => ({
@@ -51,6 +53,7 @@ export default async function LaboratorioPage({ params }: { params: { subject: s
         <LabPracticesPanel
           labRules={labRules}
           labModules={labModules}
+          moduleLinks={moduleLinks}
           practices={labPractices}
           subjectName={subject.name}
           subjectSummary={content?.descriptionSummary ?? null}
