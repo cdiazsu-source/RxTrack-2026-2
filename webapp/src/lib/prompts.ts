@@ -9,40 +9,77 @@ export interface PromptModule {
   description: string;
 }
 
-/** Contexto de una práctica de laboratorio, para poder preguntarle a una IA. */
+/**
+ * "Prompt de contexto" de una práctica de laboratorio: arma un texto
+ * autosuficiente (asignatura + agrupación del laboratorio + equipo + práctica en
+ * detalle) para pegarlo en cualquier IA y poder hacerle preguntas puntuales.
+ */
 export function labPracticePrompt(opts: {
   subjectName: string;
+  /** Resumen y objetivo de la asignatura (contexto general para la IA). */
+  subjectSummary?: string | null;
+  subjectObjective?: string | null;
+  /** Módulo curricular enlazado (cross-link blando), si lo hay. */
   moduleTitle?: string | null;
+  /** Agrupación del laboratorio: nombre, subtítulo, equipo y reglas. */
+  labModule?: { name: string; subtitle?: string; team?: string[]; rules?: string[] } | null;
   practice: {
     number: number;
     title: string;
     fundamento: string;
+    /** Desarrollo pedagógico (Markdown). Las imágenes se omiten. */
+    desarrollo?: string;
     keyPoints: string[];
     procedure: string;
     equations: string[];
     dataRequested: string[];
+    studyTopics?: string[];
   };
 }): string {
   const p = opts.practice;
+  const lm = opts.labModule ?? null;
   const bloque = (titulo: string, items: string[]) =>
     items.length ? `\n${titulo}:\n${items.map((x) => `- ${x}`).join("\n")}\n` : "";
 
+  const asignatura =
+    `CONTEXTO DE LA ASIGNATURA:\n` +
+    `Asignatura: ${opts.subjectName} (pregrado de Química Farmacéutica, Universidad Nacional de Colombia).` +
+    (opts.subjectSummary ? `\nDe qué trata: ${stripMarkup(opts.subjectSummary)}` : "") +
+    (opts.subjectObjective ? `\nObjetivo general: ${stripMarkup(opts.subjectObjective)}` : "") +
+    (opts.moduleTitle ? `\nTema del curso al que se enlaza esta práctica: ${opts.moduleTitle}.` : "") +
+    `\n`;
+
+  const laboratorio = lm
+    ? `\nCONTEXTO DEL LABORATORIO — ${lm.name}:\n` +
+      (lm.subtitle ? `${stripMarkup(lm.subtitle)}\n` : "") +
+      (lm.team && lm.team.length ? `Integrantes del grupo: ${lm.team.join(", ")}.\n` : "") +
+      (lm.rules && lm.rules.length ? `Reglas y logística:\n${lm.rules.map((r) => `- ${stripMarkup(r)}`).join("\n")}\n` : "")
+    : "";
+
   return (
-    `Eres un asistente experto en química farmacéutica y en prácticas de ` +
-    `laboratorio. Estoy en la asignatura ${opts.subjectName}` +
-    (opts.moduleTitle ? ` (${opts.moduleTitle})` : "") +
-    ` y voy a desarrollar la siguiente práctica de laboratorio. Úsala como ` +
-    `contexto para responder lo que te pregunte después.\n\n` +
-    `PRÁCTICA ${p.number} — ${p.title}\n\n` +
+    `Eres un asistente experto en química analítica, análisis instrumental y ` +
+    `prácticas de laboratorio farmacéutico. Voy a hacerte preguntas puntuales ` +
+    `sobre UNA práctica de laboratorio. Primero lee TODO el contexto de abajo ` +
+    `(asignatura, laboratorio y práctica); después responde solo con base en él ` +
+    `y en tu conocimiento técnico.\n\n` +
+    asignatura +
+    laboratorio +
+    `\n══════════ PRÁCTICA ${lm ? `(${lm.name}) ` : ""}${p.number} — ${p.title} ══════════\n\n` +
     `FUNDAMENTO:\n${stripMarkup(p.fundamento)}\n` +
+    (p.desarrollo ? `\nDESARROLLO / EXPLICACIÓN DETALLADA:\n${stripMarkdownExtras(p.desarrollo)}\n` : "") +
     bloque("LO QUE DEBO TENER PRESENTE", p.keyPoints.map(stripMarkup)) +
     `\nPROCEDIMIENTO:\n${stripMarkup(p.procedure)}\n` +
     bloque("ECUACIONES QUE NECESITO", p.equations) +
-    bloque("DATOS QUE DEBO REGISTRAR", p.dataRequested) +
-    `\nCon este contexto, respóndeme lo que te pregunte sobre esta práctica: ` +
+    bloque("DATOS QUE DEBO REGISTRAR", p.dataRequested.map(stripMarkup)) +
+    bloque("TEMAS DE CONSULTA", (p.studyTopics ?? []).map(stripMarkup)) +
+    `\nCÓMO QUIERO QUE ME RESPONDAS:\n` +
+    `- Paso a paso, con paciencia y sin dar por sabido nada: no tengo buenas bases en química analítica.\n` +
+    `- En cada cálculo: interpreta primero qué se está calculando, muestra los FACTORES DE CONVERSIÓN con las unidades que se cancelan, y cierra con una conclusión.\n` +
+    `- Si hay una reacción, escríbela balanceada y explica la estequiometría; si un reactivo puede estar hidratado, dime con qué masa molar trabajas y por qué.\n` +
+    `- No inventes datos que no te haya dado: si falta un dato para un cálculo, pídemelo.\n\n` +
+    `Con este contexto, respóndeme lo que te pregunte sobre esta práctica: ` +
     `montaje, cálculos con mis datos, interpretación de resultados, fuentes de ` +
-    `error, qué esperar. No inventes datos que no te haya dado; si falta un dato ` +
-    `para un cálculo, pídemelo.`
+    `error, tratamiento estadístico, qué esperar y cómo redactar la discusión.`
   );
 }
 
@@ -191,4 +228,10 @@ export function patternsPrompt(
 
 function stripMarkup(s: string): string {
   return s.replace(/\*\*(.+?)\*\*/g, "$1").replace(/\*(.+?)\*/g, "$1");
+}
+
+/** Para texto Markdown largo (desarrollo): quita imágenes y `**negrita**`, y
+ *  deja las tablas y listas como texto plano legible por una IA. */
+function stripMarkdownExtras(s: string): string {
+  return stripMarkup(s.replace(/^\s*!\[[^\]]*\]\([^)]*\)\s*$/gm, "")).replace(/\n{3,}/g, "\n\n");
 }

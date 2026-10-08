@@ -10,4 +10,4 @@ export function getSubjectContent(slug: string): SubjectContent | null {
 }
 
 export type { SubjectContent } from "@content/index";
-export type { LabPracticeContent, ExerciseContent } from "@content/_schema";
+export type { LabPracticeContent, LabModuleContent, ExerciseContent } from "@content/_schema";

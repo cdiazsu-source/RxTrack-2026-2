@@ -97,6 +97,13 @@ export interface ProjectContent {
 export interface LabPracticeContent {
   number: number;
   title: string;
+  /**
+   * Agrupación de laboratorio a la que pertenece (debe coincidir con el `name`
+   * de un `LabModuleContent`). Sin valor = no se agrupa (una sola lista).
+   * La numeración (`number`) es POR agrupación: "Módulo I · Práctica 1" y
+   * "Módulo II · Práctica 1" pueden coexistir.
+   */
+  labModule?: string;
   /** Módulo de la MISMA asignatura al que corresponde (cross-link blando). */
   moduleSlug?: string | null;
   /** Por qué se hace la práctica y qué se busca demostrar. Admite `**negrita**`. */
@@ -142,6 +149,22 @@ export interface LabPracticeContent {
   flowcharts?: { title: string; definition: string }[];
 }
 
+/**
+ * Agrupación de las prácticas de laboratorio (p. ej. "Módulo I", "Módulo II").
+ * Cada una tiene su propio contexto: profesor, subgrupo/pareja, reglas y
+ * cronograma. Todo eso entra también en el "Prompt de contexto" de sus prácticas.
+ */
+export interface LabModuleContent {
+  /** Nombre visible y clave de enlace con `LabPracticeContent.labModule`. */
+  name: string;
+  /** Una línea: de qué va el módulo y quién lo dicta. */
+  subtitle?: string;
+  /** Integrantes del subgrupo en este módulo. */
+  team?: string[];
+  /** Reglas / logística / cronograma de ESTA agrupación (Markdown inline). */
+  rules?: string[];
+}
+
 export interface SubjectContent {
   /** Código corto en mayúsculas: "AIF", "FT2", … */
   code: string;
@@ -177,6 +200,8 @@ export interface SubjectContent {
   projects?: ProjectContent[];
   /** Bullets con el contexto y las reglas del laboratorio (pestaña Laboratorio). */
   labRules?: string[];
+  /** Agrupaciones del laboratorio (Módulo I, Módulo II…), cada una con su equipo y reglas. */
+  labModules?: LabModuleContent[];
   /** Prácticas de laboratorio, cada una como su propia sección. */
   labPractices?: LabPracticeContent[];
 }

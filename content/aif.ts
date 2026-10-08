@@ -1,4 +1,5 @@
 import type { SubjectContent } from "./_schema";
+import { aifLabModuloII, aifLabPracticesModuloII } from "./aif-modulo2";
 
 /**
  * Análisis Instrumental Farmacéutico (UNAL) — programa oficial DEFINITIVO
@@ -1107,23 +1108,33 @@ export const aif: SubjectContent = {
   // Laboratorio del Módulo I (Prof. García Castañeda). Logística del cronograma
   // del grupo G-02 / subgrupo J3 (Cesar + Juan José Erazo Duarte) y guía-tutorial
   // oficial de laboratorio. Material de referencia: no pasa por `db:seed`.
-  labRules: [
-    "**Dónde y cuándo:** Laboratorio 120, Edificio 500 (Facultad de Ciencias Agrarias). Grupo 2 (G-02): **jueves, 8:00–13:00**.",
-    "**Asistencia mínima 90 %.** Por debajo de ese umbral la asignatura se califica **0.0**, aunque la inasistencia esté justificada (Art. 32, Acuerdo 008 de 2008, UNAL).",
-    "**Trabajo en parejas.** Cesar está en el subgrupo **J3**, con **Juan José Erazo Duarte**.",
-    "**Presentación y EPP:** bata blanca abotonada, zapatos cerrados, cabello recogido, sin uñas largas ni esmalte; gafas de seguridad y guantes según el riesgo de la práctica. En la zona de trabajo no se come, no se bebe y no se manipulan lentes de contacto.",
-    "**Electrodo según el tipo de valoración:** acuosa → electrodo combinado de vidrio con electrolito **KCl** · no acuosa → electrodo combinado de vidrio con electrolito **LiCl** · redox → electrodo combinado de **platino**.",
-    "**Antes de pesar:** consultar la tabla de valorantes, purezas y patrones primarios de la **Práctica 1** (miliequivalente y patrón primario de cada valorante).",
-    "**Montaje de bureta y electrodo combinado:** ver el video de referencia antes de la práctica → https://drive.google.com/file/d/1ZgALwf8Y9CNv9mwTYzvexv16coFV2i1R/view?usp=sharing",
-    "**Plan del subgrupo J3 — Módulo I (semanas 1 a 5):** sem. transición/1 → preparar y estandarizar NaNO₂ 0,1 M + FT-IR (extracción del activo, muestras 5 y 6, pastilla de KBr) + valoración potenciométrica acuosa · sem. 2 → valoración potenciométrica no acuosa + %humedad por pérdida por secado · sem. 3 → valoración redox y completar prácticas faltantes · sem. 4 → completar prácticas faltantes · sem. 5 → **parcial práctico** (Cesar 9:20 a.m., Juan José 9:40 a.m.) + seminario de Instrumentación (potenciometría), asignado a J3.",
-    "**Muestras asignadas al subgrupo J3:** FT-IR/ATR → tableta (muestras 5 y 6), extracción del activo · potenciometría acuosa → **ácido nicotínico** (valoración directa) · potenciometría no acuosa → **acetato de sodio·3H₂O** (USP/ANMAT) · potenciometría redox → **oxalato de sodio** (USP/ANMAT) · %humedad → **sulfato de sodio anhidro** (ANMAT).",
-    "**Residuos y orden:** disponer los residuos químicos según el Sistema de Gestión Ambiental de la Sede (no verter al desagüe sin autorización); dejar la mesa limpia y descontaminada. Salidas de emergencia y duchas de seguridad siempre despejadas.",
-    "**Referencia general:** Manual de Seguridad para Laboratorios, UNAL (División Nacional de Salud Ocupacional): http://www.laboratorios.bogota.unal.edu.co/userfiles/files/MANUAL%20DE%20SEGURIDAD%20LABORATORIOS%2031-10-2012_final(1).pdf",
+  labModules: [
+    {
+      name: "Módulo I",
+      subtitle: "Semanas 1 a 5 · Prof. García Castañeda · IR y métodos potenciométricos (valoraciones acuosa, no acuosa y redox, %humedad). Subgrupo **J3**.",
+      team: ["Cesar", "Juan José Erazo Duarte"],
+      rules: [
+        "**Dónde y cuándo:** Laboratorio 120, Edificio 500 (Facultad de Ciencias Agrarias). Grupo 2 (G-02): **jueves, 8:00–13:00**.",
+        "**Asistencia mínima 90 %.** Por debajo de ese umbral la asignatura se califica **0.0**, aunque la inasistencia esté justificada (Art. 32, Acuerdo 008 de 2008, UNAL).",
+        "**Trabajo en parejas.** Cesar está en el subgrupo **J3**, con **Juan José Erazo Duarte**.",
+        "**Presentación y EPP:** bata blanca abotonada, zapatos cerrados, cabello recogido, sin uñas largas ni esmalte; gafas de seguridad y guantes según el riesgo de la práctica. En la zona de trabajo no se come, no se bebe y no se manipulan lentes de contacto.",
+        "**Electrodo según el tipo de valoración:** acuosa → electrodo combinado de vidrio con electrolito **KCl** · no acuosa → electrodo combinado de vidrio con electrolito **LiCl** · redox → electrodo combinado de **platino**.",
+        "**Antes de pesar:** consultar la tabla de valorantes, purezas y patrones primarios de la **Práctica 1** (miliequivalente y patrón primario de cada valorante).",
+        "**Montaje de bureta y electrodo combinado:** ver el video de referencia antes de la práctica → https://drive.google.com/file/d/1ZgALwf8Y9CNv9mwTYzvexv16coFV2i1R/view?usp=sharing",
+        "**Plan del subgrupo J3 — Módulo I (semanas 1 a 5):** sem. transición/1 → preparar y estandarizar NaNO₂ 0,1 M + FT-IR (extracción del activo, muestras 5 y 6, pastilla de KBr) + valoración potenciométrica acuosa · sem. 2 → valoración potenciométrica no acuosa + %humedad por pérdida por secado · sem. 3 → valoración redox y completar prácticas faltantes · sem. 4 → completar prácticas faltantes · sem. 5 → **parcial práctico** (Cesar 9:20 a.m., Juan José 9:40 a.m.) + seminario de Instrumentación (potenciometría), asignado a J3.",
+        "**Muestras asignadas al subgrupo J3:** FT-IR/ATR → tableta (muestras 5 y 6), extracción del activo · potenciometría acuosa → **ácido nicotínico** (valoración directa) · potenciometría no acuosa → **acetato de sodio·3H₂O** (USP/ANMAT) · potenciometría redox → **oxalato de sodio** (USP/ANMAT) · %humedad → **sulfato de sodio anhidro** (ANMAT).",
+        "**Residuos y orden:** disponer los residuos químicos según el Sistema de Gestión Ambiental de la Sede (no verter al desagüe sin autorización); dejar la mesa limpia y descontaminada. Salidas de emergencia y duchas de seguridad siempre despejadas.",
+        "**Referencia general:** Manual de Seguridad para Laboratorios, UNAL (División Nacional de Salud Ocupacional): http://www.laboratorios.bogota.unal.edu.co/userfiles/files/MANUAL%20DE%20SEGURIDAD%20LABORATORIOS%2031-10-2012_final(1).pdf",
+    ],
+    },
+    // Laboratorio del Módulo II (subgrupo J5): ver content/aif-modulo2.ts
+    aifLabModuloII,
   ],
 
   labPractices: [
     {
       number: 1,
+      labModule: "Módulo I",
       title: "Preparación y estandarización de soluciones valorantes",
       moduleSlug: "metodos-electrometricos",
       fundamento:
@@ -1581,6 +1592,7 @@ export const aif: SubjectContent = {
 
     {
       number: 2,
+      labModule: "Módulo I",
       title: "Identificación de un activo por FT-IR en un producto terminado",
       moduleSlug: "ir",
       fundamento:
@@ -1729,6 +1741,7 @@ export const aif: SubjectContent = {
 
     {
       number: 3,
+      labModule: "Módulo I",
       title: "Potenciometría en medio acuoso: valoración de ácido nicotínico",
       moduleSlug: "metodos-electrometricos",
       fundamento:
@@ -2056,6 +2069,7 @@ export const aif: SubjectContent = {
 
     {
       number: 4,
+      labModule: "Módulo I",
       title: "Potenciometría en medio no acuoso: valoración de acetato de sodio",
       moduleSlug: "metodos-electrometricos",
       fundamento:
@@ -2433,6 +2447,7 @@ export const aif: SubjectContent = {
 
     {
       number: 5,
+      labModule: "Módulo I",
       title: "Potenciometría redox: valoración de oxalato de sodio con permanganato",
       moduleSlug: "metodos-electrometricos",
       fundamento:
@@ -2777,6 +2792,7 @@ export const aif: SubjectContent = {
 
     {
       number: 6,
+      labModule: "Módulo I",
       title: "Determinación de %Humedad por pérdida por secado (USP ⟨731⟩): sulfato de sodio anhidro",
       moduleSlug: "metodos-electrometricos",
       fundamento:
@@ -2829,5 +2845,8 @@ export const aif: SubjectContent = {
         "Diferencia entre resultado en base húmeda y en base seca; cuándo exige cada uno la farmacopea.",
       ],
     },
+
+    // ── Módulo II (subgrupo J5) ──
+    ...aifLabPracticesModuloII,
   ],
 };

@@ -17,6 +17,7 @@ export default async function LaboratorioPage({ params }: { params: { subject: s
   const content = getSubjectContent(params.subject);
   const labPractices = content?.labPractices ?? [];
   const labRules = content?.labRules ?? [];
+  const labModules = content?.labModules ?? [];
 
   const [reports, modules] = await Promise.all([
     prisma.labReport.findMany({
@@ -49,8 +50,11 @@ export default async function LaboratorioPage({ params }: { params: { subject: s
       {(labRules.length > 0 || labPractices.length > 0) && (
         <LabPracticesPanel
           labRules={labRules}
+          labModules={labModules}
           practices={labPractices}
           subjectName={subject.name}
+          subjectSummary={content?.descriptionSummary ?? null}
+          subjectObjective={content?.objectiveGeneral ?? null}
           subjectSlug={subject.id}
           moduleTitleBySlug={moduleTitleBySlug}
         />

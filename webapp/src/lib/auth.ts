@@ -5,6 +5,7 @@
  *  - Cesar (SITE_PASSWORD):        edita todo.
  *  - Diana (SITE_PASSWORD_READ):   ve todo, no edita.
  *  - JOSE  (SITE_PASSWORD_JOSE):   solo /aif/laboratorio, con control total ahí.
+ *  - Karen (SITE_PASSWORD_KAREN):  solo /aif (toda la asignatura), con control total.
  *  - (cuenta acotada a una asignatura): ve solo /{subject}, no edita.
  *
  * El nombre, el nivel y el alcance viajan firmados (HMAC-SHA256) en la cookie.
@@ -58,6 +59,13 @@ const ACCOUNTS: Account[] = [
     username: "jose",
     password: process.env.SITE_PASSWORD_JOSE || "AIF",
     profile: { name: "JOSE", level: "full", scope: [{ subject: "aif", section: "laboratorio" }] },
+  },
+  {
+    // Compañera de Cesar en el Módulo II de AIF (subgrupo J5): control total,
+    // acotado a TODA la asignatura AIF (sin `section`), no al resto del sitio.
+    username: "karen",
+    password: process.env.SITE_PASSWORD_KAREN || "TQM",
+    profile: { name: "Karen", level: "full", scope: [{ subject: "aif" }] },
   },
 ];
 

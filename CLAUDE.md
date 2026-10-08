@@ -51,6 +51,10 @@ Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en
   `scope: { subject: "aif", section: "laboratorio" }`: solo ve y edita
   `/aif/laboratorio`; el `middleware.ts` reenvía cualquier otra ruta ahí.
 
+- `karen` / `SITE_PASSWORD_KAREN` — `level: "full"` acotado a **toda** la asignatura
+  `scope: { subject: "aif" }` (sin `section`); pareja de Cesar en el laboratorio
+  del Módulo II de AIF (subgrupo J5).
+
 `getSession()` devuelve `{ authed, level, name, viewingAs, scope }`; `canEdit()`
 sigue siendo `level === "full"`. El alcance acotado lo aplica **el middleware**
 (no hay authz por recurso en las server actions). La portada saluda con
