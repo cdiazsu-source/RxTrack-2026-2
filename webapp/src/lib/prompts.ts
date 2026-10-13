@@ -237,6 +237,69 @@ function stripMarkdownExtras(s: string): string {
 }
 
 /**
+ * Prompt para que una IA RESUELVA un ejercicio del módulo y devuelva el enunciado y
+ * la solución ya en el Markdown de la app (renderCornell), listos para pegar en
+ * los dos campos del formulario «Agregar» de Ejercicios. La persona pega el
+ * enunciado al final (o lo trae precargado).
+ */
+export function exerciseSolutionPrompt(opts: {
+  subjectName: string;
+  moduleTitle: string;
+  moduleDescription?: string | null;
+  glossary?: string[];
+  formulas?: string[];
+  question?: string;
+}): string {
+  const bloque = (titulo: string, items?: string[]) =>
+    items && items.length ? `\n${titulo}:\n${items.map((x) => `- ${x}`).join("\n")}\n` : "";
+  const F = "````"; // cerco externo de 4: el interior lleva bloques ```formula
+
+  return [
+    `Eres un profesor experto en ${opts.subjectName} (pregrado de Química Farmacéutica, Universidad Nacional de Colombia). ` +
+      `Voy a darte UN ejercicio del módulo "${opts.moduleTitle}" y quiero que lo resuelvas completo, paso a paso, ` +
+      `en un formato que pueda pegar tal cual en mi app de estudio.`,
+    opts.moduleDescription ? `\nDe qué trata el módulo: ${stripMarkup(opts.moduleDescription)}` : "",
+    bloque("Términos del glosario del módulo (respeta esta terminología)", opts.glossary),
+    bloque("Fórmulas del módulo (úsalas por su nombre cuando apliquen)", opts.formulas),
+    "",
+    "CÓMO DEBES RESOLVERLO",
+    "- No supongas conocimientos previos: explica cada paso como si fuera la primera vez que lo veo, con analogías cuando ayuden.",
+    "- Divide la solución en pasos pequeños: «#### Paso N — qué se hace». Una sola idea por paso.",
+    "- En CADA paso, en este orden: **Interpretación.** (qué se calcula y por qué, en palabras simples) · **Factor de conversión:** (cuál se usa y qué unidades se cancelan) · el cálculo, con el resultado en **negrita** y con unidades · **Conclusión:** (qué significa ese resultado y cómo conecta con el siguiente paso).",
+    "- Muestra TODAS las conversiones de unidades de forma explícita (mL→L, mg→g, g→mol, % p/p→g, etc.). Nunca saltes de un número a otro sin mostrar el factor.",
+    "- Si hay una reacción: escríbela balanceada, explica la estequiometría (relación molar entre las sustancias) y di de qué reactivo parte cada cálculo.",
+    "- Si hay concentraciones: parte de M → N → equivalentes con N = M·θ, aunque θ valga 1, y explica qué es θ en esa reacción.",
+    "- Si un reactivo puede estar hidratado o no ser puro, dime con qué masa molar y qué pureza trabajas, y por qué.",
+    "- Si el enunciado no da un dato que haga falta, NO lo inventes en silencio: dilo, propón un valor tabulado y decláralo como supuesto al inicio. Si no se puede resolver sin ese dato, pregúntamelo.",
+    "- Cierra con «#### Respuesta final» (una línea en **negrita** con unidades y cifras significativas razonables) y con «#### Errores comunes» (2 a 4 viñetas con los fallos típicos de este tipo de ejercicio).",
+    "- Escribe en español y usa coma decimal (1,19 g/mL).",
+    "",
+    "FORMATO DE SALIDA (obligatorio — mi app solo entiende este Markdown)",
+    `Entrega EXACTAMENTE dos bloques de código, uno para el enunciado y otro para la solución, cada uno cercado con CUATRO acentos graves (${F}markdown … ${F}) para que pueda copiarlos sin que se pierda el formato. Antes o después de los bloques no escribas nada más.`,
+    "1) Primer bloque = ENUNCIADO: el problema tal cual (una sola pregunta), con **negrita** en los datos clave. Si añadiste supuestos, ponlos al final en una línea que empiece por «*Dato que hay que asumir* (el enunciado no lo da): …».",
+    "2) Segundo bloque = SOLUCIÓN paso a paso.",
+    "Reglas del Markdown permitido:",
+    "- Encabezados: «#### Título» (siempre cuatro #).",
+    "- **negrita** y *cursiva*. NO uses «*» como signo de multiplicación (se confunde con cursiva): usa «×» o «·».",
+    "- Listas: una viñeta por línea con «* » o numeradas «1. ». Sin listas anidadas.",
+    "- Tablas con | pipes |, una fila por línea, sin saltos de línea dentro de una celda y sin el símbolo | dentro del texto de una celda.",
+    "- Subíndices y superíndices dentro de una frase: usa caracteres Unicode (H₂O, KMnO₄, Ca²⁺, mol⁻¹, 10⁻³). NO escribas _{2} ni ^{2} en el texto corrido: solo funcionan dentro de un bloque ```formula.",
+    "- Ecuaciones y fracciones: usa un bloque ```formula (una línea por renglón) con _{sub}, ^{sup} y #{numerador|denominador}. Ejemplo:",
+    "  ```formula",
+    "  C_{1} · V_{1} = C_{2} · V_{2}",
+    "  n = #{m|PM}",
+    "  ```",
+    "- Está PROHIBIDO: LaTeX ($…$, \\frac, \\text), HTML, imágenes y enlaces.",
+    "",
+    "──────── ENUNCIADO DEL EJERCICIO ────────",
+    opts.question?.trim() || "[pega aquí el enunciado del ejercicio]",
+    "",
+  ]
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+/**
  * Prompt para dividir un paso que se siente grande o confuso en micro-pasos
  * (Modo Enfoque → «Se me complicó»). La persona lo pega en su IA y escribe cada
  * paso devuelto en el formulario «Dividir este paso».

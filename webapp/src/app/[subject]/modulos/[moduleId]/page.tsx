@@ -218,6 +218,13 @@ export default async function ModuleDetailPage({
               solution: e.solution,
               order: e.order,
             }))}
+            promptContext={{
+              subjectName: subject.name,
+              moduleTitle: mod.title,
+              moduleDescription: mod.description,
+              glossary: modGlossary.map((g) => g.term),
+              formulas: modFormulas.map((f) => f.name),
+            }}
           />
         </section>
       )}

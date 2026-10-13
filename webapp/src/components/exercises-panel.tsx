@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, ChevronDown, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight, ChevronDown, Eye, Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
 
 import { addExercise, deleteExercise, updateExercise } from "@/lib/actions/exercises";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
 import { HelpHint } from "@/components/help-hint";
+import { PromptBox } from "@/components/prompt-box";
 import { toast } from "@/components/ui/toast";
 import { useCanEdit } from "@/components/access-context";
 import { renderCornell } from "@/lib/markdown-lite";
-import { cn } from "@/lib/utils";
+import { exerciseSolutionPrompt } from "@/lib/prompts";
 
 export type ExerciseView = { id: string; question: string; solution: string; order: number };
+
+/** Contexto del módulo que alimenta el prompt de IA. */
+export type ExercisePromptContext = {
+  subjectName: string;
+  moduleTitle: string;
+  moduleDescription?: string | null;
+  glossary: string[];
+  formulas: string[];
+};
 
 const MD_HINT = "Markdown: #### subtítulo · **negrita** · tablas con | | · listas · `código`.";
 
@@ -64,14 +74,79 @@ function ExerciseForm({
   );
 }
 
+/**
+ * Prompt para resolver un ejercicio con una IA y traer la respuesta ya en el
+ * formato de la app. El enunciado se escribe/pega aquí (o se trae del ejercicio
+ * que estás viendo) y queda dentro del prompt; luego copias el prompt completo.
+ */
+function ExercisePromptSection({
+  ctx,
+  currentQuestion,
+}: {
+  ctx: ExercisePromptContext;
+  currentQuestion: string | null;
+}) {
+  const [question, setQuestion] = useState("");
+  const text = useMemo(
+    () =>
+      exerciseSolutionPrompt({
+        subjectName: ctx.subjectName,
+        moduleTitle: ctx.moduleTitle,
+        moduleDescription: ctx.moduleDescription,
+        glossary: ctx.glossary,
+        formulas: ctx.formulas,
+        question,
+      }),
+    [ctx, question],
+  );
+
+  return (
+    <div className="flex flex-col gap-3 rounded-md border border-dashed border-input p-3">
+      <ol className="list-decimal space-y-0.5 pl-5 text-xs text-muted-foreground">
+        <li>Escribe o pega el enunciado aquí abajo (queda dentro del prompt).</li>
+        <li>Copia el prompt y pégalo en tu IA.</li>
+        <li>
+          Ella te devuelve dos bloques: el enunciado y la solución. Pégalos en «Agregar» → Enunciado y Solución paso a
+          paso.
+        </li>
+      </ol>
+      <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
+        Enunciado del ejercicio
+        <Textarea
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          rows={3}
+          placeholder="Pega aquí la pregunta del ejercicio, tal cual."
+          className="text-sm font-normal text-foreground"
+        />
+      </label>
+      {currentQuestion && currentQuestion !== question && (
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          className="self-start"
+          onClick={() => setQuestion(currentQuestion)}
+        >
+          Usar el enunciado del ejercicio que estoy viendo
+        </Button>
+      )}
+      <PromptBox text={text} rows={10} />
+    </div>
+  );
+}
+
 export function ExercisesPanel({
   moduleId,
   exercises,
+  promptContext,
 }: {
   moduleId: string;
   exercises: ExerciseView[];
+  promptContext: ExercisePromptContext;
 }) {
   const canEdit = useCanEdit();
+  const [showPrompt, setShowPrompt] = useState(false);
   const sorted = [...exercises].sort((a, b) => a.order - b.order);
   const total = sorted.length;
 
@@ -101,15 +176,23 @@ export function ExercisesPanel({
           {total > 0 && <span className="font-normal text-muted-foreground">({idx + 1}/{total})</span>}
           <HelpHint k="ejercicios" />
         </CardTitle>
-        {canEdit && !adding && (
-          <Button size="sm" variant="outline" onClick={() => setAdding(true)}>
-            <Plus className="h-3.5 w-3.5" />
-            Agregar
+        <div className="flex items-center gap-1.5">
+          <Button size="sm" variant="ghost" onClick={() => setShowPrompt((s) => !s)} aria-expanded={showPrompt}>
+            <Sparkles className="h-3.5 w-3.5" />
+            Prompt para IA
           </Button>
-        )}
+          {canEdit && !adding && (
+            <Button size="sm" variant="outline" onClick={() => setAdding(true)}>
+              <Plus className="h-3.5 w-3.5" />
+              Agregar
+            </Button>
+          )}
+        </div>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-3">
+        {showPrompt && <ExercisePromptSection ctx={promptContext} currentQuestion={current?.question ?? null} />}
+
         {canEdit && adding && (
           <ExerciseForm moduleId={moduleId} onDone={() => { setAdding(false); go(total); }} />
         )}

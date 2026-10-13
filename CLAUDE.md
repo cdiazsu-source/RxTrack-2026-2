@@ -85,6 +85,13 @@ estacionamiento de ideas (→ bandeja) y nota «para retomar». El temporizador 
 `Project.focusMinutes`. **Regla de producto: la interfaz nunca menciona el diagnóstico
 (TDAH) ni lo describe como tal** — es solo «Modo Enfoque».
 
+**Prompt de ejercicios.** El panel «Ejercicios» de cada módulo tiene el botón «Prompt para IA»
+(`exerciseSolutionPrompt` en `lib/prompts.ts`): arma un texto con el contexto del módulo
+(glosario, fórmulas, descripción) + el enunciado que pegues, y exige que la IA devuelva dos
+bloques ya en el Markdown de `renderCornell` (enunciado y solución con Interpretación / Factor de
+conversión / Conclusión), listos para pegar en «Agregar». Si cambia `markdown-lite.ts`, actualizar
+las reglas de formato dentro de ese prompt (p. ej. `_{ }` solo funciona dentro de ```formula).
+
 ## Estado
 
 Fase 0 (andamiaje) y Fase 1 (una asignatura de punta a punta) implementadas.

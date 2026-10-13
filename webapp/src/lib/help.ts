@@ -34,7 +34,7 @@ export const HELP: Record<string, string> = {
   checklist:
     "Subtareas del módulo o del proyecto. Las agregas, marcas, editas, reordenas o borras libremente; el perfil de solo lectura también puede. El `db:seed` nunca las crea, desmarca ni borra: son 100% de la persona. La barra cuenta hechas / total y alimenta el «Sigue esto».",
   ejercicios:
-    "Problemas resueltos del módulo, de uno en uno. El enunciado se ve siempre; la solución aparece al pulsar «Ver solución». Vienen de `modules[].exercises[]` en el content y el `db:seed` los sincroniza (empareja por el texto del enunciado); los que agregues dentro de la app se quedan. No guarda tu progreso por ejercicio.",
+    "Problemas resueltos del módulo, de uno en uno. El enunciado se ve siempre; la solución aparece al pulsar «Ver solución». Vienen de `modules[].exercises[]` en el content y el `db:seed` los sincroniza (empareja por el texto del enunciado); los que agregues dentro de la app se quedan. No guarda tu progreso por ejercicio. «Prompt para IA» arma un texto (con el glosario y las fórmulas del módulo y tu enunciado) para pegarlo en tu asistente; le pide la solución ya en el Markdown de la app. La app no llama a ninguna IA: tú copias el prompt y pegas la respuesta en «Agregar».",
   recursos:
     "Enlaces externos del módulo (videos, artículos, guías). Los agregas y borras tú. La app solo los abre en una pestaña nueva: no descarga ni guarda nada.",
   laboratorio:
