@@ -74,6 +74,17 @@ Quiz»): si los tiene, su nota es el promedio simple de todos y la `grade`
 manual se ignora. `db:seed` empareja por `(subjectId, name, owner)` y nunca
 toca notas ni quizzes existentes.
 
+**Nota rápida (portada).** Caja al final de `/` (`quick-note-box.tsx`): texto + asignatura
+opcional. Escribe en `InboxItem` (misma bandeja que el botón «+»), con `subjectId` blando.
+
+**Modo Enfoque (por proyecto).** `focus-mode.tsx` en `/[subject]/proyectos/[id]` (también
+`?enfoque=1` lo abre solo): overlay a pantalla completa con un paso a la vez, bloques de
+2/10/15/25/45 min, pausas, «Se me complicó» (dividir / prompt de IA / dejar para después),
+estacionamiento de ideas (→ bandeja) y nota «para retomar». El temporizador vive en
+`localStorage` (`rxtrack:focus:<projectId>`); en BD solo `Project.focusNote` y
+`Project.focusMinutes`. **Regla de producto: la interfaz nunca menciona el diagnóstico
+(TDAH) ni lo describe como tal** — es solo «Modo Enfoque».
+
 ## Estado
 
 Fase 0 (andamiaje) y Fase 1 (una asignatura de punta a punta) implementadas.

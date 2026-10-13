@@ -235,3 +235,38 @@ function stripMarkup(s: string): string {
 function stripMarkdownExtras(s: string): string {
   return stripMarkup(s.replace(/^\s*!\[[^\]]*\]\([^)]*\)\s*$/gm, "")).replace(/\n{3,}/g, "\n\n");
 }
+
+/**
+ * Prompt para dividir un paso que se siente grande o confuso en micro-pasos
+ * (Modo Enfoque → «Se me complicó»). La persona lo pega en su IA y escribe cada
+ * paso devuelto en el formulario «Dividir este paso».
+ */
+export function focusSplitPrompt(opts: {
+  subjectName: string;
+  projectTitle: string;
+  step: string;
+  otherSteps: string[];
+}): string {
+  const others = opts.otherSteps.length
+    ? opts.otherSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")
+    : "(no hay otros pasos)";
+  return [
+    "Ayúdame a empezar un paso que se me hace demasiado grande o confuso.",
+    "",
+    `Asignatura: ${opts.subjectName}`,
+    `Proyecto: ${opts.projectTitle}`,
+    `Paso en el que estoy trabado: ${opts.step}`,
+    "",
+    "Otros pasos del proyecto (solo de contexto, no los repitas):",
+    others,
+    "",
+    "Divide ese paso en entre 3 y 7 micro-pasos con estas reglas:",
+    "- Cada micro-paso debe poder hacerse en 2 a 10 minutos.",
+    "- Empieza con un primer movimiento físico y concreto (abrir un archivo, escribir el título, sacar un material), no con «pensar» ni «planear».",
+    "- Cada micro-paso debe ser una acción visible: al terminarlo se puede saber sin duda que ya está hecho.",
+    "- Una sola acción por micro-paso; sin «y» que junten dos cosas.",
+    "- Ordénalos en el orden en que realmente los haría.",
+    "",
+    "Respóndeme solo con la lista numerada, un micro-paso por línea, sin explicaciones.",
+  ].join("\n");
+}

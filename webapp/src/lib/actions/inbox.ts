@@ -11,7 +11,12 @@ export async function addInboxItem(formData: FormData) {
   const text = String(formData.get("text") ?? "").trim();
   if (!text) return;
   const url = String(formData.get("url") ?? "").trim() || null;
-  await prisma.inboxItem.create({ data: { text, url } });
+  // Asignatura opcional (enlace blando): solo se guarda si existe.
+  const rawSubject = String(formData.get("subjectId") ?? "").trim();
+  const subjectId = rawSubject
+    ? (await prisma.subject.findUnique({ where: { id: rawSubject }, select: { id: true } }))?.id ?? null
+    : null;
+  await prisma.inboxItem.create({ data: { text, url, subjectId } });
   revalidateAll();
 }
 

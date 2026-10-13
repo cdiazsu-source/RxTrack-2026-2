@@ -15,13 +15,16 @@ import { ResumeTracker } from "@/components/resume-banner";
 import { Checklist } from "@/components/checklist";
 import { NotesLog, type NoteView } from "@/components/notes-log";
 import { HelpHint } from "@/components/help-hint";
+import { FocusMode } from "@/components/focus-mode";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProjectDetailPage({
   params,
+  searchParams,
 }: {
   params: { subject: string; projectId: string };
+  searchParams?: { enfoque?: string };
 }) {
   const subject = await getSubjectBySlug(params.subject);
   if (!subject) notFound();
@@ -86,6 +89,18 @@ export default async function ProjectDetailPage({
           )}
         </div>
       </div>
+
+      <FocusMode
+        projectId={project.id}
+        projectTitle={project.title}
+        subjectId={subject.id}
+        subjectName={subject.name}
+        driveUrl={project.driveUrl}
+        items={project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done }))}
+        focusNote={project.focusNote}
+        focusMinutes={project.focusMinutes}
+        autoOpen={searchParams?.enfoque === "1"}
+      />
 
       <Checklist
         parent={{ type: "project", id: project.id }}

@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressRing } from "@/components/progress-ring";
 import { UpdatesFeed } from "@/components/updates-feed";
 import { ResumeBanner } from "@/components/resume-banner";
+import { QuickNoteBox, type QuickNoteView } from "@/components/quick-note-box";
 import { HelpHint } from "@/components/help-hint";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +23,7 @@ export const dynamic = "force-dynamic";
 export default async function SemesterPage() {
   const [session, subjects, canManageTasks] = await Promise.all([getSession(), listSubjects(), canEdit()]);
 
-  const [progressBySubject, meta, feed, allDates, streakDays, taskRows, taskModules] = await Promise.all([
+  const [progressBySubject, meta, feed, allDates, streakDays, taskRows, taskModules, pendingNotes, pendingNotesCount] = await Promise.all([
     Promise.all(subjects.map((s) => getSubjectProgress(s.id))),
     prisma.semesterMeta.findUnique({ where: { id: "singleton" } }),
     buildFeed({ limit: 18 }),
@@ -34,6 +35,8 @@ export default async function SemesterPage() {
     tickStreak().catch(() => 0),
     prisma.assignedTask.findMany({ orderBy: [{ status: "asc" }, { createdAt: "desc" }] }),
     prisma.module.findMany({ orderBy: { order: "asc" }, select: { id: true, title: true, subjectId: true } }),
+    prisma.inboxItem.findMany({ where: { triagedAt: null }, orderBy: { createdAt: "desc" }, take: 5 }),
+    prisma.inboxItem.count({ where: { triagedAt: null } }),
   ]);
 
   const tasks: TaskView[] = taskRows.map((t) => ({
@@ -49,6 +52,13 @@ export default async function SemesterPage() {
     code: s.code,
     name: s.name,
     modules: taskModules.filter((m) => m.subjectId === s.id).map((m) => ({ id: m.id, title: m.title })),
+  }));
+  const quickNotes: QuickNoteView[] = pendingNotes.map((n) => ({
+    id: n.id,
+    text: n.text,
+    subjectId: n.subjectId,
+    subjectCode: subjects.find((s) => s.id === n.subjectId)?.code ?? null,
+    createdAt: n.createdAt.toISOString(),
   }));
   const showTasks = canManageTasks || tasks.some((t) => t.status !== "HECHA");
 
@@ -138,6 +148,14 @@ export default async function SemesterPage() {
       </section>
 
       <UpdatesFeed items={feed} />
+
+      {session.authed && (
+        <QuickNoteBox
+          subjects={subjects.map((s) => ({ id: s.id, code: s.code, name: s.name }))}
+          notes={quickNotes}
+          pendingCount={pendingNotesCount}
+        />
+      )}
     </div>
   );
 }

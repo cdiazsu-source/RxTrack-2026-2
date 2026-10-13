@@ -268,16 +268,20 @@ model LabMaterial {
 /// Proyecto de la asignatura: entregable, informe, parcial a preparar, producto
 /// final. El concepto de "ET en Marcha", ahora con subjectId. Casi siempre isManual.
 model Project {
-  id        String        @id @default(cuid())
-  subjectId String
-  subject   Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  title     String
-  category  String?
-  status    ProjectStatus @default(POR_INICIAR)
-  driveUrl  String?
-  order     Int
+  id           String        @id @default(cuid())
+  subjectId    String
+  subject      Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  title        String
+  category     String?
+  status       ProjectStatus @default(POR_INICIAR)
+  driveUrl     String?
+  order        Int
   /// false = sembrado desde content/<code>.ts (arreglo `projects`).
-  isManual  Boolean       @default(true)
+  isManual     Boolean       @default(true)
+  /// Modo Enfoque: "para retomar" (dónde me quedé / primer paso al volver).
+  focusNote    String?
+  /// Modo Enfoque: minutos acumulados en bloques de trabajo completados.
+  focusMinutes Int           @default(0)
 
   checklistItems ChecklistItem[]
   notes          ProjectNote[]

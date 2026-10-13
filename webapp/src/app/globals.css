@@ -157,6 +157,21 @@
   .rx-toast-in {
     animation: rx-toast-in 0.18s cubic-bezier(0.23, 1, 0.32, 1) both;
   }
+
+  /* Confirmación al completar un paso en el Modo Enfoque: aparece, se asienta. */
+  @keyframes rx-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .rx-pop {
+    animation: rx-pop 0.2s cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
 }
 
 @layer components {

@@ -49,6 +49,8 @@ export const HELP: Record<string, string> = {
     "Entregables fijos de la asignatura (seminario, informe, producto final). Los de `projects[]` en `content/<code>.ts` los sincroniza el seed; los que crees con «Nuevo proyecto» son tuyos y el seed no los toca. Cada proyecto tiene estado, checklist y bitácora propios.",
   "proyecto-cabecera":
     "Estado del proyecto (lo pones tú) + enlace a Drive (solo se abre) + «Eliminar», que solo aparece en proyectos creados a mano y borra también su checklist y su bitácora.",
+  "modo-enfoque":
+    "Una pantalla limpia con UN solo paso del proyecto a la vez. Empiezas con 2 minutos (luego decides si sigues) o con un bloque de 10–45 min; el tiempo se ve en un anillo y en la pestaña. «Hecho» marca la subtarea del checklist; «Se me complicó» te deja dividir el paso, copiar un prompt para que una IA lo divida, o dejarlo para después. Lo que se te cruce lo anotas sin salir y va a la bandeja, ligado a la asignatura. Al cerrar un bloque dejas escrito dónde quedaste. La app no llama a ninguna IA. Salir con Esc no detiene el bloque.",
   bitacora:
     "Notas de avance del proyecto: qué se hizo, qué sigue, algún bloqueo. Puede escribir cualquier sesión con acceso (también el perfil de solo lectura). Cada nota guarda quién la escribió y su cargo, puede ligarse a una subtarea del checklist y mencionar a Cesar / Diana. Todo esto alimenta «Últimas actualizaciones» de la portada.",
 
@@ -83,6 +85,8 @@ export const HELP: Record<string, string> = {
   // ---- Vistas globales ----
   calendario:
     "Todas las fechas de las asignaturas + las fechas de clase + tus eventos personales, en un solo mes. Los parciales enlazan a «Preparar». Tus eventos los agregas y borras aquí; las fechas de asignatura se editan en cada «Fechas».",
+  "nota-rapida":
+    "Escribe lo que se te ocurra, recuerdes o debas hacer, sin decidir dónde va. Si quieres, lígala a una asignatura. Todo cae en la misma bandeja que el botón + (y Ctrl+Shift+K); desde aquí puedes marcarlo como resuelto.",
   inbox:
     "Bandeja de captura. Todo lo que anotas con + o Ctrl+Shift+K cae aquí sin decidir dónde va. Después lo clasificas a una asignatura, lo conviertes en subtarea de un módulo, o lo marcas como resuelto.",
 };
