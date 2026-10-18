@@ -6,13 +6,14 @@ import { Search } from "lucide-react";
 
 import { search, KIND_LABEL, type SearchHit } from "@/lib/actions/search";
 import { cn } from "@/lib/utils";
+import { SIDE_ICON_BTN, SIDE_ICON_TIP } from "@/components/side-icon";
 
 /**
  * Buscador global. Se abre con Ctrl/Cmd + K desde cualquier parte y busca en
  * apuntes, glosario, fórmulas, bitácora, recursos, fechas, proyectos y tarjetas
  * de las 7 asignaturas.
  */
-export function SearchDialog({ variant = "bar" }: { variant?: "bar" | "side" }) {
+export function SearchDialog({ variant = "bar" }: { variant?: "bar" | "icon" }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -69,17 +70,16 @@ export function SearchDialog({ variant = "bar" }: { variant?: "bar" | "side" }) 
         type="button"
         onClick={() => setOpen(true)}
         className={
-          variant === "side"
-            ? "press flex min-h-11 w-full items-center gap-2.5 rounded-l-[10px] px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          variant === "icon"
+            ? SIDE_ICON_BTN
             : "press inline-flex items-center gap-1.5 rounded-md border border-input px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent"
         }
         aria-label="Buscar (Ctrl+K)"
       >
-        {variant === "side" ? (
+        {variant === "icon" ? (
           <>
-            <Search className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
-            <span className="flex-1 text-left">Buscar</span>
-            <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">Ctrl K</kbd>
+            <Search className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+            <span className={SIDE_ICON_TIP}>Buscar (Ctrl K)</span>
           </>
         ) : (
           <>

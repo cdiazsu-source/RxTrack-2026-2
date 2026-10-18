@@ -5,12 +5,14 @@ import { usePathname } from "next/navigation";
 import { CalendarDays, Eye, Inbox, Layers, LayoutDashboard, LogOut, Pill } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import type { SubjectScope } from "@/lib/auth";
+import type { SubjectScope, ViewProfile } from "@/lib/auth";
 import { logout } from "@/lib/actions/auth";
-import { startViewAs, stopViewAs } from "@/lib/actions/view-as";
+import { stopViewAs } from "@/lib/actions/view-as";
 import { SubjectSwitcher, type SwitcherSubject } from "@/components/subject-switcher";
 import { SearchDialog } from "@/components/search-dialog";
 import { QuickCapture } from "@/components/quick-capture";
+import { ViewAsMenu } from "@/components/view-as-menu";
+import { SIDE_ICON_BTN, SIDE_ICON_TIP } from "@/components/side-icon";
 
 /** Fecha del último cambio a la app. Actualízala a mano al publicar cambios. */
 const LAST_MODIFIED = "18 oct 2026";
@@ -26,8 +28,11 @@ export function MainFrame({ sidebar, children }: { sidebar: boolean; children: R
   );
 }
 
+// Alturas del menú lateral: compactas por defecto en pantallas bajas (≤ 760 px) y un poco más
+// holgadas en las altas, para que todo quepa sin desplazarse.
 const SIDE_LINK =
-  "press flex min-h-11 w-full items-center gap-2.5 rounded-l-[10px] px-3 text-sm transition-colors";
+  "press flex min-h-10 w-full items-center gap-2.5 rounded-l-[10px] px-3 text-sm transition-colors [@media(min-height:761px)]:min-h-11";
+const SIDE_LINK_DENSE = "min-h-8 [@media(min-height:761px)]:min-h-9";
 
 function SideBadge({ n }: { n: number }) {
   return (
@@ -42,21 +47,24 @@ function SideItem({
   href,
   active,
   dense = false,
+  title,
   children,
 }: {
   href: string;
   active: boolean;
   dense?: boolean;
+  title?: string;
   children: React.ReactNode;
 }) {
   return (
     <li className={cn("relative", active && "sidebar-tab")}>
       <Link
         href={href}
+        title={title}
         aria-current={active ? "page" : undefined}
         className={cn(
           SIDE_LINK,
-          dense && "min-h-10",
+          dense && SIDE_LINK_DENSE,
           active
             ? "bg-background font-semibold text-primary"
             : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
@@ -68,22 +76,47 @@ function SideItem({
   );
 }
 
+/** Aviso fijo mientras Cesar ve la app como otra persona, con la salida a su vista. */
+function ViewingPill({ name, className }: { name: string; className?: string }) {
+  return (
+    <form action={stopViewAs}>
+      <button
+        type="submit"
+        className={cn(
+          "press inline-flex items-center gap-1.5 rounded-full bg-warning px-2.5 py-1 text-xs font-semibold text-warning-foreground",
+          className,
+        )}
+        title="Volver a tu vista de Cesar"
+      >
+        <Eye className="h-3.5 w-3.5 shrink-0" />
+        Viendo como {name} — volver
+      </button>
+    </form>
+  );
+}
+
 export function SiteNav({
   canEdit,
   subjects,
   inboxCount,
   realFull = false,
   viewingAs = false,
+  viewingName = "",
+  viewProfiles = [],
   scope = null,
 }: {
   canEdit: boolean;
   subjects: SwitcherSubject[];
   inboxCount: number;
-  /** Nivel real "full" (Cesar), aunque esté viendo como Diana. */
+  /** Nivel real "full" (Cesar), aunque esté viendo como otro perfil. */
   realFull?: boolean;
-  /** Cesar está en modo "ver como Diana". */
+  /** Cesar está en modo "Ver como". */
   viewingAs?: boolean;
-  /** Sesión con acceso acotado (JOSE, Paula): solo marca + sus asignaturas + salir. */
+  /** Nombre del perfil que está viendo (Diana, Paula, JOSE, Karen…). */
+  viewingName?: string;
+  /** Perfiles disponibles en "Ver como". */
+  viewProfiles?: ViewProfile[];
+  /** Sesión con acceso acotado (JOSE, Karen, Paula): solo marca + sus asignaturas + salir. */
   scope?: SubjectScope[] | null;
 }) {
   const pathname = usePathname();
@@ -95,6 +128,7 @@ export function SiteNav({
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
           <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
           <div className="flex items-center gap-3">
+            {viewingAs && <ViewingPill name={viewingName} />}
             {scope.length > 1 && (
               <nav className="flex items-center gap-1.5">
                 {scope.map((s) => {
@@ -152,91 +186,73 @@ export function SiteNav({
     );
   };
 
-  const sideLabel = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const sideActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   const sidebar = (
     <aside
       aria-label="Navegación principal"
-      className="site-nav fixed inset-y-0 left-0 z-40 hidden w-56 flex-col bg-card pb-3 pl-3 pt-5 shadow-[inset_-1px_0_0_hsl(var(--border))] lg:flex"
+      className="site-nav fixed inset-y-0 left-0 z-40 hidden w-56 flex-col bg-card pb-2 pl-3 pt-4 shadow-[inset_-1px_0_0_hsl(var(--border))] lg:flex"
     >
-      <Link href="/" className="flex items-center gap-2.5 px-3 pb-3 outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <Link href="/" className="flex items-center gap-2.5 px-3 pb-2 outline-none focus-visible:ring-2 focus-visible:ring-ring">
         <span className="flex h-7 w-7 items-center justify-center rounded-[7px] bg-primary text-primary-foreground">
           <Pill className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
         </span>
         <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
       </Link>
 
-      <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-2 [scrollbar-color:hsl(var(--border))_transparent] [scrollbar-width:thin]">
-        <p className="px-3 pb-1.5 pt-3 text-xs font-semibold text-muted-foreground">Semestre</p>
-        <ul className="flex flex-col gap-1">
-          <SideItem href="/" active={sideLabel("/")}>
+      <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul className="flex flex-col gap-1 pt-1">
+          <SideItem href="/" active={sideActive("/")}>
             <LayoutDashboard className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
             <span className="flex-1">Semestre</span>
           </SideItem>
-          <SideItem href="/calendario" active={sideLabel("/calendario")}>
+          <SideItem href="/calendario" active={sideActive("/calendario")}>
             <CalendarDays className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
             <span className="flex-1">Calendario</span>
           </SideItem>
-          <SideItem href="/repaso" active={sideLabel("/repaso")}>
+          <SideItem href="/repaso" active={sideActive("/repaso")}>
             <Layers className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
             <span className="flex-1">Repaso</span>
           </SideItem>
-          <SideItem href="/inbox" active={sideLabel("/inbox")}>
+          <SideItem href="/inbox" active={sideActive("/inbox")}>
             <Inbox className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
             <span className="flex-1">Bandeja</span>
             {inboxCount > 0 && <SideBadge n={inboxCount} />}
           </SideItem>
         </ul>
 
-        <p className="px-3 pb-1.5 pt-5 text-xs font-semibold text-muted-foreground">Asignaturas</p>
-        <ul className="flex flex-col gap-1">
+        <p className="px-3 pb-1 pt-3 text-xs font-semibold text-muted-foreground [@media(min-height:761px)]:pt-4">Asignaturas</p>
+        <ul className="flex flex-col gap-0.5">
           {subjects.map((sub) => (
-            <SideItem key={sub.id} dense href={`/${sub.id}`} active={pathname === `/${sub.id}` || pathname.startsWith(`/${sub.id}/`)}>
+            <SideItem
+              key={sub.id}
+              dense
+              href={`/${sub.id}`}
+              title={sub.name}
+              active={pathname === `/${sub.id}` || pathname.startsWith(`/${sub.id}/`)}
+            >
               <span className="w-10 shrink-0 text-xs font-semibold">{sub.code}</span>
-              <span className="min-w-0 flex-1 truncate" title={sub.name}>
-                {sub.name}
-              </span>
+              <span className="min-w-0 flex-1 truncate">{sub.name}</span>
             </SideItem>
           ))}
         </ul>
       </nav>
 
-      <div className="mr-3 border-t border-border pt-2">
-        <div className="-mr-0 flex flex-col gap-0.5">
-          <SearchDialog variant="side" />
-          <QuickCapture variant="side" />
-          {viewingAs ? (
-            <form action={stopViewAs}>
-              <button
-                type="submit"
-                className="press my-1 inline-flex w-full items-center gap-1.5 rounded-full bg-warning px-3 py-1.5 text-xs font-semibold text-warning-foreground"
-                title="Volver a tu vista de Cesar"
-              >
-                <Eye className="h-3.5 w-3.5 shrink-0" />
-                Viendo como Diana — volver
-              </button>
-            </form>
-          ) : (
-            <>
-              {realFull && (
-                <form action={startViewAs}>
-                  <button type="submit" className={cn(SIDE_LINK, "text-muted-foreground hover:bg-accent hover:text-accent-foreground")} title="Ver la interfaz como la ve Diana">
-                    <Eye className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
-                    <span className="flex-1 text-left">Ver como Diana</span>
-                  </button>
-                </form>
-              )}
-            </>
-          )}
+      <div className="mr-3 border-t border-border pt-1.5">
+        {viewingAs && <ViewingPill name={viewingName} className="mb-1.5 w-full" />}
+        <div className="flex items-center justify-between">
+          <SearchDialog variant="icon" />
+          <QuickCapture variant="icon" />
+          {realFull && !viewingAs && <ViewAsMenu profiles={viewProfiles} variant="icon" />}
           <form action={logout}>
-            <button type="submit" className={cn(SIDE_LINK, "text-muted-foreground hover:bg-accent hover:text-accent-foreground")}>
-              <LogOut className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
-              <span className="flex-1 text-left">Salir</span>
+            <button type="submit" aria-label="Salir" className={SIDE_ICON_BTN}>
+              <LogOut className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+              <span className={SIDE_ICON_TIP}>Salir</span>
             </button>
           </form>
         </div>
-        <div className="flex items-center justify-between gap-2 px-3 pt-2 text-xs text-muted-foreground">
-          <span>Última modificación: {LAST_MODIFIED}</span>
+        <div className="flex items-center justify-between gap-2 px-1 pt-0.5 text-[11px] text-muted-foreground">
+          <span>Actualizado: {LAST_MODIFIED}</span>
           {!canEdit && !viewingAs && (
             <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 font-medium text-secondary-foreground">Lectura</span>
           )}
@@ -248,77 +264,53 @@ export function SiteNav({
   return (
     <>
       {sidebar}
-    <header className="site-nav sticky lg:hidden top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
-        <Link href="/" className="font-display text-xl font-semibold tracking-tight text-primary">
-          RxTrack
-        </Link>
+      <header className="site-nav sticky top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 lg:hidden">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
+          <Link href="/" className="font-display text-xl font-semibold tracking-tight text-primary">
+            RxTrack
+          </Link>
 
-        {link("/", "Semestre", Layers)}
-        {link("/calendario", "Calendario", CalendarDays)}
-        {link("/repaso", "Repaso", Layers)}
-        {link("/inbox", "Bandeja", Inbox, inboxCount)}
+          {link("/", "Semestre", Layers)}
+          {link("/calendario", "Calendario", CalendarDays)}
+          {link("/repaso", "Repaso", Layers)}
+          {link("/inbox", "Bandeja", Inbox, inboxCount)}
 
-        <div className="hidden lg:block">
-          <SubjectSwitcher subjects={subjects} />
-        </div>
+          <div className="ml-auto flex items-center gap-2">
+            <span className="hidden whitespace-nowrap text-xs text-muted-foreground md:inline">
+              Última modificación: {LAST_MODIFIED}
+            </span>
+            <SearchDialog />
+            <QuickCapture />
 
-        <div className="ml-auto flex items-center gap-2">
-          <span className="hidden whitespace-nowrap text-xs text-muted-foreground md:inline">
-            Última modificación: {LAST_MODIFIED}
-          </span>
-          <SearchDialog />
-          <QuickCapture />
+            {viewingAs ? (
+              <ViewingPill name={viewingName} />
+            ) : (
+              <>
+                {!canEdit && (
+                  <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+                    Lectura
+                  </span>
+                )}
+                {realFull && <ViewAsMenu profiles={viewProfiles} variant="bar" />}
+              </>
+            )}
 
-          {viewingAs ? (
-            <form action={stopViewAs}>
+            <form action={logout}>
               <button
                 type="submit"
-                className="press inline-flex items-center gap-1.5 rounded-full bg-warning px-2.5 py-1 text-xs font-semibold text-warning-foreground"
-                title="Volver a tu vista de Cesar"
+                className="press inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
               >
-                <Eye className="h-3.5 w-3.5" />
-                Viendo como Diana — volver
+                <LogOut className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Salir</span>
               </button>
             </form>
-          ) : (
-            <>
-              {!canEdit && (
-                <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
-                  Lectura
-                </span>
-              )}
-              {realFull && (
-                <form action={startViewAs}>
-                  <button
-                    type="submit"
-                    className="press inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-                    title="Ver la interfaz como la ve Diana"
-                  >
-                    <Eye className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Ver como Diana</span>
-                  </button>
-                </form>
-              )}
-            </>
-          )}
+          </div>
 
-          <form action={logout}>
-            <button
-              type="submit"
-              className="press inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Salir</span>
-            </button>
-          </form>
+          <div className="w-full">
+            <SubjectSwitcher subjects={subjects} />
+          </div>
         </div>
-
-        <div className="w-full lg:hidden">
-          <SubjectSwitcher subjects={subjects} />
-        </div>
-      </div>
-    </header>
+      </header>
     </>
   );
 }

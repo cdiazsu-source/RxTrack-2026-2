@@ -1,33 +1,36 @@
 import { cookies } from "next/headers";
 
-import { type AccessLevel, type SubjectScope, SESSION_COOKIE, verifyToken } from "@/lib/auth";
+import {
+  type AccessLevel,
+  type SubjectScope,
+  SESSION_COOKIE,
+  VIEW_AS_COOKIE,
+  verifyToken,
+  viewProfileByKey,
+} from "@/lib/auth";
 
-/** Cookie de "ver como Diana": Cesar baja su nivel efectivo a "read" para
- *  revisar la interfaz tal como la ve ella. */
-export const VIEW_AS_COOKIE = "rxtrack_view_as";
+export { VIEW_AS_COOKIE };
 
 export type Session =
   | { authed: true; level: AccessLevel; name: string; viewingAs: boolean; scope: SubjectScope[] | null }
   | { authed: false };
 
-/** Sesión actual (server components / server actions). Aplica "ver como Diana". */
+/** Sesión actual (server components / server actions). Aplica "Ver como": con la cookie
+ *  puesta, Cesar ve (y puede) lo mismo que el perfil elegido: su nivel, nombre y alcance. */
 export async function getSession(): Promise<Session> {
   const profile = await verifyToken(cookies().get(SESSION_COOKIE)?.value);
   if (!profile) return { authed: false };
-  // "Ver como Diana" es solo para Cesar (full, sin alcance acotado).
-  const viewingAs =
-    profile.level === "full" && !profile.scope && cookies().get(VIEW_AS_COOKIE)?.value === "read";
-  return {
-    authed: true,
-    level: viewingAs ? "read" : profile.level,
-    name: viewingAs ? "Diana" : profile.name,
-    viewingAs,
-    scope: profile.scope ?? null,
-  };
+  // "Ver como" es solo para Cesar (full, sin alcance acotado).
+  const target =
+    profile.level === "full" && !profile.scope ? viewProfileByKey(cookies().get(VIEW_AS_COOKIE)?.value) : null;
+  if (target) {
+    return { authed: true, level: target.level, name: target.name, viewingAs: true, scope: target.scope };
+  }
+  return { authed: true, level: profile.level, name: profile.name, viewingAs: false, scope: profile.scope ?? null };
 }
 
-/** Nivel REAL del token, sin aplicar "ver como Diana". Para saber si mostrar el
- *  botón de vista previa y para permitir salir de ella. */
+/** Nivel REAL del token, sin aplicar "Ver como". Para saber si mostrar el
+ *  selector de perfiles y para permitir salir de la vista previa. */
 export async function realLevel(): Promise<AccessLevel | null> {
   const profile = await verifyToken(cookies().get(SESSION_COOKIE)?.value);
   return profile?.level ?? null;

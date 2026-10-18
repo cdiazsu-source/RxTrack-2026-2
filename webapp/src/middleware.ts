@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { SESSION_COOKIE, landingPath, verifyToken } from "@/lib/auth";
+import { SESSION_COOKIE, VIEW_AS_COOKIE, landingPath, verifyToken, viewProfileByKey } from "@/lib/auth";
 
 /** Archivos estáticos servidos desde /public que no pasan por el control de acceso. */
 const PUBLIC_FILE = /\.(?:svg|png|ico|webmanifest|js|json|txt|woff2?|map)$/;
@@ -22,14 +22,19 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (profile.scope && profile.scope.length > 0) {
+  // "Ver como" (solo Cesar): si el perfil elegido tiene alcance acotado, se aplica el suyo.
+  const viewing =
+    profile.level === "full" && !profile.scope ? viewProfileByKey(req.cookies.get(VIEW_AS_COOKIE)?.value) : null;
+  const scope = viewing ? viewing.scope : profile.scope;
+
+  if (scope && scope.length > 0) {
     const { pathname } = req.nextUrl;
-    const homes = profile.scope.map((s) => (s.section ? `/${s.subject}/${s.section}` : `/${s.subject}`));
+    const homes = scope.map((s) => (s.section ? `/${s.subject}/${s.section}` : `/${s.subject}`));
     const allowed =
       PUBLIC_FILE.test(pathname) || homes.some((home) => pathname === home || pathname.startsWith(`${home}/`));
     if (!allowed) {
       const url = req.nextUrl.clone();
-      url.pathname = landingPath(profile);
+      url.pathname = landingPath({ name: profile.name, level: profile.level, scope });
       url.search = "";
       return NextResponse.redirect(url);
     }

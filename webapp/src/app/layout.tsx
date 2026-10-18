@@ -8,6 +8,7 @@ import { AccessProvider } from "@/components/access-context";
 import { canEdit, canContribute, getSession, realLevel } from "@/lib/session";
 import { listSubjects } from "@/lib/subjects";
 import { prisma } from "@/lib/prisma";
+import { listViewProfiles } from "@/lib/auth";
 
 import "./globals.css";
 
@@ -50,7 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const navSubjects = subjects.map((s) => ({ id: s.id, code: s.code, name: s.name }));
   const viewingAs = session.authed && session.viewingAs;
   const realFull = realLvl === "full";
-  // Sesión con acceso acotado (JOSE, Paula): barra de navegación mínima.
+  // Sesión con acceso acotado (JOSE, Karen, Paula), real o vista con "Ver como": barra mínima.
   const scope = session.authed ? session.scope : null;
 
   return (
@@ -63,6 +64,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             inboxCount={inboxCount}
             realFull={realFull}
             viewingAs={viewingAs}
+            viewingName={viewingAs && session.authed ? session.name : ""}
+            viewProfiles={realFull ? listViewProfiles() : []}
             scope={scope}
           />
           <MainFrame sidebar={!scope}>{children}</MainFrame>

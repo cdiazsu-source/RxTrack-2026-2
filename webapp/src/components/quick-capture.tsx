@@ -7,13 +7,14 @@ import { addInboxItem } from "@/lib/actions/inbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { SIDE_ICON_BTN, SIDE_ICON_TIP } from "@/components/side-icon";
 
 /**
  * Captura rápida (TDAH): botón "+" siempre visible. Sueltas una idea o un enlace
  * sin decidir dónde va; cae en la bandeja (/inbox) para clasificar después.
  * Atajo: Ctrl/Cmd + Shift + K.
  */
-export function QuickCapture({ variant = "bar" }: { variant?: "bar" | "side" }) {
+export function QuickCapture({ variant = "bar" }: { variant?: "bar" | "icon" }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
 
@@ -41,15 +42,15 @@ export function QuickCapture({ variant = "bar" }: { variant?: "bar" | "side" }) 
         aria-label="Captura rápida (Ctrl+Shift+K)"
         title="Captura rápida"
         className={
-          variant === "side"
-            ? "press flex min-h-11 w-full items-center gap-2.5 rounded-l-[10px] px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          variant === "icon"
+            ? SIDE_ICON_BTN
             : "press inline-flex h-7 w-7 items-center justify-center rounded-md border border-input text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
         }
       >
-        {variant === "side" ? (
+        {variant === "icon" ? (
           <>
-            <Plus className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
-            <span className="flex-1 text-left">Captura rápida</span>
+            <Plus className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+            <span className={SIDE_ICON_TIP}>Captura rápida (Ctrl+Shift+K)</span>
           </>
         ) : (
           <Plus className="h-4 w-4" />

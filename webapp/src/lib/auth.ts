@@ -72,6 +72,48 @@ const ACCOUNTS: Account[] = [
 /** Nombres de las personas con cuenta — para @menciones en la bitácora. */
 export const PEOPLE = ACCOUNTS.map((a) => a.profile.name);
 
+/** Cookie de "Ver como": guarda el usuario del perfil que Cesar está viendo. */
+export const VIEW_AS_COOKIE = "rxtrack_view_as";
+
+/** Perfil que se puede "ver como". Sin contraseñas: es seguro enviarlo al cliente. */
+export type ViewProfile = {
+  key: string;
+  name: string;
+  level: AccessLevel;
+  scope: SubjectScope[] | null;
+  /** Una línea con lo que esa persona puede hacer, p. ej. "Solo lectura · FT2, FG". */
+  detail: string;
+};
+
+function describeProfile(p: Profile): string {
+  const what = p.level === "read" ? "Solo lectura" : "Edita";
+  const where = p.scope?.length
+    ? p.scope
+        .map((s) => (s.section ? `${s.subject.toUpperCase()} · ${s.section[0].toUpperCase()}${s.section.slice(1)}` : s.subject.toUpperCase()))
+        .join(", ")
+    : "todo el sitio";
+  return `${what} · ${where}`;
+}
+
+/** Perfiles que Cesar puede ver: todas las cuentas salvo las de acceso total sin alcance (la suya). */
+export function listViewProfiles(): ViewProfile[] {
+  return ACCOUNTS.filter((a) => a.profile.level === "read" || a.profile.scope)
+    .map((a) => ({
+      key: a.username,
+      name: a.profile.name,
+      level: a.profile.level,
+      scope: a.profile.scope ?? null,
+      detail: describeProfile(a.profile),
+    }));
+}
+
+/** Perfil de "Ver como" por su clave. Acepta el valor antiguo "read" (= Diana). */
+export function viewProfileByKey(key: string | undefined | null): ViewProfile | null {
+  if (!key) return null;
+  const k = key === "read" ? "diana" : key;
+  return listViewProfiles().find((p) => p.key === k) ?? null;
+}
+
 const SECRET = process.env.AUTH_SECRET || "rxtrack-dev-secret-cambiar-en-vercel";
 
 const enc = new TextEncoder();

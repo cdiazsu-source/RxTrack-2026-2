@@ -86,6 +86,15 @@ sigue siendo `level === "full"`. El alcance acotado lo aplica **el middleware**
 acceso es parcial). `SiteNav`/`SubjectSubnav` se recortan cuando la sesión tiene
 `scope`. `middleware.ts` protege todo salvo `/login`.
 
+**Ver como.** Cesar (acceso total sin alcance) puede ver la app como cualquier otra cuenta
+desde el ícono del ojo del menú lateral (`components/view-as-menu.tsx`). La lista sale de
+`listViewProfiles()` en `lib/auth.ts` (todas las cuentas salvo las de acceso total sin
+alcance), así que una cuenta nueva aparece sola. La cookie `rxtrack_view_as` guarda el
+usuario elegido; `getSession()` y `middleware.ts` aplican su nivel, nombre y **alcance**
+(Cesar rebota igual que esa persona), y `startViewAs(key)` lo lleva a su `landingPath`.
+Mientras se ve como otro perfil aparece «Viendo como X — volver» (también en la barra mínima
+de los perfiles acotados). Por cómo funciona, Cesar actúa con los permisos de ese perfil.
+
 **Evaluación, por persona.** `EvaluationItem` tiene `owner: "Cesar" | "Diana"`:
 cada quien tiene su propia fila por componente (mismo `name`/`weight`/`order`,
 nota aparte) — son dos seguimientos independientes del mismo curso. Estructura
