@@ -13,6 +13,7 @@ import { SearchDialog } from "@/components/search-dialog";
 import { QuickCapture } from "@/components/quick-capture";
 import { ViewAsMenu } from "@/components/view-as-menu";
 import { SIDE_ICON_BTN, SIDE_ICON_TIP } from "@/components/side-icon";
+import { subjectIcon } from "@/lib/subject-icons";
 
 /** Fecha del último cambio a la app. Actualízala a mano al publicar cambios. */
 const LAST_MODIFIED = "18 oct 2026";
@@ -223,18 +224,21 @@ export function SiteNav({
 
         <p className="px-3 pb-1 pt-3 text-xs font-semibold text-muted-foreground [@media(min-height:761px)]:pt-4">Asignaturas</p>
         <ul className="flex flex-col gap-0.5">
-          {subjects.map((sub) => (
-            <SideItem
-              key={sub.id}
-              dense
-              href={`/${sub.id}`}
-              title={sub.name}
-              active={pathname === `/${sub.id}` || pathname.startsWith(`/${sub.id}/`)}
-            >
-              <span className="w-10 shrink-0 text-xs font-semibold">{sub.code}</span>
-              <span className="min-w-0 flex-1 truncate">{sub.name}</span>
-            </SideItem>
-          ))}
+          {subjects.map((sub) => {
+            const Icon = subjectIcon(sub.id);
+            return (
+              <SideItem
+                key={sub.id}
+                dense
+                href={`/${sub.id}`}
+                title={`${sub.code} · ${sub.name}`}
+                active={pathname === `/${sub.id}` || pathname.startsWith(`/${sub.id}/`)}
+              >
+                <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
+                <span className="min-w-0 flex-1 truncate">{sub.name}</span>
+              </SideItem>
+            );
+          })}
         </ul>
       </nav>
 

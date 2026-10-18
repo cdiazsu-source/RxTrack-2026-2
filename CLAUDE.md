@@ -49,6 +49,8 @@ fijo en pantallas `lg+` (`components/site-nav.tsx`; el ítem activo es una pesta
 funde con el contenido, clase `.sidebar-tab`) y la barra superior en móvil. Si cambias el
 color de marca, actualiza también `icon.svg`, los PNG de `public/`, `manifest.webmanifest`
 y `themeColor` en `layout.tsx`.
+Los íconos de asignatura del menú lateral están en `lib/subject-icons.ts` (Lucide, por `id`); una
+asignatura nueva sin entrada usa el libro abierto, así que añade su fila al crearla.
 
 ### Menú rápido de secciones
 
