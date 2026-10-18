@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  * apuntes, glosario, fórmulas, bitácora, recursos, fechas, proyectos y tarjetas
  * de las 7 asignaturas.
  */
-export function SearchDialog() {
+export function SearchDialog({ variant = "bar" }: { variant?: "bar" | "side" }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -68,12 +68,26 @@ export function SearchDialog() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="press inline-flex items-center gap-1.5 rounded-md border border-input px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent"
+        className={
+          variant === "side"
+            ? "press flex min-h-11 w-full items-center gap-2.5 rounded-l-[10px] px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            : "press inline-flex items-center gap-1.5 rounded-md border border-input px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent"
+        }
         aria-label="Buscar (Ctrl+K)"
       >
-        <Search className="h-3.5 w-3.5" />
-        <span className="hidden sm:inline">Buscar</span>
-        <kbd className="hidden rounded bg-muted px-1 font-mono text-[10px] sm:inline">Ctrl K</kbd>
+        {variant === "side" ? (
+          <>
+            <Search className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
+            <span className="flex-1 text-left">Buscar</span>
+            <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">Ctrl K</kbd>
+          </>
+        ) : (
+          <>
+            <Search className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Buscar</span>
+            <kbd className="hidden rounded bg-muted px-1 font-mono text-[10px] sm:inline">Ctrl K</kbd>
+          </>
+        )}
       </button>
 
       {open && (

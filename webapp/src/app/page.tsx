@@ -1,3 +1,4 @@
+import { SectionRail } from "@/components/section-rail";
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
@@ -74,16 +75,29 @@ export default async function SemesterPage() {
     .slice(0, 3);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 lg:pr-14">
+      <SectionRail
+        items={[
+          ...(showTasks ? [{ id: "tareas", label: "Tareas", icon: "checks" as const }] : []),
+          { id: "resumen", label: "Resumen y lo que sigue", icon: "gauge" },
+          { id: "asignaturas", label: "Asignaturas", icon: "grid" },
+          { id: "actividad", label: "Últimas actualizaciones", icon: "history" },
+          ...(session.authed ? [{ id: "notas", label: "Notas rápidas", icon: "note" as const }] : []),
+        ]}
+      />
       {session.authed && (
         <h1 className="font-display text-2xl font-semibold tracking-tight">Hola, {session.name}.</h1>
       )}
 
       <ResumeBanner route={meta?.resumeRoute ?? null} label={meta?.resumeLabel ?? null} note={meta?.resumeNote ?? null} />
 
-      {showTasks && <TasksPanel tasks={tasks} canManage={canManageTasks} subjects={taskSubjects} />}
+      {showTasks && (
+        <section id="tareas" className="scroll-mt-24">
+          <TasksPanel tasks={tasks} canManage={canManageTasks} subjects={taskSubjects} />
+        </section>
+      )}
 
-      <div className="grid gap-4 md:grid-cols-[auto_1fr]">
+      <div id="resumen" className="grid scroll-mt-24 gap-4 md:grid-cols-[auto_1fr]">
         <Card>
           <CardContent className="flex items-center gap-4 py-5">
             <ProgressRing value={semPct} size={84} stroke={7} sublabel="semestre" />
@@ -130,7 +144,7 @@ export default async function SemesterPage() {
         </Card>
       </div>
 
-      <section className="flex flex-col gap-3">
+      <section id="asignaturas" className="flex scroll-mt-24 flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Asignaturas</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {subjects.map((s, i) => (
@@ -147,14 +161,18 @@ export default async function SemesterPage() {
         </div>
       </section>
 
-      <UpdatesFeed items={feed} />
+      <section id="actividad" className="scroll-mt-24">
+        <UpdatesFeed items={feed} />
+      </section>
 
       {session.authed && (
-        <QuickNoteBox
-          subjects={subjects.map((s) => ({ id: s.id, code: s.code, name: s.name }))}
-          notes={quickNotes}
-          pendingCount={pendingNotesCount}
-        />
+        <section id="notas" className="scroll-mt-24">
+          <QuickNoteBox
+            subjects={subjects.map((s) => ({ id: s.id, code: s.code, name: s.name }))}
+            notes={quickNotes}
+            pendingCount={pendingNotesCount}
+          />
+        </section>
       )}
     </div>
   );

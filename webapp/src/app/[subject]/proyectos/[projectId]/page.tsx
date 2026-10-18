@@ -1,3 +1,4 @@
+import { SectionRail } from "@/components/section-rail";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ChevronRight, Trash2 } from "lucide-react";
@@ -59,7 +60,16 @@ export default async function ProjectDetailPage({
   const checkItems = project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done }));
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 lg:pr-14">
+      <SectionRail
+        items={[
+          ...(project.description ? [{ id: "contexto", label: "Contexto del proyecto", icon: "info" as const }] : []),
+          { id: "enlaces", label: "Documentos y enlaces", icon: "link" },
+          { id: "enfoque", label: "Modo Enfoque", icon: "target" },
+          { id: "checklist", label: "Subtareas", icon: "checks" },
+          { id: "bitacora", label: "Bitácora", icon: "chat" },
+        ]}
+      />
       <ResumeTracker route={`/${subject.id}/proyectos/${project.id}`} label={`Proyecto · ${subject.code} · ${project.title}`} />
 
       <Link href={`/${subject.id}/proyectos`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
@@ -94,7 +104,7 @@ export default async function ProjectDetailPage({
       </div>
 
       {project.description && (
-        <details open className="group rounded-lg border border-border bg-card [&_summary]:list-none">
+        <details id="contexto" open className="group scroll-mt-24 rounded-lg border border-border bg-card [&_summary]:list-none">
           <summary className="flex cursor-pointer items-center justify-between gap-2 p-4 text-sm font-medium">
             Contexto del proyecto
             <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" aria-hidden />
@@ -106,8 +116,11 @@ export default async function ProjectDetailPage({
         </details>
       )}
 
-      <ProjectLinks projectId={project.id} links={project.links.map((l) => ({ id: l.id, name: l.name, url: l.url }))} />
+      <section id="enlaces" className="scroll-mt-24">
+        <ProjectLinks projectId={project.id} links={project.links.map((l) => ({ id: l.id, name: l.name, url: l.url }))} />
+      </section>
 
+      <section id="enfoque" className="scroll-mt-24">
       <FocusMode
         projectId={project.id}
         projectTitle={project.title}
@@ -119,13 +132,18 @@ export default async function ProjectDetailPage({
         focusMinutes={project.focusMinutes}
         autoOpen={searchParams?.enfoque === "1"}
       />
+      </section>
 
-      <Checklist
-        parent={{ type: "project", id: project.id }}
-        items={project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done, order: c.order }))}
-      />
+      <section id="checklist" className="scroll-mt-24">
+        <Checklist
+          parent={{ type: "project", id: project.id }}
+          items={project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done, order: c.order }))}
+        />
+      </section>
 
-      <NotesLog projectId={project.id} notes={notes} checklistItems={checkItems} people={PEOPLE} />
+      <section id="bitacora" className="scroll-mt-24">
+        <NotesLog projectId={project.id} notes={notes} checklistItems={checkItems} people={PEOPLE} />
+      </section>
     </div>
   );
 }

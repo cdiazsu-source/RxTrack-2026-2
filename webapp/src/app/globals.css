@@ -4,40 +4,46 @@
 
 @layer base {
   :root {
-    /* Paleta institucional Universidad Nacional de Colombia.
-       Verde 7743 C #4A7729 como primario; rojo 187 C #A6192E como destructivo;
-       verde 376 C #84BD00 como éxito. Valores en HSL para hsl(var(--token)). */
-    /* Rediseño: neutros ligeramente cálidos (menos "clínico"), verde UNAL intacto. */
-    --background: 42 30% 98%;
-    --foreground: 40 8% 16%;
+    /* Paleta de la Facultad de Ciencias (UNAL Bogotá) — pregrado en Farmacia
+       (ciencias.bogota.unal.edu.co/estudiar_en_la_facultad/pregrados/farmacia).
+       - Magenta  #A8009C  PRIMARIO: botón principal, enlaces, progreso, foco, ítem activo
+                           (contraste 6,7:1 sobre blanco y 6,3:1 sobre el lienzo)
+       - Ciruela  #3B0136  texto sobre tintes (secundario/acento) y elementos de apoyo
+       - Verde    #337561  ÉXITO / completado (texto blanco encima, 5,4:1)
+       - Lima     #94B43B  acento del sitio; no se usa como texto (2,4:1 sobre blanco)
+       Fondos planos, sin degradados. Los tintes (lienzo, secundario, acento, borde) son el
+       magenta a baja opacidad sobre blanco. Estados (éxito, advertencia, error) semánticos.
+       Valores en HSL para hsl(var(--token)). */
+    --background: 300 45% 97.8%; /* lienzo #FCF7FC */
+    --foreground: 210 11% 15%; /* #212529, texto del sitio */
 
-    --card: 40 33% 99.5%;
-    --card-foreground: 40 8% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 11% 15%;
 
-    --primary: 95 49% 31%;
+    --primary: 304 100% 33%; /* #A8009C */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 78 40% 92%;
-    --secondary-foreground: 95 49% 20%;
+    --secondary: 304 47% 93%; /* #F6E6F5 */
+    --secondary-foreground: 305 97% 12%; /* #3B0136 */
 
-    --muted: 42 18% 95%;
-    --muted-foreground: 40 6% 42%;
+    --muted: 306 50% 96%; /* #FAF0F9 */
+    --muted-foreground: 308 8% 38%; /* #6A5A68, 6,1:1 sobre blanco */
 
-    --accent: 78 50% 90%;
-    --accent-foreground: 95 49% 20%;
+    --accent: 304 49% 89%; /* #F1D6EF */
+    --accent-foreground: 305 97% 12%;
 
-    --destructive: 351 74% 37%;
+    --destructive: 0 70% 38%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 78 90% 33%;
-    --success-foreground: 96 55% 12%;
+    --success: 162 39% 33%; /* #337561 */
+    --success-foreground: 0 0% 100%;
 
     --warning: 32 90% 42%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 40 14% 87%;
-    --input: 40 14% 87%;
-    --ring: 95 49% 31%;
+    --border: 305 30% 88%;
+    --input: 305 30% 88%;
+    --ring: 304 100% 33%;
 
     --radius: 0.75rem;
   }
@@ -51,12 +57,12 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Rediseño: tipografía de "display" serif (Fraunces) para títulos; Inter para
-     el cuerpo. Los CardTitle de la app son <h3>, así que también entran. */
+  /* Tipografía de la Facultad: Ancizar Serif para títulos y Ancizar Sans para el
+     cuerpo. Los CardTitle de la app son <h3>, así que también entran. */
   h1,
   h2,
   h3 {
-    font-family: var(--font-fraunces), "Iowan Old Style", Palatino, Georgia, serif;
+    font-family: var(--font-ancizar-serif), "MS Serif", "New York", Georgia, serif;
     letter-spacing: -0.01em;
   }
   h1 {
@@ -73,8 +79,11 @@
       transform: none;
     }
   }
+  /* "backwards" y no "both": el estado final es el natural (transform: none). Con "both" el
+     transform queda aplicado al terminar y vuelve a los hijos position:fixed relativos al
+     contenido en vez de a la ventana (rompería el menú rápido de secciones y los diálogos). */
   .page-enter {
-    animation: rx-rise 0.35s cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation: rx-rise 0.35s cubic-bezier(0.23, 1, 0.32, 1) backwards;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -175,6 +184,35 @@
 }
 
 @layer components {
+  /* Ítem activo del menú lateral (lg+): una pestaña que se funde con el contenido.
+     Dos esquinas CÓNCAVAS (inverse border radius) de 12 px arriba y abajo de su borde
+     derecho (el borde del menú es una sombra interior, así la pestaña lo tapa sin desbordar), dibujadas con geometría CSS (círculo + trazo de borde) para que tomen los
+     colores del tema: menú = --card, contenido = --background, trazo = --border.
+     Fondos planos, sin sombras. */
+  @media (min-width: 1024px) {
+    .sidebar-tab {
+      --tab-r: 12px;
+      z-index: 2;
+    }
+    .sidebar-tab::before,
+    .sidebar-tab::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      width: var(--tab-r);
+      height: var(--tab-r);
+      pointer-events: none;
+    }
+    .sidebar-tab::before {
+      top: calc(var(--tab-r) * -1);
+      background: radial-gradient(circle at 0 0, hsl(var(--card)) 10.6px, hsl(var(--border)) 11.3px 11.7px, hsl(var(--background)) 12.4px);
+    }
+    .sidebar-tab::after {
+      bottom: calc(var(--tab-r) * -1);
+      background: radial-gradient(circle at 0 100%, hsl(var(--card)) 10.6px, hsl(var(--border)) 11.3px 11.7px, hsl(var(--background)) 12.4px);
+    }
+  }
+
   /* --- Render de apuntes Cornell (markdown-lite.ts) --- */
   .cornell :where(.cornell-heading) {
     @apply mb-1 mt-4 text-sm font-semibold text-foreground first:mt-0;

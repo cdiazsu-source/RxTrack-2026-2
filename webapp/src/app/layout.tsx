@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import localFont from "next/font/local";
 
-import { SiteNav } from "@/components/site-nav";
+import { SiteNav, MainFrame } from "@/components/site-nav";
 import { PwaRegister } from "@/components/pwa-register";
 import { Toaster } from "@/components/ui/toast";
 import { AccessProvider } from "@/components/access-context";
@@ -11,12 +11,19 @@ import { prisma } from "@/lib/prisma";
 
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
+// Tipografía de la Facultad de Ciencias (UNAL): Ancizar Sans (cuerpo) y Ancizar Serif (títulos).
+// Variables de 400 a 700, servidas desde el propio proyecto (sirven también sin conexión en la PWA).
+const ancizarSans = localFont({
+  src: "./fonts/AncizarSans-latin.woff2",
+  weight: "400 700",
+  variable: "--font-ancizar-sans",
   display: "swap",
-  weight: ["400", "500", "600"],
+});
+const ancizarSerif = localFont({
+  src: "./fonts/AncizarSerif-latin.woff2",
+  weight: "400 700",
+  variable: "--font-ancizar-serif",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#4A7729",
+  themeColor: "#A8009C",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -47,7 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const scope = session.authed ? session.scope : null;
 
   return (
-    <html lang="es" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="es" className={`${ancizarSans.variable} ${ancizarSerif.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
         <AccessProvider canEdit={editable} canContribute={contributor}>
           <SiteNav
@@ -58,7 +65,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             viewingAs={viewingAs}
             scope={scope}
           />
-          <main className="page-enter mx-auto max-w-6xl px-5 py-8">{children}</main>
+          <MainFrame sidebar={!scope}>{children}</MainFrame>
           <Toaster />
           <PwaRegister />
         </AccessProvider>

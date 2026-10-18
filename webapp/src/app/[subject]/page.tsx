@@ -1,3 +1,4 @@
+import { SectionRail } from "@/components/section-rail";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
@@ -55,7 +56,14 @@ export default async function SubjectDashboard({ params }: { params: { subject: 
     .slice(0, 4);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 lg:pr-14">
+      <SectionRail
+        items={[
+          { id: "avance", label: "Avance y semana", icon: "gauge" },
+          ...(evaluation.length > 0 ? [{ id: "evaluacion", label: "Evaluación y notas", icon: "grad" as const }] : []),
+          { id: "modulos", label: "Módulos y fechas", icon: "book" },
+        ]}
+      />
       {subject.descriptionSummary && (
         <Card>
           <CardContent className="pt-5">
@@ -73,7 +81,7 @@ export default async function SubjectDashboard({ params }: { params: { subject: 
         </Card>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div id="avance" className="grid scroll-mt-24 gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-1.5">
@@ -133,10 +141,12 @@ export default async function SubjectDashboard({ params }: { params: { subject: 
       )}
 
       {evaluation.length > 0 && (
-        <EvaluationPanel subjectId={subject.id} items={evaluation as EvaluationView[]} />
+        <section id="evaluacion" className="scroll-mt-24">
+          <EvaluationPanel subjectId={subject.id} items={evaluation as EvaluationView[]} />
+        </section>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div id="modulos" className="grid scroll-mt-24 gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle className="flex items-center gap-1.5">

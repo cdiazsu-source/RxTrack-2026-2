@@ -17,6 +17,7 @@ import { HelpHint } from "@/components/help-hint";
 import { ExercisesPanel } from "@/components/exercises-panel";
 import { ResourcesPanel } from "@/components/resources-panel";
 import { LabPanel } from "@/components/lab-panel";
+import { SectionRail } from "@/components/section-rail";
 import { inlineLite, renderCornell } from "@/lib/markdown-lite";
 
 export const dynamic = "force-dynamic";
@@ -107,7 +108,19 @@ export default async function ModuleDetailPage({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 lg:pr-14">
+      <SectionRail
+        items={[
+          { id: "inicio", label: "Empieza por aquí", icon: "target" },
+          { id: "descripcion", label: "Descripción", icon: "info" },
+          ...(mod.chapter ? [{ id: "desarrollo", label: "Desarrollo", icon: "book" as const }] : []),
+          { id: "apuntes", label: "Apuntes", icon: "notes" },
+          { id: "checklist", label: "Checklist", icon: "checks" },
+          ...(mod.exercises.length > 0 || editable ? [{ id: "ejercicios", label: "Ejercicios", icon: "practice" as const }] : []),
+          { id: "recursos", label: "Recursos", icon: "folder" },
+          ...(mod.hasLab ? [{ id: "lab", label: "Laboratorio", icon: "lab" as const }] : []),
+        ]}
+      />
       <ResumeTracker route={`/${subject.id}/modulos/${mod.id}`} label={`Apuntes · ${subject.code} · ${mod.title}`} />
 
       <Link
@@ -119,7 +132,7 @@ export default async function ModuleDetailPage({
       </Link>
 
       {/* Cabecera: título + avance + la única acción siguiente, siempre arriba. */}
-      <div className="flex flex-col gap-4 rounded-xl border border-primary/30 bg-primary/[0.04] p-5 shadow-card">
+      <div id="inicio" className="flex scroll-mt-24 flex-col gap-4 rounded-xl border border-primary/30 bg-primary/[0.04] p-5 shadow-card">
         <div className="flex items-start gap-4">
           <ProgressRing value={pct(progress)} size={64} stroke={6} sublabel="módulo" />
           <div className="min-w-0 flex-1">
@@ -156,7 +169,7 @@ export default async function ModuleDetailPage({
       </div>
 
       {/* Descripción: plegada por defecto — no es lo primero que hay que hacer. */}
-      <details className="group rounded-lg border border-border bg-card [&_summary]:list-none">
+      <details id="descripcion" className="group scroll-mt-24 rounded-lg border border-border bg-card [&_summary]:list-none">
         <summary className="flex cursor-pointer items-center justify-between gap-2 p-4 text-sm font-medium">
           <span className="flex items-center gap-1.5">
             Descripción del módulo
@@ -172,7 +185,7 @@ export default async function ModuleDetailPage({
 
       {/* Desarrollo: capítulo extenso y pedagógico del módulo — lectura opcional. */}
       {mod.chapter && (
-        <details className="group rounded-lg border border-border bg-card [&_summary]:list-none">
+        <details id="desarrollo" className="group scroll-mt-24 rounded-lg border border-border bg-card [&_summary]:list-none">
           <summary className="flex cursor-pointer items-center justify-between gap-2 p-4 text-sm font-medium">
             <span className="flex items-center gap-1.5">
               Desarrollo del módulo
@@ -229,7 +242,9 @@ export default async function ModuleDetailPage({
         </section>
       )}
 
-      <ResourcesPanel moduleId={mod.id} resources={mod.resources} />
+      <section id="recursos" className="scroll-mt-24">
+        <ResourcesPanel moduleId={mod.id} resources={mod.resources} />
+      </section>
 
       {mod.hasLab && (
         <section id="lab" className="scroll-mt-24">

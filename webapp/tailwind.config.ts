@@ -45,8 +45,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
-        display: ["var(--font-fraunces)", "Iowan Old Style", "Palatino", "Georgia", "serif"],
+        sans: ["var(--font-ancizar-sans)", "Tahoma", "Geneva", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["var(--font-ancizar-serif)", "MS Serif", "New York", "Georgia", "serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

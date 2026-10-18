@@ -2,7 +2,7 @@
    Objetivo: que la app abra al instante desde el ícono del celular y no se
    rompa sin conexión. No cachea datos sensibles de forma agresiva: usa
    stale-while-revalidate para assets y network-first para navegaciones. */
-const CACHE = "rxtrack-v1";
+const CACHE = "rxtrack-v2";
 const SHELL = ["/", "/icon.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (e) => {

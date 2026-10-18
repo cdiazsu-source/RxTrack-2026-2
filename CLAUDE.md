@@ -37,6 +37,30 @@ pregrado de Química Farmacéutica (UNAL). Nace de dos proyectos previos:
    renderiza con `lib/markdown-lite.ts` / `lib/formula-markup.ts`: se escapa
    todo y luego un safelist reconvierte `**negrita**`, tablas, `_{sub}`, etc.
 
+## Identidad visual
+
+Paleta y tipografía de la **Facultad de Ciencias UNAL** (pregrado en Farmacia): magenta
+`#A8009C` como primario, ciruela `#3B0136` para texto sobre tintes, verde `#337561`
+para éxito, fondos planos (sin degradados). Los tokens HSL viven en `globals.css`
+(`--primary`, `--background`, `--card`…) y se consumen con `hsl(var(--token))`; no uses
+hex sueltos en componentes. Fuentes **Ancizar Sans** (cuerpo) y **Ancizar Serif** (títulos),
+servidas desde `src/app/fonts` con `next/font/local`. La navegación es un menú lateral
+fijo en pantallas `lg+` (`components/site-nav.tsx`; el ítem activo es una pestaña que se
+funde con el contenido, clase `.sidebar-tab`) y la barra superior en móvil. Si cambias el
+color de marca, actualiza también `icon.svg`, los PNG de `public/`, `manifest.webmanifest`
+y `themeColor` en `layout.tsx`.
+
+### Menú rápido de secciones
+
+`components/section-rail.tsx` (`<SectionRail items={[{ id, label, icon }]} />`): botones con ícono
+fijos al costado derecho para saltar en un clic a cada sección de la página larga (inicio,
+panel de asignatura, módulo, proyecto), sin desplazarse. Marca la sección actual, abre los
+`<details>` plegados al llegar y trae «Arriba»; en móvil se recoge en un botón flotante. Para
+usarlo en otra página: pon `id` + `scroll-mt-24` a cada sección, añade `lg:pr-14` al
+contenedor y pasa los `items` (`icon` es un nombre de la lista `ICONS` del componente). Se
+dibuja en un portal en `<body>` a propósito: la animación `.page-enter` aplica un transform
+que volvería "fixed" relativo al contenido.
+
 ## Acceso
 
 Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en

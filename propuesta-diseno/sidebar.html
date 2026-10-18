@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RxTrack — propuesta de menú lateral</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Inter:wght@400;500;600&family=Ancizar+Sans:wght@400;500;600&family=Ancizar+Serif:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="lucide.min.js"></script>
+<style>
+:root{
+  --background:42 30% 98%;--foreground:40 8% 16%;--card:40 33% 99.5%;
+  --primary:95 49% 31%;--primary-foreground:0 0% 100%;
+  --secondary:78 40% 92%;--secondary-foreground:95 49% 20%;
+  --muted:42 18% 95%;--muted-foreground:40 6% 42%;
+  --accent:78 50% 90%;--accent-foreground:95 49% 20%;
+  --destructive:351 74% 37%;--success:78 90% 33%;--success-foreground:96 55% 12%;
+  --warning:32 90% 42%;--border:40 14% 87%;--input:40 14% 87%;--ring:95 49% 31%;
+  --radius:0.75rem;
+  --side-w:14rem;
+  --tab-r:12px;
+  --font-body:Inter,ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;
+  --font-display:Fraunces,"Iowan Old Style",Palatino,Georgia,serif;
+  --mark:#4A7729;
+}
+/* Paleta Facultad de Ciencias · Farmacia (ciencias.bogota.unal.edu.co): magenta #A8009C, ciruela #3B0136, verde #337561, Ancizar */
+body[data-theme="facultad"]{
+  --background:300 45% 97.8%;--foreground:210 11% 15%;--card:0 0% 100%;
+  --primary:304 100% 33%;--primary-foreground:0 0% 100%;
+  --secondary:304 47% 93%;--secondary-foreground:305 97% 12%;
+  --muted:306 50% 96%;--muted-foreground:308 8% 38%;
+  --accent:304 49% 89%;--accent-foreground:305 97% 12%;
+  --destructive:0 70% 38%;--success:162 39% 33%;--success-foreground:0 0% 100%;
+  --warning:32 90% 42%;--border:305 30% 88%;--input:305 30% 88%;--ring:304 100% 33%;
+  --font-body:"Ancizar Sans",Tahoma,Geneva,sans-serif;
+  --font-display:"Ancizar Serif","MS Serif","New York",serif;
+  --mark:#A8009C;
+}
+body{--side-bg:hsl(var(--card))}
+body.muted-side{--side-bg:hsl(var(--muted))}
+*{box-sizing:border-box;border-color:hsl(var(--border))}
+html,body{margin:0}
+body{background:hsl(var(--background));color:hsl(var(--foreground));font-family:var(--font-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh}
+h1,h2,h3{font-family:var(--font-display);letter-spacing:-.01em;margin:0}
+h1{letter-spacing:-.02em}
+button{font-family:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid hsl(var(--ring));outline-offset:2px}
+
+/* ---------- Menú lateral ---------- */
+.side{position:fixed;inset:0 auto 0 0;width:var(--side-w);background:var(--side-bg);border-right:1px solid hsl(var(--border));padding:20px 0 12px 12px;display:flex;flex-direction:column;z-index:40}
+.brand{display:flex;align-items:center;gap:10px;padding:0 12px 14px 12px;text-decoration:none}
+.brand .mark{width:28px;height:28px;border-radius:7px;background:var(--mark);display:grid;place-items:center;flex:none}
+.brand .mark svg,.brand .mark i{width:18px;height:18px;color:#fff}
+.brand span{font-family:var(--font-display);font-size:20px;font-weight:600;color:hsl(var(--primary));letter-spacing:-.01em}
+.sec{font-size:12px;font-weight:600;color:hsl(var(--muted-foreground));padding:14px 12px 6px;margin:0}
+ul.nav{list-style:none;margin:0;padding:0}
+.nav li{position:relative;margin:0 0 4px}
+.it{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 14px 0 12px;font-size:14px;font-weight:400;color:hsl(var(--muted-foreground));text-decoration:none;border-radius:10px 0 0 10px;background:transparent;border:0;width:100%;text-align:left;cursor:pointer;transition:transform .15s cubic-bezier(.23,1,.32,1),background-color .15s cubic-bezier(.23,1,.32,1),color .15s}
+.it svg{width:18px;height:18px;flex:none}
+.it .l{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it:hover{background:hsl(var(--accent));color:hsl(var(--accent-foreground))}
+.it:active{transform:scale(.97)}
+.bd{min-width:22px;height:20px;padding:0 7px;border-radius:999px;background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));font-size:12px;font-weight:500;display:inline-flex;align-items:center;justify-content:center}
+.bd.ok{background:hsl(var(--success));color:hsl(var(--success-foreground))}
+body.muted-side .bd{background:hsl(var(--card))}
+
+/* Pestaña activa: se funde con el contenido */
+.nav li.on{margin-right:-1px;z-index:2}
+.nav li.on .it{background:hsl(var(--background));color:hsl(var(--primary));font-weight:600;padding-right:15px}
+.nav li.on .it:hover{background:hsl(var(--background));color:hsl(var(--primary))}
+.nav li.on::before,.nav li.on::after{content:"";position:absolute;right:0;width:var(--tab-r);height:var(--tab-r);pointer-events:none}
+.nav li.on::before{top:calc(var(--tab-r) * -1);background:radial-gradient(circle at 0 0,var(--side-bg) 10.6px,hsl(var(--border)) 11.3px 11.7px,hsl(var(--background)) 12.4px)}
+.nav li.on::after{bottom:calc(var(--tab-r) * -1);background:radial-gradient(circle at 0 100%,var(--side-bg) 10.6px,hsl(var(--border)) 11.3px 11.7px,hsl(var(--background)) 12.4px)}
+
+.foot{margin-top:auto;border-top:1px solid hsl(var(--border));padding-top:8px;margin-right:12px}
+.foot .nav li{margin-bottom:0}
+.chip{margin:10px 12px 0 12px;font-size:12px;color:hsl(var(--muted-foreground))}
+
+/* ---------- Contenido ---------- */
+.main{margin-left:var(--side-w);padding:32px 40px 80px;max-width:calc(var(--side-w) + 60rem);animation:rise .35s cubic-bezier(.23,1,.32,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:12px;font-weight:600;color:hsl(var(--muted-foreground));margin:0 0 4px}
+.main h1{font-size:30px;font-weight:500;margin-bottom:6px}
+.lead{font-size:14px;color:hsl(var(--muted-foreground));margin:0 0 24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius);padding:20px;box-shadow:0 1px 2px hsl(var(--foreground)/.04),0 4px 12px hsl(var(--foreground)/.05);transition:box-shadow .15s}
+.card:hover{box-shadow:0 2px 6px hsl(var(--foreground)/.06),0 14px 34px hsl(var(--foreground)/.10)}
+.card h3{font-size:16px;font-weight:600;margin-bottom:10px}
+.bar{height:8px;border-radius:999px;background:hsl(var(--accent));overflow:hidden}
+.bar b{display:block;height:100%;background:hsl(var(--primary));border-radius:999px;transition:width .5s cubic-bezier(.23,1,.32,1)}
+.row{display:flex;justify-content:space-between;font-size:14px;margin-top:8px;color:hsl(var(--muted-foreground))}
+.btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 16px;border-radius:10px;background:hsl(var(--primary));color:#fff;font-size:14px;font-weight:500;border:0;margin-top:14px;cursor:pointer;box-shadow:0 1px 2px hsl(var(--foreground)/.1);transition:transform .15s cubic-bezier(.23,1,.32,1),background-color .15s}
+.btn:hover{background:hsl(var(--primary)/.9)}
+.btn:active{transform:scale(.97)}
+.next{border-left:3px solid hsl(var(--primary));background:hsl(var(--primary)/.06);padding:10px 12px;border-radius:0;font-size:14px;margin-top:12px}
+.item{display:flex;align-items:center;gap:10px;font-size:14px;padding:6px 0}
+.item + .item{border-top:1px solid hsl(var(--border))}
+
+/* ---------- Panel de prueba ---------- */
+.lab{position:fixed;right:16px;bottom:16px;z-index:60;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius);padding:12px 14px;font-size:13px;box-shadow:0 2px 6px hsl(var(--foreground)/.06),0 14px 34px hsl(var(--foreground)/.10);display:flex;flex-direction:column;gap:8px}
+.lab label{display:flex;align-items:center;gap:8px;cursor:pointer;min-height:28px}
+.lab strong{font-family:var(--font-display);font-weight:600;font-size:14px}
+.lab input{accent-color:hsl(var(--primary));width:16px;height:16px}
+
+/* ---------- Móvil / tableta: barra superior ---------- */
+.topbar{display:none}
+@media (max-width:1023px){
+  .side{display:none}
+  .topbar{display:block;position:sticky;top:0;z-index:40;background:hsl(var(--card)/.95);border-bottom:1px solid hsl(var(--border)/.6);backdrop-filter:blur(12px)}
+  .topbar .in{display:flex;align-items:center;gap:6px;padding:10px 16px;overflow-x:auto}
+  .topbar .brand{padding:0 8px 0 0}
+  .topbar .pill{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;border-radius:8px;padding:8px 12px;font-size:14px;font-weight:500;color:hsl(var(--muted-foreground));background:transparent;border:0;cursor:pointer;min-height:40px}
+  .topbar .pill svg{width:16px;height:16px}
+  .topbar .pill.on{background:hsl(var(--primary));color:#fff}
+  .main{margin-left:0;padding:24px 16px 120px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<aside class="side" aria-label="Navegación principal">
+  <a class="brand" href="#"><span class="mark" id="mark1"></span><span>RxTrack</span></a>
+  <nav>
+    <p class="sec">Semestre</p>
+    <ul class="nav" id="nav1"></ul>
+    <p class="sec">Asignaturas</p>
+    <ul class="nav" id="nav2"></ul>
+  </nav>
+  <div class="foot">
+    <ul class="nav"><li><button class="it" type="button" data-id="search"><i data-lucide="search"></i><span class="l">Buscar</span></button></li><li><button class="it" type="button" data-id="out"><i data-lucide="log-out"></i><span class="l">Salir</span></button></li></ul>
+    <p class="chip">Última modificación: 30 sep 2026</p>
+  </div>
+</aside>
+
+<header class="topbar"><div class="in" id="topbar"></div></header>
+
+<main class="main" id="main">
+  <p class="eyebrow" id="eyebrow">Semestre 2026-2</p>
+  <h1 id="title">Repaso</h1>
+  <p class="lead" id="lead">Tarjetas listas para hoy, de la más urgente a la menos.</p>
+  <div class="grid">
+    <section class="card">
+      <h3>Hoy</h3>
+      <div class="bar"><b id="bar" style="width:58%"></b></div>
+      <div class="row"><span id="cnt">7 de 12 tarjetas</span><span id="pct">58 %</span></div>
+      <button class="btn" type="button" id="go"><i data-lucide="play" style="width:16px;height:16px"></i>Continuar repaso</button>
+    </section>
+    <section class="card">
+      <h3>Lo que sigue</h3>
+      <div class="next">Titulación de Mohr: ejercicio 3</div>
+      <div class="item"><i data-lucide="check" style="width:16px;height:16px;color:hsl(78 90% 33%)"></i>Preparar quiz de la práctica 2</div>
+      <div class="item"><i data-lucide="clock" style="width:16px;height:16px;color:hsl(32 90% 42%)"></i>Preinforme en 23 días</div>
+    </section>
+  </div>
+</main>
+
+<div class="lab" role="group" aria-label="Opciones de la propuesta">
+  <strong>Probar la propuesta</strong>
+  <label><input type="radio" name="theme" value="rx" checked> Paleta RxTrack (verde UNAL)</label>
+  <label><input type="radio" name="theme" value="facultad"> Paleta Facultad de Ciencias · Farmacia</label>
+  <label><input type="checkbox" id="muted"> Lateral en tono muted (#F5F3F0)</label>
+  <label><input type="checkbox" id="badgeok"> Badge verde de éxito en «Bandeja»</label>
+  <label><input type="checkbox" id="empty"> Sin ítem activo contiguo (probar bordes)</label>
+</div>
+
+<script>
+const SEM=[
+  {id:'semestre',label:'Semestre',icon:'layers',lead:'Todas tus asignaturas y lo que viene primero.'},
+  {id:'calendario',label:'Calendario',icon:'calendar-days',lead:'Entregas, quices y laboratorios por fecha.'},
+  {id:'repaso',label:'Repaso',icon:'layers-2',lead:'Tarjetas listas para hoy, de la más urgente a la menos.'},
+  {id:'bandeja',label:'Bandeja',icon:'inbox',badge:3,lead:'Lo que capturaste y falta clasificar.'}
+];
+const SUB=[
+  {id:'aif',label:'AIF',icon:'flask-conical',badge:2,lead:'Análisis instrumental farmacéutico.'},
+  {id:'ft2',label:'FT2',icon:'pill',lead:'Farmacotecnia 2.'},
+  {id:'todas',label:'Ver las 7 asignaturas',icon:'ellipsis',lead:'El semestre completo, asignatura por asignatura.'}
+];
+const ALL=[...SEM,...SUB];
+let active='repaso';
+
+function li(it){
+  const badge=it.badge?`<span class="bd${document.getElementById('badgeok')?.checked&&it.id==='bandeja'?' ok':''}">${it.badge}</span>`:'';
+  return `<li class="${it.id===active?'on':''}"><button class="it" type="button" data-id="${it.id}" ${it.id===active?'aria-current="page"':''}><i data-lucide="${it.icon}"></i><span class="l">${it.label}</span>${badge}</button></li>`;
+}
+function render(){
+  const mk=document.body.dataset.theme==='facultad'?'pill':'plus';
+  document.getElementById('mark1').innerHTML=`<i data-lucide="${mk}"></i>`;
+  document.getElementById('nav1').innerHTML=SEM.map(li).join('');
+  document.getElementById('nav2').innerHTML=SUB.map(li).join('');
+  document.getElementById('topbar').innerHTML=
+    `<a class="brand" href="#"><span class="mark"><i data-lucide="${mk}"></i></span><span>RxTrack</span></a>`+
+    ALL.slice(0,6).map(it=>`<button class="pill${it.id===active?' on':''}" type="button" data-id="${it.id}"><i data-lucide="${it.icon}"></i>${it.label}</button>`).join('');
+  const cur=ALL.find(i=>i.id===active);
+  if(cur){document.getElementById('title').textContent=cur.label;document.getElementById('lead').textContent=cur.lead;}
+  lucide.createIcons({attrs:{'stroke-width':1.75}});
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-id]');
+  if(!b)return;
+  const id=b.dataset.id;
+  if(id==='search'||id==='out')return;
+  active=id;render();
+  const m=document.getElementById('main');m.style.animation='none';void m.offsetWidth;m.style.animation='';
+});
+document.querySelectorAll('input[name=theme]').forEach(r=>r.addEventListener('change',e=>{document.body.dataset.theme=e.target.value;render();}));
+document.getElementById('muted').addEventListener('change',e=>document.body.classList.toggle('muted-side',e.target.checked));
+document.getElementById('badgeok').addEventListener('change',render);
+document.getElementById('empty').addEventListener('change',e=>{active=e.target.checked?'semestre':'repaso';render();});
+let n=7;
+document.getElementById('go').addEventListener('click',()=>{n=Math.min(12,n+1);document.getElementById('bar').style.width=(n/12*100)+'%';document.getElementById('cnt').textContent=n+' de 12 tarjetas';document.getElementById('pct').textContent=Math.round(n/12*100)+' %';});
+render();
+</script>
+</body>
+</html>
