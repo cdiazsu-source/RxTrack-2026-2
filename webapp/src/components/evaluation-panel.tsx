@@ -1,29 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 
 import {
   addEvaluationItem,
   addQuizGrade,
+  clearEvaluationGrade,
   deleteEvaluationItem,
   deleteQuizGrade,
   setEvaluationGrade,
+  updateQuizGrade,
 } from "@/lib/actions/evaluation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ProgressBar } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HelpHint } from "@/components/help-hint";
+import { toast } from "@/components/ui/toast";
 import { useCanContribute, useCanEdit } from "@/components/access-context";
 import { cn, formatDate, todayInputValue } from "@/lib/utils";
 
-export type QuizGradeView = { id: string; date: string | null; grade: number };
+export type QuizGradeView = { id: string; date: string | null; grade: number; description: string | null };
 export type EvaluationView = {
   id: string;
   name: string;
   weight: number;
   grade: number | null;
+  gradeNote: string | null;
   order: number;
   quizzes: QuizGradeView[];
 };
@@ -32,11 +36,72 @@ function fmt(n: number) {
   return n.toLocaleString("es-CO", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 }
 
+/** La fecha llega como Date desde el servidor (o como texto ISO): "2026-09-13". */
+function toDateInput(d: string | Date | null): string {
+  if (!d) return "";
+  const x = new Date(d);
+  return Number.isNaN(x.getTime()) ? "" : x.toISOString().slice(0, 10);
+}
+
 /** Nota efectiva de un componente: si tiene quizzes, su promedio simple
  *  (todos pesan igual); si no, la nota manual. */
 function effectiveGrade(it: EvaluationView): number | null {
   if (it.quizzes.length > 0) return it.quizzes.reduce((a, q) => a + q.grade, 0) / it.quizzes.length;
   return it.grade;
+}
+
+const DESC_PLACEHOLDER = "Descripción (opcional): tema, formato, observaciones…";
+
+/** Alta y edición de un quiz: nota, fecha y descripción. */
+function QuizForm({
+  itemId,
+  quiz,
+  onDone,
+}: {
+  itemId: string;
+  quiz?: QuizGradeView;
+  onDone: () => void;
+}) {
+  return (
+    <form
+      action={async (fd) => {
+        if (quiz) await updateQuizGrade(quiz.id, fd);
+        else await addQuizGrade(itemId, fd);
+        toast(quiz ? "Quiz actualizado" : "Quiz agregado");
+        onDone();
+      }}
+      className="flex flex-col gap-2 border-l border-border pl-3"
+    >
+      <div className="flex flex-wrap items-end gap-2">
+        <Input
+          name="grade"
+          defaultValue={quiz ? String(quiz.grade).replace(".", ",") : ""}
+          placeholder="Nota"
+          inputMode="decimal"
+          required
+          className="h-7 w-16 text-center text-xs"
+        />
+        <Input
+          name="date"
+          type="date"
+          defaultValue={quiz ? toDateInput(quiz.date) : todayInputValue()}
+          className="h-7 w-36 text-xs"
+        />
+      </div>
+      <Input
+        name="description"
+        defaultValue={quiz?.description ?? ""}
+        placeholder={DESC_PLACEHOLDER}
+        maxLength={300}
+        className="h-8 text-xs"
+        aria-label="Descripción del quiz"
+      />
+      <div className="flex gap-2">
+        <Button type="submit" size="sm" variant="outline">{quiz ? "Guardar cambios" : "Agregar quiz"}</Button>
+        <Button type="button" size="sm" variant="ghost" onClick={onDone}>Cancelar</Button>
+      </div>
+    </form>
+  );
 }
 
 function EvaluationRow({
@@ -52,8 +117,11 @@ function EvaluationRow({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [addingQuiz, setAddingQuiz] = useState(false);
+  const [editingQuizId, setEditingQuizId] = useState<string | null>(null);
+  const [editingGrade, setEditingGrade] = useState(false);
   const hasQuizzes = it.quizzes.length > 0;
   const avg = effectiveGrade(it);
+  const hasManual = it.grade !== null || !!it.gradeNote;
 
   return (
     <li className="flex flex-col gap-2 py-2">
@@ -73,19 +141,34 @@ function EvaluationRow({
               </span>
               <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
             </button>
-          ) : canContribute ? (
-            <form action={(fd) => setEvaluationGrade(it.id, fd)} className="flex items-center gap-1">
-              <Input
-                name="grade"
-                defaultValue={it.grade ?? ""}
-                placeholder="—"
-                inputMode="decimal"
-                className="h-7 w-16 text-center text-sm"
-              />
-              <Button type="submit" size="sm" variant="ghost">OK</Button>
-            </form>
           ) : (
-            <span className="tabular-nums text-sm">{it.grade === null ? "—" : fmt(it.grade)}</span>
+            <>
+              <span className="tabular-nums text-sm">{it.grade === null ? "—" : fmt(it.grade)}</span>
+              {canContribute && (
+                <button
+                  type="button"
+                  onClick={() => setEditingGrade((v) => !v)}
+                  className="text-muted-foreground hover:text-primary"
+                  aria-label={hasManual ? "Modificar nota" : "Poner nota"}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+              )}
+              {canContribute && hasManual && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearEvaluationGrade(it.id);
+                    setEditingGrade(false);
+                    toast("Nota eliminada", "info");
+                  }}
+                  className="text-muted-foreground hover-reveal hover:text-destructive"
+                  aria-label="Eliminar nota"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </>
           )}
           {canContribute && (
             <button
@@ -112,47 +195,93 @@ function EvaluationRow({
         </span>
       </div>
 
+      {!hasQuizzes && it.gradeNote && !editingGrade && (
+        <p className="whitespace-pre-line break-words text-xs text-muted-foreground">{it.gradeNote}</p>
+      )}
+
+      {!hasQuizzes && canContribute && editingGrade && (
+        <form
+          action={async (fd) => {
+            await setEvaluationGrade(it.id, fd);
+            toast("Nota guardada");
+            setEditingGrade(false);
+          }}
+          className="flex flex-col gap-2 border-l border-border pl-3"
+        >
+          <Input
+            name="grade"
+            defaultValue={it.grade !== null ? String(it.grade).replace(".", ",") : ""}
+            placeholder="Nota (0 a 5)"
+            inputMode="decimal"
+            className="h-7 w-28 text-center text-sm"
+            aria-label="Nota"
+          />
+          <Input
+            name="description"
+            defaultValue={it.gradeNote ?? ""}
+            placeholder={DESC_PLACEHOLDER}
+            maxLength={300}
+            className="h-8 text-xs"
+            aria-label="Descripción de la nota"
+          />
+          <div className="flex gap-2">
+            <Button type="submit" size="sm" variant="outline">Guardar</Button>
+            <Button type="button" size="sm" variant="ghost" onClick={() => setEditingGrade(false)}>Cancelar</Button>
+          </div>
+        </form>
+      )}
+
       {expanded && hasQuizzes && (
-        <ul className="ml-1 flex flex-col gap-1 border-l border-border pl-3">
-          {it.quizzes.map((q, i) => (
-            <li key={q.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="w-14 shrink-0">Quiz {i + 1}</span>
-              <span className="w-24 shrink-0">{q.date ? formatDate(q.date) : "sin fecha"}</span>
-              <span className="tabular-nums font-medium text-foreground">{fmt(q.grade)}</span>
-              {canContribute && (
-                <button
-                  type="button"
-                  onClick={() => deleteQuizGrade(q.id)}
-                  className="hover-reveal hover:text-destructive"
-                  aria-label="Eliminar quiz"
-                >
-                  <Trash2 className="h-3 w-3" />
-                </button>
-              )}
-            </li>
-          ))}
+        <ul className="ml-1 flex flex-col gap-1.5 border-l border-border pl-3">
+          {it.quizzes.map((q, i) =>
+            editingQuizId === q.id && canContribute ? (
+              <li key={q.id}>
+                <QuizForm itemId={it.id} quiz={q} onDone={() => setEditingQuizId(null)} />
+              </li>
+            ) : (
+              <li key={q.id} className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <span className="w-14 shrink-0">Quiz {i + 1}</span>
+                  <span className="w-24 shrink-0">{q.date ? formatDate(q.date) : "sin fecha"}</span>
+                  <span className="tabular-nums font-medium text-foreground">{fmt(q.grade)}</span>
+                  {canContribute && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingQuizId(q.id);
+                          setAddingQuiz(false);
+                        }}
+                        className="hover-reveal hover:text-primary"
+                        aria-label="Modificar quiz"
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          deleteQuizGrade(q.id);
+                          toast("Quiz eliminado", "info");
+                        }}
+                        className="hover-reveal hover:text-destructive"
+                        aria-label="Eliminar quiz"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </>
+                  )}
+                </div>
+                {q.description && <p className="whitespace-pre-line break-words pl-0.5">{q.description}</p>}
+              </li>
+            ),
+          )}
         </ul>
       )}
 
       {canContribute && addingQuiz && (
-        <form
-          action={async (fd) => {
-            await addQuizGrade(it.id, fd);
-            setAddingQuiz(false);
-          }}
-          className="ml-1 flex flex-wrap items-end gap-2 border-l border-border pl-3"
-        >
-          <Input
-            name="grade"
-            placeholder="Nota"
-            inputMode="decimal"
-            required
-            className="h-7 w-16 text-center text-xs"
-          />
-          <Input name="date" type="date" defaultValue={todayInputValue()} className="h-7 w-36 text-xs" />
-          <Button type="submit" size="sm" variant="outline">Agregar quiz</Button>
-          <Button type="button" size="sm" variant="ghost" onClick={() => setAddingQuiz(false)}>Cancelar</Button>
-        </form>
+        <div className="ml-1">
+          <QuizForm itemId={it.id} onDone={() => setAddingQuiz(false)} />
+        </div>
       )}
     </li>
   );

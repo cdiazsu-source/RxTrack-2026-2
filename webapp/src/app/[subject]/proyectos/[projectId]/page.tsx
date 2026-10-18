@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, Trash2 } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getSubjectBySlug } from "@/lib/subjects";
@@ -16,6 +16,8 @@ import { Checklist } from "@/components/checklist";
 import { NotesLog, type NoteView } from "@/components/notes-log";
 import { HelpHint } from "@/components/help-hint";
 import { FocusMode } from "@/components/focus-mode";
+import { ProjectLinks } from "@/components/project-links";
+import { renderCornell } from "@/lib/markdown-lite";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +35,7 @@ export default async function ProjectDetailPage({
     where: { id: params.projectId, subjectId: subject.id },
     include: {
       checklistItems: { orderBy: { order: "asc" } },
+      links: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] },
       notes: {
         orderBy: { createdAt: "desc" },
         include: { checklistItem: { select: { text: true, done: true } } },
@@ -89,6 +92,21 @@ export default async function ProjectDetailPage({
           )}
         </div>
       </div>
+
+      {project.description && (
+        <details open className="group rounded-lg border border-border bg-card [&_summary]:list-none">
+          <summary className="flex cursor-pointer items-center justify-between gap-2 p-4 text-sm font-medium">
+            Contexto del proyecto
+            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" aria-hidden />
+          </summary>
+          <div
+            className="cornell border-t border-border p-4 pt-3 text-sm leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: renderCornell(project.description) }}
+          />
+        </details>
+      )}
+
+      <ProjectLinks projectId={project.id} links={project.links.map((l) => ({ id: l.id, name: l.name, url: l.url }))} />
 
       <FocusMode
         projectId={project.id}

@@ -9,7 +9,8 @@
  *               con fromContent=true.
  *   - KeyDate:  no toca `date`.  EvaluationItem: no toca `grade` ni sus quizzes;
  *               crea una fila por (name, owner) — Cesar y Diana llevan nota aparte.
- *   - Project:  no toca status, driveUrl, bitácora ni checklist. Solo isManual=false.
+ *   - Project:  no toca status, driveUrl, enlaces, bitácora ni checklist. Solo isManual=false;
+ *               sí mantiene título (vía formerTitles), categoría y descripción desde el content.
  *   - Glosario/Fórmula/Bibliografía: se emparejan por texto; si renombras algo en
  *     el content se crea una fila nueva y la vieja se queda (seguro: solo agrega).
  *   - Nada con fromContent=false / isManual=true (creado dentro de la app).
@@ -207,13 +208,14 @@ async function seedSubject(content: (typeof ALL_SUBJECTS)[number], order: number
   const projects = content.projects ?? [];
   for (let i = 0; i < projects.length; i++) {
     const p = projects[i];
+    // Empareja por título actual o por alguno anterior (renombrado sin perder avance).
     const existing = await prisma.project.findFirst({
-      where: { subjectId: subject.id, title: p.title, isManual: false },
+      where: { subjectId: subject.id, isManual: false, title: { in: [p.title, ...(p.formerTitles ?? [])] } },
       select: { id: true },
     });
-    const data = { category: p.category ?? null, order: i };
+    const data = { category: p.category ?? null, order: i, description: p.description ?? null };
     if (existing) {
-      await prisma.project.update({ where: { id: existing.id }, data });
+      await prisma.project.update({ where: { id: existing.id }, data: { ...data, title: p.title } });
     } else {
       await prisma.project.create({
         data: { subjectId: subject.id, title: p.title, isManual: false, ...data },

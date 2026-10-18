@@ -87,6 +87,10 @@ export interface BibliographyContent {
 export interface ProjectContent {
   title: string;
   category?: string | null;
+  /** Contexto del entregable (Markdown de renderCornell). El seed lo mantiene al día. */
+  description?: string;
+  /** Títulos anteriores: si renombras el proyecto, el seed lo reconoce y conserva checklist y bitácora. */
+  formerTitles?: string[];
 }
 
 /**

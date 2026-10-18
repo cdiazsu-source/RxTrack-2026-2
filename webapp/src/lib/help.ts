@@ -16,7 +16,7 @@ export const HELP: Record<string, string> = {
   "meta-semanal":
     "Una frase con lo que quieres lograr esta semana en esta materia. Texto libre, la escribes y editas tú. No sale del temario ni la toca el seed; es solo un recordatorio.",
   evaluacion:
-    "Componentes de la nota y su peso. El nombre y el peso vienen de `evaluation[]` en `content/<code>.ts` (los pesos deben sumar 100); el `db:seed` los actualiza. Cesar y Diana ven y editan CADA UNO su propia nota — son seguimientos independientes del mismo curso. La NOTA (0 a 5) de cada componente la registras tú, a mano, o como el promedio de varios quices sueltos (botón «+ Quiz»: uno por uno, con su fecha; todos pesan igual). El seed nunca borra notas ni quices. Con las notas puestas calcula acumulada y proyección.",
+    "Componentes de la nota y su peso. El nombre y el peso vienen de `evaluation[]` en `content/<code>.ts` (los pesos deben sumar 100); el `db:seed` los actualiza. Cesar y Diana ven y editan CADA UNO su propia nota — son seguimientos independientes del mismo curso. La NOTA (0 a 5) de cada componente la registras tú, a mano, o como el promedio de varios quices sueltos (botón «+ Quiz»: uno por uno, con su fecha; todos pesan igual). Cada nota y cada quiz se puede modificar (lápiz), eliminar (papelera) y llevar una descripción libre (tema, formato, observaciones). El seed nunca borra notas ni quices. Con las notas puestas calcula acumulada y proyección.",
   "proximas-fechas":
     "Las fechas de esta asignatura que ya tienen día puesto, ordenadas. Se ponen/editan en la pestaña «Fechas». Aquí solo se muestran.",
 
@@ -48,7 +48,7 @@ export const HELP: Record<string, string> = {
   proyectos:
     "Entregables fijos de la asignatura (seminario, informe, producto final). Los de `projects[]` en `content/<code>.ts` los sincroniza el seed; los que crees con «Nuevo proyecto» son tuyos y el seed no los toca. Cada proyecto tiene estado, checklist y bitácora propios.",
   "proyecto-cabecera":
-    "Estado del proyecto (lo pones tú) + enlace a Drive (solo se abre) + «Eliminar», que solo aparece en proyectos creados a mano y borra también su checklist y su bitácora.",
+    "Estado del proyecto (lo pones tú) + enlace a Drive (solo se abre) + «Eliminar», que solo aparece en proyectos creados a mano y borra también su checklist y su bitácora. Debajo de la cabecera, «Contexto del proyecto» (lo escribe `content/<code>.ts` y lo mantiene el seed) y «Documentos y enlaces», donde anexas varios enlaces con nombre (Google Drive, referencias) y puedes modificarlos o eliminarlos.",
   "modo-enfoque":
     "Una pantalla limpia con UN solo paso del proyecto a la vez. Empiezas con 2 minutos (luego decides si sigues) o con un bloque de 10–45 min; el tiempo se ve en un anillo y en la pestaña. «Hecho» marca la subtarea del checklist; «Se me complicó» te deja dividir el paso, copiar un prompt para que una IA lo divida, o dejarlo para después. Lo que se te cruce lo anotas sin salir y va a la bandeja, ligado a la asignatura. Al cerrar un bloque dejas escrito dónde quedaste. La app no llama a ninguna IA. Salir con Esc no detiene el bloque.",
   bitacora:

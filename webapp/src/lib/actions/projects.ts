@@ -67,3 +67,42 @@ export async function deleteProject(projectId: string, subjectSlug: string) {
   revalidateAll();
   redirect(`/${subjectSlug}/proyectos`);
 }
+
+/** Solo http(s): evita `javascript:` y similares en un href. */
+function cleanHttpUrl(raw: string): string | null {
+  try {
+    const u = new URL(raw.trim());
+    return u.protocol === "https:" || u.protocol === "http:" ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function addProjectLink(projectId: string, formData: FormData) {
+  if (await blockedForContribute()) return;
+  const url = cleanHttpUrl(String(formData.get("url") ?? ""));
+  if (!url) return;
+  const name = String(formData.get("name") ?? "").trim().slice(0, 120) || new URL(url).hostname;
+  const last = await prisma.projectLink.findFirst({
+    where: { projectId },
+    orderBy: { order: "desc" },
+    select: { order: true },
+  });
+  await prisma.projectLink.create({ data: { projectId, name, url, order: (last?.order ?? -1) + 1 } });
+  revalidateAll();
+}
+
+export async function updateProjectLink(linkId: string, formData: FormData) {
+  if (await blockedForContribute()) return;
+  const url = cleanHttpUrl(String(formData.get("url") ?? ""));
+  if (!url) return;
+  const name = String(formData.get("name") ?? "").trim().slice(0, 120) || new URL(url).hostname;
+  await prisma.projectLink.update({ where: { id: linkId }, data: { name, url } });
+  revalidateAll();
+}
+
+export async function deleteProjectLink(linkId: string) {
+  if (await blockedForContribute()) return;
+  await prisma.projectLink.delete({ where: { id: linkId } }).catch(() => undefined);
+  revalidateAll();
+}

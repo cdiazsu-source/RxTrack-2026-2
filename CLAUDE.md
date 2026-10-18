@@ -72,7 +72,10 @@ gateado por dueño (`item.owner === session.name`), no por `canEdit`. Un
 componente puede además tener varios `QuizGrade` (nota + fecha, botón «+
 Quiz»): si los tiene, su nota es el promedio simple de todos y la `grade`
 manual se ignora. `db:seed` empareja por `(subjectId, name, owner)` y nunca
-toca notas ni quizzes existentes.
+toca notas ni quizzes existentes. Cada nota manual (`EvaluationItem.gradeNote`) y cada quiz
+(`QuizGrade.description`) lleva una descripción libre opcional (≤300 car.) y se puede modificar
+(`setEvaluationGrade`/`updateQuizGrade`) y eliminar (`clearEvaluationGrade`/`deleteQuizGrade`),
+siempre solo por el dueño de la fila.
 
 **Nota rápida (portada).** Caja al final de `/` (`quick-note-box.tsx`): texto + asignatura
 opcional. Escribe en `InboxItem` (misma bandeja que el botón «+»), con `subjectId` blando.
@@ -84,6 +87,8 @@ estacionamiento de ideas (→ bandeja) y nota «para retomar». El temporizador 
 `localStorage` (`rxtrack:focus:<projectId>`); en BD solo `Project.focusNote` y
 `Project.focusMinutes`. **Regla de producto: la interfaz nunca menciona el diagnóstico
 (TDAH) ni lo describe como tal** — es solo «Modo Enfoque».
+
+**Proyectos: contexto y enlaces.** Cada proyecto puede llevar `description` (Markdown de `renderCornell`; en los sembrados la escribe `projects[].description` de `content/<code>.ts` y el seed la mantiene) y varios enlaces `ProjectLink` (nombre + URL http/https; anexar/modificar/eliminar con `canContribute`). Renombrar un proyecto sembrado: dejar el título viejo en `formerTitles` para que el seed conserve su checklist y bitácora.
 
 **Prompt de ejercicios.** El panel «Ejercicios» de cada módulo tiene el botón «Prompt para IA»
 (`exerciseSolutionPrompt` en `lib/prompts.ts`): arma un texto con el contexto del módulo

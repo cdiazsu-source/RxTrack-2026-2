@@ -12,10 +12,16 @@ function clampGrade(raw: FormDataEntryValue | null): number | null {
   return Number.isFinite(n) ? Math.min(5, Math.max(0, n)) : null;
 }
 
-/** Registrar la nota obtenida en un componente (0..5). Vacío = sin nota aún.
- *  Solo la persona dueña de esa fila (Cesar o Diana) puede tocar su propia
- *  nota — cada quien lleva la suya, aparte. Sin efecto si el componente ya
- *  tiene quizzes (su nota sale del promedio, no de este campo). */
+function cleanDescription(raw: FormDataEntryValue | null): string | null {
+  const s = String(raw ?? "").trim().slice(0, 300);
+  return s || null;
+}
+
+/** Registrar la nota obtenida en un componente (0..5) y, opcionalmente, su
+ *  descripción. Vacío = sin nota aún. Solo la persona dueña de esa fila (Cesar
+ *  o Diana) puede tocar su propia nota — cada quien lleva la suya, aparte. Sin
+ *  efecto si el componente ya tiene quizzes (su nota sale del promedio, no de
+ *  este campo). */
 export async function setEvaluationGrade(id: string, formData: FormData) {
   if (await blockedForContribute()) return;
   const session = await getSession();
@@ -25,7 +31,20 @@ export async function setEvaluationGrade(id: string, formData: FormData) {
     select: { owner: true, _count: { select: { quizzes: true } } },
   });
   if (!item || item.owner !== session.name || item._count.quizzes > 0) return;
-  await prisma.evaluationItem.update({ where: { id }, data: { grade: clampGrade(formData.get("grade")) } });
+  const data: { grade: number | null; gradeNote?: string | null } = { grade: clampGrade(formData.get("grade")) };
+  if (formData.has("description")) data.gradeNote = cleanDescription(formData.get("description"));
+  await prisma.evaluationItem.update({ where: { id }, data });
+  revalidateAll();
+}
+
+/** Borra la nota manual de un componente (nota y descripción). Solo su dueño. */
+export async function clearEvaluationGrade(id: string) {
+  if (await blockedForContribute()) return;
+  const session = await getSession();
+  if (!session.authed) return;
+  const item = await prisma.evaluationItem.findUnique({ where: { id }, select: { owner: true } });
+  if (!item || item.owner !== session.name) return;
+  await prisma.evaluationItem.update({ where: { id }, data: { grade: null, gradeNote: null } });
   revalidateAll();
 }
 
@@ -73,7 +92,24 @@ export async function addQuizGrade(evaluationItemId: string, formData: FormData)
   const grade = clampGrade(formData.get("grade"));
   if (grade === null) return;
   const date = parseDateInput(formData.get("date"));
-  await prisma.quizGrade.create({ data: { evaluationItemId, grade, date } });
+  const description = cleanDescription(formData.get("description"));
+  await prisma.quizGrade.create({ data: { evaluationItemId, grade, date, description } });
+  revalidateAll();
+}
+
+/** Modifica la nota, la fecha y la descripción de un quiz. Solo el dueño de la fila. */
+export async function updateQuizGrade(id: string, formData: FormData) {
+  if (await blockedForContribute()) return;
+  const session = await getSession();
+  if (!session.authed) return;
+  const quiz = await prisma.quizGrade.findUnique({ where: { id }, select: { evaluationItem: { select: { owner: true } } } });
+  if (!quiz || quiz.evaluationItem.owner !== session.name) return;
+  const grade = clampGrade(formData.get("grade"));
+  if (grade === null) return;
+  await prisma.quizGrade.update({
+    where: { id },
+    data: { grade, date: parseDateInput(formData.get("date")), description: cleanDescription(formData.get("description")) },
+  });
   revalidateAll();
 }
 
