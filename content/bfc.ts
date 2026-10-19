@@ -1,4 +1,11 @@
 import type { SubjectContent } from "./_schema";
+import { bfcBiofarmacia } from "./bfc-biofarmacia";
+import { bfcFarmacocineticaA } from "./bfc-farmacocinetica-a";
+import { bfcFarmacocineticaB } from "./bfc-farmacocinetica-b";
+import { bfcBibliographyExtra, bfcFormulasExtra, bfcGlossaryExtra, bfcProjectDescriptions } from "./bfc-extra";
+
+/** Capítulos y ejercicios resueltos por módulo (archivos bfc-*.ts), por slug de módulo. */
+const MODULE_EXTRAS = { ...bfcBiofarmacia, ...bfcFarmacocineticaA, ...bfcFarmacocineticaB };
 
 /**
  * Biofarmacia y Farmacocinética (UNAL) — desde el programa oficial 2-2026
@@ -12,6 +19,12 @@ import type { SubjectContent } from "./_schema";
  *    programa SÍ trae el calendario clase por clase; los módulos 5–10 siguen
  *    ese calendario casi 1:1.
  * Requisitos: Fisioanatomía y Farmacotecnia I. Curso validable. Sin laboratorio.
+ *
+ * Los módulos llevan además un capítulo de lectura y ejercicios resueltos (archivos
+ * bfc-biofarmacia.ts, bfc-farmacocinetica-a.ts y bfc-farmacocinetica-b.ts), y el glosario,
+ * las fórmulas (con ejemplos) y la bibliografía ampliados viven en bfc-extra.ts. Esos
+ * archivos se redactaron desde la literatura y la normativa (no desde las diapositivas
+ * de clase).
  */
 export const bfc: SubjectContent = {
   code: "BFC",
@@ -38,7 +51,7 @@ export const bfc: SubjectContent = {
     "Estar en capacidad de hacer una correcta **selección y suministro de medicamentos** a nivel hospitalario.",
   ],
 
-  modules: [
+  modules: ([
     // ── BLOQUE BIOFARMACIA (semanas 1–8) — Prof. Helber Barbosa ─────────────
     {
       slug: "introduccion-biofarmacia",
@@ -103,7 +116,7 @@ export const bfc: SubjectContent = {
       description:
         "**Semana 16 (7 de diciembre, lun).** **Normativa** de los estudios de biodisponibilidad y bioequivalencia.\n\n**Semana 16 (10 de diciembre, jue).** Talleres de aplicación.\n\n*(Semana 16, 14 de diciembre: segunda evaluación, acumulativa — ver Fechas clave.)*",
     },
-  ],
+  ] as NonNullable<SubjectContent["modules"]>).map((m) => ({ ...m, ...MODULE_EXTRAS[m.slug as keyof typeof MODULE_EXTRAS] })),
 
   glossary: [
     { term: "LADME", moduleSlug: "introduccion-biofarmacia", definition: "Las cinco etapas por las que pasa un fármaco tras su administración: **L**iberación (desde la forma farmacéutica), **A**bsorción, **D**istribución, **M**etabolismo y **E**liminación." },
@@ -126,6 +139,7 @@ export const bfc: SubjectContent = {
     { term: "Cmax / tmax", moduleSlug: "absorcion-un-compartimento", definition: "**Cmax**: concentración plasmática máxima alcanzada tras una dosis extravascular. **tmax**: tiempo al que ocurre." },
     { term: "Sistema de Clasificación Biofarmacéutica (SCB)", moduleSlug: "bioequivalencia-scb", definition: "Clasifica los fármacos en 4 clases según su **solubilidad acuosa** y su **permeabilidad intestinal**; base científica para otorgar **bioexenciones** (eximir del estudio in vivo de bioequivalencia)." },
     { term: "Bioexención", moduleSlug: "bioequivalencia-scb", definition: "Autorización regulatoria para **no exigir** un estudio de bioequivalencia in vivo, sustentada en criterios biofarmacéuticos (p. ej. SCB) que predicen equivalencia." },
+    ...bfcGlossaryExtra,
   ],
 
   formulas: [
@@ -219,6 +233,7 @@ export const bfc: SubjectContent = {
       derivation:
         "Como el ABC es proporcional a la cantidad de fármaco absorbido, comparar el ABC del producto en estudio frente al de referencia —corrigiendo por si las dosis administradas no fueron idénticas— da directamente la fracción relativa absorbida. Los estudios de bioequivalencia comparan además C_{max} y t_{max}, y exigen que los intervalos de confianza de estos cocientes caigan dentro de los márgenes regulatorios (típicamente 80–125 %) para declarar bioequivalencia.\nF = biodisponibilidad relativa del producto en estudio frente al de referencia — %.\nABC_{test} = área bajo la curva del producto en estudio — mg·h/L.\nABC_{ref} = área bajo la curva del producto de referencia — mg·h/L.\nDosis_{test}, Dosis_{ref} = dosis administrada de cada producto — mg.",
     },
+    ...bfcFormulasExtra,
   ],
 
   evaluation: [
@@ -237,8 +252,8 @@ export const bfc: SubjectContent = {
   ],
 
   projects: [
-    { title: "Quices de control de lectura de artículos — Biofarmacia", category: "Quiz" },
-    { title: "Talleres de farmacocinética (uno por tema, retroalimentados en clase)", category: "Taller" },
+    { title: "Quices de control de lectura de artículos — Biofarmacia", category: "Quiz", description: bfcProjectDescriptions.quices },
+    { title: "Talleres de farmacocinética (uno por tema, retroalimentados en clase)", category: "Taller", description: bfcProjectDescriptions.talleres },
   ],
 
   bibliography: [
@@ -253,7 +268,8 @@ export const bfc: SubjectContent = {
     { kind: "libro", reference: "Hauschke D., Steinijans V. and Pigeot I. Bioequivalence Studies in Drug Development. Methods and Applications. John Wiley & Sons Ltd, The Atrium, England, 2007." },
     { kind: "libro", reference: "Ahmed T. A. Basic Pharmacokinetic: Concepts and Some Clinical Applications. IntechOpen, 2015." },
     { kind: "libro", reference: "Loftsson T. Essential Pharmacokinetics: A Primer for Pharmaceutical Scientists. Academic Press, USA, 2015." },
-    { kind: "libro", reference: "Resolución 1124 de 2016, Ministerio de Salud. República de Colombia." },
-    { kind: "revista", reference: "Barbosa H. y Zambrano P. Revisión crítica de las vías de administración de medicamentos desde un enfoque farmacéutico. Universidad Nacional de Colombia, Bogotá, D.C., Colombia, 2024.", url: "https://repositorio.unal.edu.co/handle/unal/87111" },
+    { kind: "libro", reference: "Resolución 1124 de 2016, Ministerio de Salud. República de Colombia.", url: "https://normograma.invima.gov.co/compilacion/docs/resolucion_minsaludps_1124_2016.htm", moduleSlug: "normativa-talleres-finales" },
+    { kind: "revista", reference: "Barbosa H. y Zambrano P. Revisión crítica de las vías de administración de medicamentos desde un enfoque farmacéutico. Universidad Nacional de Colombia, Bogotá, D.C., Colombia, 2024.", url: "https://repositorio.unal.edu.co/handle/unal/87111", moduleSlug: "vias-dosis-regimen" },
+    ...bfcBibliographyExtra,
   ],
 };
