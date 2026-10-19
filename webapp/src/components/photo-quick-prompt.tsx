@@ -235,7 +235,9 @@ export function PhotoQuickPrompt({
             </ul>
           )}
           <p className="text-[11px] text-muted-foreground">
-            La foto no se sube a ningún servidor: se queda en tu navegador. La app no llama a ninguna IA.
+            Consejo: encuadra solo el tablero o la diapositiva (menos pared, marcos y reflejos) y que se lea nítido. El prompt le pide a la IA
+            ignorar lo que esté fuera del contenido, pero una foto limpia da mejores resultados. La foto no se sube a ningún servidor: se queda en
+            tu navegador, y la app no llama a ninguna IA.
           </p>
         </div>
 
