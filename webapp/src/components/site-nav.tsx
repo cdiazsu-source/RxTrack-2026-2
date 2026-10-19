@@ -14,6 +14,7 @@ import { QuickCapture } from "@/components/quick-capture";
 import { ViewAsMenu } from "@/components/view-as-menu";
 import { SIDE_ICON_BTN, SIDE_ICON_TIP } from "@/components/side-icon";
 import { subjectIcon } from "@/lib/subject-icons";
+import { BRAND_SUBTITLE } from "@/lib/brand";
 
 /** Fecha del último cambio a la app. Actualízala a mano al publicar cambios. */
 const LAST_MODIFIED = "18 oct 2026";
@@ -127,7 +128,10 @@ export function SiteNav({
     return (
       <header className="site-nav sticky top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
-          <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
+          <span className="flex min-w-0 flex-col leading-tight">
+            <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
+            <span className="text-[10px] text-muted-foreground sm:text-[11px]">{BRAND_SUBTITLE}</span>
+          </span>
           <div className="flex items-center gap-3">
             {viewingAs && <ViewingPill name={viewingName} />}
             {scope.length > 1 && (
@@ -198,7 +202,10 @@ export function SiteNav({
         <span className="flex h-7 w-7 items-center justify-center rounded-[7px] bg-primary text-primary-foreground">
           <Pill className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
         </span>
-        <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
+        <span className="flex min-w-0 flex-col leading-tight">
+          <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
+          <span className="text-[10px] font-medium text-muted-foreground">{BRAND_SUBTITLE}</span>
+        </span>
       </Link>
 
       <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -270,8 +277,9 @@ export function SiteNav({
       {sidebar}
       <header className="site-nav sticky top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70 lg:hidden">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-5 py-3">
-          <Link href="/" className="font-display text-xl font-semibold tracking-tight text-primary">
-            RxTrack
+          <Link href="/" className="flex flex-col leading-tight">
+            <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
+            <span className="max-w-[15rem] text-[10px] text-muted-foreground">{BRAND_SUBTITLE}</span>
           </Link>
 
           {link("/", "Semestre", Layers)}
