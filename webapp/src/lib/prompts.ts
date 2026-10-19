@@ -301,6 +301,276 @@ export function exerciseSolutionPrompt(opts: {
 }
 
 /**
+ * «Prompt rápido» de un módulo para una FOTO: la persona adjunta en su IA la imagen
+ * de una diapositiva o del tablero y pega este texto. La IA devuelve, en cuatro
+ * bloques, la transcripción fiel, la explicación, la relación con el módulo y un
+ * control de calidad — todo en el Markdown de la app, listo para pegar en
+ * «Diapositivas / notas» de una sesión de apuntes.
+ */
+export function photoExtractPrompt(opts: {
+  subjectName: string;
+  moduleTitle: string;
+  moduleDescription?: string | null;
+  glossary?: string[];
+  formulas?: string[];
+  /** Qué es la imagen. */
+  kind?: "diapositiva" | "tablero" | "ambas";
+  /** Cuántas imágenes se van a adjuntar (por defecto, una). */
+  imageCount?: number;
+  /** Nota de la persona sobre la imagen (tema, qué le interesa, qué no entiende). */
+  note?: string;
+}): string {
+  const bloque = (titulo: string, items?: string[]) =>
+    items && items.length ? `\n${titulo}:\n${items.map((x) => `- ${x}`).join("\n")}\n` : "";
+  const F = "````"; // cerco externo de 4: el interior lleva bloques ```formula
+  const n = Math.max(1, opts.imageCount ?? 1);
+  const que =
+    opts.kind === "tablero"
+      ? "una foto del TABLERO de la clase (puede haber letra manuscrita, borrones, flechas y dibujos a mano)"
+      : opts.kind === "diapositiva"
+        ? "una DIAPOSITIVA de la clase (o una foto de la pantalla del salón)"
+        : "una diapositiva o una foto del tablero de la clase (puede haber letra manuscrita, flechas y dibujos)";
+
+  return [
+    `Eres un profesor experto en ${opts.subjectName} (pregrado de Química Farmacéutica, Universidad Nacional de Colombia). ` +
+      (n > 1
+        ? `Te adjunto ${n} IMÁGENES, en orden (Imagen 1, Imagen 2…); cada una es ${que}. `
+        : `Te adjunto una IMAGEN: ${que}. `) +
+      `Pertenece al módulo «${opts.moduleTitle}». Quiero que extraigas lo que dice y lo expliques apoyándote en el contexto del módulo.`,
+    opts.moduleDescription ? `\nDe qué trata el módulo: ${stripMarkup(opts.moduleDescription)}` : "",
+    bloque("Términos del glosario del módulo (respeta esta terminología)", opts.glossary),
+    bloque("Fórmulas del módulo (nómbralas cuando aparezcan)", opts.formulas),
+    opts.note?.trim() ? `\nNOTA MÍA SOBRE LA IMAGEN: ${opts.note.trim()}` : "",
+    "",
+    "QUÉ DEBES ENTREGAR (cuatro bloques, en este orden, y nada antes ni después)",
+    "#### 1. Transcripción fiel",
+    "- Copia TODO el texto visible tal como está, en orden de lectura (de arriba abajo y de izquierda a derecha), sin resumir, sin corregir y sin completar con lo que «debería» decir.",
+    "- Conserva títulos, listas, tablas (con | pipes |), fórmulas, valores, unidades, nombres de fármacos y referencias citadas.",
+    "- Esquemas, dibujos, flechas y gráficas: descríbelos entre corchetes con lo que se ve, p. ej. [Esquema: curva de concentración (eje y) contra tiempo (eje x), con un pico a las 2 h].",
+    "- Si no puedes leer algo (letra manuscrita, brillo, texto cortado), escribe [?] en ese lugar. NO adivines.",
+    n > 1 ? "- Separa cada imagen con «**Imagen N**» en una línea propia y al final integra todo en un solo hilo coherente." : null,
+    "#### 2. Qué significa, paso a paso",
+    "- Explica cada idea de la imagen en lenguaje sencillo, sin suponer conocimientos previos; define cada término técnico la primera vez que aparece y usa una analogía cuando ayude.",
+    "- Si hay cálculos o ecuaciones: rehazlos completos — qué se calcula y por qué, la fórmula, los datos CON SUS UNIDADES, el factor de conversión (qué unidades se cancelan), el resultado y una conclusión.",
+    "- Distingue claramente lo que dice la imagen de lo que añades tú: lo tuyo va precedido de «(aclaración)».",
+    "#### 3. Relación con el módulo",
+    "- ¿A qué parte del módulo corresponde esta imagen? ¿Qué términos del glosario y qué fórmulas de las listadas arriba aparecen o se usan?",
+    "- Si la imagen NO parece pertenecer a este módulo, dilo con claridad y sugiere a qué tema sí.",
+    "#### 4. Control de calidad",
+    "- Posibles errores en la imagen (unidades, signos, cifras que no cuadran, datos contradictorios) — sin corregirlos en la transcripción: aquí.",
+    "- Lo que debo confirmar con el profesor.",
+    "- 3 preguntas de repaso sobre esta imagen, cada una con su respuesta breve.",
+    "",
+    "REGLAS",
+    "- Responde en español y usa coma decimal (1,19 g/mL).",
+    "- Básate solo en la imagen, en el contexto del módulo y en conocimiento técnico verificable. Si falta un dato, dilo y pregúntamelo; no inventes.",
+    "",
+    "FORMATO DE SALIDA (obligatorio — mi app solo entiende este Markdown)",
+    `Entrega TODO dentro de UN solo bloque de código cercado con CUATRO acentos graves (${F}markdown … ${F}) para que pueda copiarlo sin que se pierda el formato. Fuera del bloque no escribas nada.`,
+    "- Encabezados: «#### Título» (siempre cuatro #); para separar imágenes una línea «**Imagen N**».",
+    "- **negrita** y *cursiva*. NO uses «*» como signo de multiplicación (se confunde con cursiva): usa «×» o «·».",
+    "- Listas: una viñeta por línea con «* » o numeradas «1. ». Sin listas anidadas.",
+    "- Tablas con | pipes |, una fila por línea, sin saltos de línea dentro de una celda y sin el símbolo | dentro del texto de una celda.",
+    "- Subíndices y superíndices dentro de una frase: usa caracteres Unicode (H₂O, Ca²⁺, mol⁻¹, 10⁻³). NO escribas _{2} ni ^{2} en el texto corrido: solo funcionan dentro de un bloque ```formula.",
+    "- Ecuaciones y fracciones: usa un bloque ```formula (una línea por renglón) con _{sub}, ^{sup} y #{numerador|denominador}. Ejemplo:",
+    "  ```formula",
+    "  C_{1} · V_{1} = C_{2} · V_{2}",
+    "  n = #{m|PM}",
+    "  ```",
+    "- Está PROHIBIDO: LaTeX ($…$, \\frac, \\text), HTML, imágenes y enlaces.",
+    "",
+  ]
+    .filter((l): l is string => l !== null)
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+/** Markup de fórmulas de la app (#{a|b}, _{x}, ^{x}) → texto plano que cualquier IA lee bien. */
+function plainFormula(s: string): string {
+  return s
+    .replace(/_\{([^{}]+)\}/g, "_$1")
+    .replace(/\^\{([^{}]+)\}/g, "^($1)")
+    .replace(/#\{([^|{}]+)\|([^{}]+)\}/g, "($1)/($2)");
+}
+
+/** Recorta un texto largo dejando constancia, para que el prompt no se salga de la ventana de la IA. */
+function clip(s: string, max: number): string {
+  const t = s.trim();
+  return t.length <= max ? t : `${t.slice(0, max).trimEnd()}\n[…recortado por longitud: ${t.length - max} caracteres más en la app…]`;
+}
+
+export type ResearchUse = "podcast" | "tarjetas" | "guia" | "quiz";
+
+/** Un apunte de clase tal como lo guarda la app. */
+export interface ResearchSession {
+  label: string;
+  topic: string;
+  /** Apuntes (Cornell). */
+  content: string;
+  slidesText?: string | null;
+  transcript?: string | null;
+}
+
+/**
+ * «Prompt de investigación» de un módulo: junta TODO lo que la app sabe del módulo
+ * (descripción, desarrollo, glosario, fórmulas, ejercicios, apuntes de clase) y le
+ * pide a la IA que investigue los términos y escriba un texto científico amplio que
+ * sirva de insumo único para generar después un podcast, tarjetas de estudio, una guía
+ * y/o un quiz. La persona lo pega en su IA (idealmente una con búsqueda web).
+ */
+export function moduleResearchPrompt(opts: {
+  subjectName: string;
+  subjectSummary?: string | null;
+  subjectObjective?: string | null;
+  /** Títulos de todos los módulos del curso, en orden. */
+  courseModules: string[];
+  moduleTitle: string;
+  moduleDescription?: string | null;
+  chapter?: string | null;
+  glossary: { term: string; definition: string }[];
+  formulas: { name: string; expression: string; variables?: string; description?: string }[];
+  exercises?: string[];
+  sessions: ResearchSession[];
+  includeChapter?: boolean;
+  includeExercises?: boolean;
+  includeTranscripts?: boolean;
+  uses: ResearchUse[];
+  /** Qué quiere la persona que se enfatice (opcional). */
+  focus?: string;
+}): string {
+  const F = "````"; // cerco externo de 4: el interior lleva bloques ```formula
+  const sec = (titulo: string, cuerpo: string) => `\n══════════ ${titulo} ══════════\n${cuerpo.trim()}\n`;
+  const uses = opts.uses.length ? opts.uses : (["podcast", "tarjetas", "guia", "quiz"] as ResearchUse[]);
+  const usos: Record<ResearchUse, string> = {
+    podcast: "un PODCAST (guion de conversación o monólogo explicativo)",
+    tarjetas: "TARJETAS DE ESTUDIO (pregunta → respuesta)",
+    guia: "una GUÍA DE ESTUDIO / mapa conceptual",
+    quiz: "un QUIZ de práctica",
+  };
+
+  const temario = opts.courseModules
+    .map((t, i) => `${t === opts.moduleTitle ? "► " : "  "}${i + 1}. ${t}`)
+    .join("\n");
+
+  const glosario = opts.glossary.length
+    ? opts.glossary.map((g) => `- ${g.term}: ${stripMarkup(g.definition)}`).join("\n")
+    : "(el módulo aún no tiene glosario cargado)";
+
+  const formulas = opts.formulas.length
+    ? opts.formulas
+        .map(
+          (f) =>
+            `- ${f.name}: ${plainFormula(f.expression).replace(/\n/g, " ; ")}` +
+            (f.variables ? `\n    Variables: ${stripMarkup(plainFormula(f.variables))}` : "") +
+            (f.description ? `\n    Qué es: ${stripMarkup(f.description)}` : ""),
+        )
+        .join("\n")
+    : "(sin fórmulas cargadas)";
+
+  const apuntes = opts.sessions.length
+    ? opts.sessions
+        .map((s) => {
+          const partes = [`### ${s.label}${s.topic ? ` — ${s.topic}` : ""}`];
+          if (s.content.trim()) partes.push(`APUNTES:\n${clip(stripMarkdownExtras(s.content), 12000)}`);
+          if (s.slidesText?.trim()) partes.push(`DIAPOSITIVAS / NOTAS DE CLASE:\n${clip(stripMarkdownExtras(s.slidesText), 12000)}`);
+          if (opts.includeTranscripts && s.transcript?.trim())
+            partes.push(`TRANSCRIPCIÓN DE LA CLASE:\n${clip(stripMarkdownExtras(s.transcript), 20000)}`);
+          return partes.join("\n\n");
+        })
+        .join("\n\n")
+    : "(aún no hay apuntes de clase de este módulo: apóyate en el desarrollo, el glosario y la literatura)";
+
+  const bloquesUso: string[] = [];
+  if (uses.includes("podcast"))
+    bloquesUso.push(
+      [
+        "#### Insumos para podcast",
+        "* **Gancho de apertura** (2–3 frases con una pregunta o un dato sorprendente y verificable).",
+        "* **Estructura de un episodio de 15–20 minutos:** apertura, tres bloques con su idea central y su analogía hablada, y cierre con la idea que debe quedar.",
+        "* **Una historia o caso real** del tema (con año y fuente) que se pueda contar en voz alta.",
+        "* **Cómo decir los números y las ecuaciones en voz alta**, sin leer símbolos (ej.: «la concentración se reduce a la mitad cada vez que pasa una vida media»).",
+        "* **5 frases memorables** y **5 preguntas retóricas** para engancharse al oyente.",
+      ].join("\n"),
+    );
+  if (uses.includes("tarjetas"))
+    bloquesUso.push(
+      [
+        "#### Insumos para tarjetas de estudio",
+        "Entre 30 y 60 tarjetas ATÓMICAS (una sola idea por tarjeta) en una tabla Markdown `| Frente | Reverso | Tipo |`, mezclando tipos: definición, «¿por qué?», comparación, cálculo corto con unidades, completar la frase y «error común». Los frentes deben ser preguntas concretas, no títulos; los reversos, de 1–3 líneas. Sin repetir el mismo dato en dos tarjetas.",
+      ].join("\n"),
+    );
+  if (uses.includes("guia"))
+    bloquesUso.push(
+      [
+        "#### Insumos para guía de estudio",
+        "* **Mapa conceptual** en viñetas jerárquicas (concepto → subconceptos → relaciones con verbos: «determina», «aumenta», «depende de»).",
+        "* **Tabla comparativa** de los conceptos fáciles de confundir.",
+        "* **Lista «debo saber hacer»** (verbos de acción: calcular, explicar, clasificar, interpretar) con un nivel de dificultad.",
+        "* **Plan de repaso** en 3 pasadas (qué leer, qué practicar, qué autoevaluar).",
+      ].join("\n"),
+    );
+  if (uses.includes("quiz"))
+    bloquesUso.push(
+      [
+        "#### Insumos para quiz",
+        "15 preguntas de práctica (mezcla de opción múltiple con 4 opciones, verdadero/falso con justificación y cálculo corto), cada una con su respuesta y una justificación de 1–3 líneas, ordenadas de fácil a difícil.",
+      ].join("\n"),
+    );
+
+  return (
+    `Eres un investigador y profesor universitario experto en ${opts.subjectName} (pregrado de Química Farmacéutica, Universidad Nacional de Colombia), ` +
+    `con rigor científico y gran capacidad didáctica. Voy a darte TODO el material de UN módulo de mi curso. ` +
+    `Tu tarea: INVESTIGAR los términos y conceptos del módulo y escribir un TEXTO CIENTÍFICO AMPLIO que sea mi insumo único para producir después ` +
+    `${uses.map((u) => usos[u]).join(", ")}.\n` +
+    sec(
+      "LA ASIGNATURA",
+      `${opts.subjectName}.` +
+        (opts.subjectSummary ? `\nDe qué trata: ${stripMarkup(opts.subjectSummary)}` : "") +
+        (opts.subjectObjective ? `\nObjetivo general: ${stripMarkup(opts.subjectObjective)}` : ""),
+    ) +
+    sec("DÓNDE ESTÁ ESTE MÓDULO EN EL TEMARIO (► = el de este texto)", temario) +
+    sec(`EL MÓDULO — ${opts.moduleTitle}`, opts.moduleDescription ? stripMarkup(opts.moduleDescription) : "(sin descripción)") +
+    (opts.includeChapter && opts.chapter?.trim()
+      ? sec("DESARROLLO DEL MÓDULO (material de lectura de la app)", clip(stripMarkdownExtras(opts.chapter), 30000))
+      : "") +
+    sec("GLOSARIO DEL MÓDULO (respeta esta terminología)", glosario) +
+    sec("FÓRMULAS DEL MÓDULO", formulas) +
+    (opts.includeExercises && opts.exercises?.length
+      ? sec("EJERCICIOS DEL MÓDULO (solo los enunciados: qué se espera que sepa resolver)", opts.exercises.map((q, i) => `${i + 1}. ${clip(stripMarkdownExtras(q), 1500)}`).join("\n"))
+      : "") +
+    sec("MIS APUNTES DE CLASE DE ESTE MÓDULO (lo que de verdad se vio y se enfatizó)", apuntes) +
+    (opts.focus?.trim() ? sec("LO QUE QUIERO QUE ENFATICES", opts.focus.trim()) : "") +
+    `\n══════════ QUÉ DEBES HACER ══════════\n` +
+    `**A. Investiga.** Para cada término del glosario y para los conceptos importantes que aparezcan en mis apuntes aunque no estén en el glosario: definición precisa, fundamento (fisicoquímico, fisiológico o matemático), contexto histórico si ayuda, magnitudes típicas con unidades, ejemplos con fármacos o productos reales, y los errores o mitos frecuentes. ` +
+    `Si tienes acceso a búsqueda web o a literatura, ÚSALA para verificar y enriquecer; si no, dilo en la primera línea y apóyate en conocimiento sólido.\n` +
+    `**B. Escribe un texto científico amplio** (mínimo ~3000 palabras; más si el módulo lo exige) con esta estructura, en este orden:\n` +
+    `#### 1. Panorama del módulo\n(qué pregunta responde, por qué importa para un químico farmacéutico, cómo se conecta con los módulos anterior y siguiente)\n` +
+    `#### 2. Conceptos clave desarrollados\n(UNO por UNO: definición precisa → explicación paso a paso sin suponer bases previas → analogía → ejemplo con un fármaco real → error común)\n` +
+    `#### 3. Mecanismos, ecuaciones y cálculos\n(cada ecuación derivada o justificada; qué significa cada símbolo con su unidad; al menos un ejemplo numérico resuelto por ecuación, mostrando el factor de conversión, qué unidades se cancelan y una conclusión)\n` +
+    `#### 4. Casos, datos y normas reales\n(estudios, guías, normas o cifras reales, SIEMPRE con año y fuente)\n` +
+    `#### 5. Lo que dicen mis apuntes frente a la literatura\n(coincidencias, vacíos, ideas que mis apuntes dejan incompletas y posibles errores, marcados con [CORRECCIÓN])\n` +
+    `#### 6. Errores y confusiones frecuentes\n` +
+    `#### 7. Resumen ejecutivo\n(10 líneas)\n` +
+    `#### 8. Fuentes\n(lista verificable: autores, año, título, revista o editorial, y DOI o URL. SOLO incluye las que realmente conoces o encontraste; NO inventes referencias ni DOI. Marca con [verificar] lo que no puedas confirmar)\n` +
+    (bloquesUso.length
+      ? `**C. Termina con estas secciones de insumos** (todas derivadas del texto anterior, sin datos nuevos):\n${bloquesUso.join("\n")}\n`
+      : "") +
+    `\n══════════ REGLAS ══════════\n` +
+    `- Rigor primero: no inventes cifras, fechas ni referencias. Si dudas de un dato, escribe [verificar].\n` +
+    `- Distingue lo que viene de mis apuntes («según tus apuntes») de lo que añade la investigación («la literatura indica»).\n` +
+    `- No supongas conocimientos previos: define cada término técnico la primera vez, usa analogías y explica los cálculos con unidades.\n` +
+    `- Si algo de mis apuntes parece incorrecto o contradice la literatura, dilo con respeto y justifica.\n` +
+    `- Escribe en español, con coma decimal (1,19 g/mL) y unidades en todos los números.\n` +
+    `- Si tu respuesta no cabe en un solo mensaje, entrégala por partes: termina cada parte con «[CONTINÚA — escribe sigue]» y espera mi «sigue». No resumas para que quepa.\n\n` +
+    `══════════ FORMATO DE SALIDA ══════════\n` +
+    `Responde en Markdown legible por mi app: encabezados «#### Título» (siempre cuatro #), **negrita**, listas con «* » o «1. », tablas con | pipes | (una fila por línea), ` +
+    `subíndices y superíndices en el texto corrido con caracteres Unicode (H₂O, mol⁻¹, 10⁻³), y las ecuaciones en bloques \`\`\`formula (una línea por renglón) con _{sub}, ^{sup} y #{numerador|denominador}. ` +
+    `NO uses «*» como signo de multiplicación (usa «×» o «·»). Prohibido LaTeX ($…$, \\frac), HTML e imágenes. ` +
+    `Entrega el texto completo dentro de UN bloque de código cercado con CUATRO acentos graves (${F}markdown … ${F}) para poder copiarlo sin que se pierda el formato.\n`
+  );
+}
+
+/**
  * Prompt de contexto de un proyecto: lo que cualquier IA necesita saber para
  * ayudar sin tener que preguntar «¿en qué estás trabajando?». Incluye la
  * descripción completa, el avance del checklist, los enlaces y las últimas

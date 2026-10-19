@@ -18,6 +18,8 @@ import {
   Link2,
   ListChecks,
   MessageSquare,
+  Camera,
+  Sparkles,
   NotebookPen,
   StickyNote,
   Target,
@@ -45,6 +47,8 @@ const ICONS = {
   target: Target,
   link: Link2,
   chat: MessageSquare,
+  camera: Camera,
+  sparkles: Sparkles,
 } satisfies Record<string, LucideIcon>;
 
 const scrollBehavior = (): ScrollBehavior =>

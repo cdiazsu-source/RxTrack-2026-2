@@ -15,6 +15,8 @@ import { SessionNotes, type SessionView } from "@/components/session-notes";
 import { Checklist } from "@/components/checklist";
 import { HelpHint } from "@/components/help-hint";
 import { ExercisesPanel } from "@/components/exercises-panel";
+import { PhotoQuickPrompt } from "@/components/photo-quick-prompt";
+import { ModuleResearchPrompt } from "@/components/module-research-prompt";
 import { ResourcesPanel } from "@/components/resources-panel";
 import { LabPanel } from "@/components/lab-panel";
 import { SectionRail } from "@/components/section-rail";
@@ -43,11 +45,11 @@ export default async function ModuleDetailPage({
     }),
     canEdit(),
     getSession(),
-    prisma.glossaryTerm.findMany({ where: { moduleId: params.moduleId }, select: { term: true } }),
+    prisma.glossaryTerm.findMany({ where: { moduleId: params.moduleId }, orderBy: { term: "asc" }, select: { term: true, definition: true } }),
     prisma.formula.findMany({
       where: { moduleId: params.moduleId },
       orderBy: { order: "asc" },
-      select: { name: true },
+      select: { name: true, expression: true, variables: true, description: true },
     }),
     prisma.module.findMany({
       where: { subjectId: subject.id },
@@ -112,6 +114,8 @@ export default async function ModuleDetailPage({
       <SectionRail
         items={[
           { id: "inicio", label: "Empieza por aquí", icon: "target" },
+          { id: "foto-rapida", label: "Prompt rápido: foto", icon: "camera" },
+          { id: "investigacion", label: "Prompt de investigación", icon: "sparkles" },
           { id: "descripcion", label: "Descripción", icon: "info" },
           ...(mod.chapter ? [{ id: "desarrollo", label: "Desarrollo", icon: "book" as const }] : []),
           { id: "apuntes", label: "Apuntes", icon: "notes" },
@@ -167,6 +171,38 @@ export default async function ModuleDetailPage({
           </p>
         )}
       </div>
+
+      {/* Prompt rápido: foto de una diapositiva o del tablero → prompt con el contexto del módulo. */}
+      <PhotoQuickPrompt
+        subjectName={subject.name}
+        moduleTitle={mod.title}
+        moduleDescription={mod.description}
+        glossary={modGlossary.map((g) => g.term)}
+        formulas={modFormulas.map((f) => f.name)}
+      />
+
+      {/* Prompt de investigación: todo el contexto del módulo → texto científico amplio para podcast, tarjetas, guía y quiz. */}
+      <ModuleResearchPrompt
+        data={{
+          subjectName: subject.name,
+          subjectSummary: subject.descriptionSummary,
+          subjectObjective: subject.objectiveGeneral,
+          courseModules: courseModules.map((m) => m.title),
+          moduleTitle: mod.title,
+          moduleDescription: mod.description,
+          chapter: mod.chapter,
+          glossary: modGlossary.map((g) => ({ term: g.term, definition: g.definition })),
+          formulas: modFormulas.map((f) => ({ name: f.name, expression: f.expression, variables: f.variables, description: f.description })),
+          exercises: mod.exercises.map((e) => e.question),
+          sessions: mod.sessions.map((s) => ({
+            label: `Sesión ${s.number ?? "—"}${s.date ? ` (${s.date.toISOString().slice(0, 10)})` : ""}`,
+            topic: s.topic,
+            content: s.content,
+            slidesText: s.slidesText,
+            transcript: s.transcript,
+          })),
+        }}
+      />
 
       {/* Descripción: plegada por defecto — no es lo primero que hay que hacer. */}
       <details id="descripcion" className="group scroll-mt-24 rounded-lg border border-border bg-card [&_summary]:list-none">

@@ -132,6 +132,28 @@ estacionamiento de ideas (→ bandeja) y nota «para retomar». El temporizador 
 qué se le va a pedir (reemplaza el marcador `[escribe aquí lo que quieres pedirle a la IA]`; si
 cambias ese texto en el prompt, cámbialo también en el componente). No menciona TDAH.
 
+**Prompt rápido: foto de diapositiva o tablero.** Cada módulo (`/[subject]/modulos/[id]`) tiene una
+tarjeta plegable «Prompt rápido» (`photo-quick-prompt.tsx`, ancla `#foto-rapida`, ícono `camera` del
+`SectionRail`): se agrega una foto (cámara, galería, pegar o arrastrar; hasta 6), se elige si es
+diapositiva o tablero y se escribe una nota opcional. `photoExtractPrompt` (`lib/prompts.ts`) arma el
+prompt con el contexto del módulo (descripción, glosario, fórmulas) y pide cuatro bloques —
+transcripción fiel, qué significa, relación con el módulo, control de calidad— en un solo bloque
+Markdown listo para pegar en «Diapositivas / notas» de los apuntes. **La foto nunca se sube ni la app
+llama a una IA** (las imágenes viven como `URL.createObjectURL` en el navegador). Para llevarla a la IA:
+«Copiar prompt» (y adjuntar la foto a mano), «Copiar imagen + prompt» (`ClipboardItem`, solo con una
+imagen y si el navegador lo permite) o «Compartir con mi IA» (`navigator.share` con archivos, en el
+teléfono). Las dos últimas se detectan en el cliente: si no aparecen, el navegador no las soporta.
+
+**Prompt de investigación del módulo.** Segunda tarjeta plegable de cada módulo (`module-research-prompt.tsx`,
+ancla `#investigacion`, ícono `sparkles`). `moduleResearchPrompt` (`lib/prompts.ts`) junta descripción,
+desarrollo (`chapter`), glosario con definiciones, fórmulas, enunciados de ejercicios y los apuntes de
+clase (apuntes Cornell, diapositivas y, opcionalmente, transcripciones; todo recortado por longitud) y
+le pide a la IA que investigue los términos y escriba un texto científico amplio de 8 secciones
+(panorama, conceptos, ecuaciones con cálculos, casos reales, contraste con los apuntes, errores,
+resumen, fuentes) más secciones de insumos según lo marcado: podcast, tarjetas, guía, quiz. Exige no
+inventar referencias ni DOI (marcar [verificar]) y permite entregarlo por partes («sigue»). Los toggles
+de material y de usos viven en el cliente; la página del módulo pasa los datos como props.
+
 **Prompt de ejercicios.** El panel «Ejercicios» de cada módulo tiene el botón «Prompt para IA»
 (`exerciseSolutionPrompt` en `lib/prompts.ts`): arma un texto con el contexto del módulo
 (glosario, fórmulas, descripción) + el enunciado que pegues, y exige que la IA devuelva dos
