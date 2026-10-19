@@ -19,6 +19,11 @@ import { HelpHint } from "@/components/help-hint";
 import { FocusMode } from "@/components/focus-mode";
 import { ProjectLinks } from "@/components/project-links";
 import { renderCornell } from "@/lib/markdown-lite";
+import { projectContextPrompt } from "@/lib/prompts";
+import { ProjectContextButton } from "@/components/project-context-button";
+
+const STATUS_LABEL = { POR_INICIAR: "Por iniciar", EN_CURSO: "En curso", COMPLETADO: "Completado" } as const;
+const fmtDate = (d: Date) => d.toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "numeric", timeZone: "America/Bogota" });
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +63,22 @@ export default async function ProjectDetailPage({
     mentions: n.mentions,
   }));
   const checkItems = project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done }));
+
+  const contextBase = projectContextPrompt({
+    subjectName: subject.name,
+    subjectCode: subject.code,
+    professors: subject.professors,
+    projectTitle: project.title,
+    category: project.category,
+    status: STATUS_LABEL[project.status],
+    description: project.description,
+    checklist: checkItems.map((c) => ({ text: c.text, done: c.done })),
+    links: project.links.map((l) => ({ name: l.name, url: l.url })),
+    driveUrl: project.driveUrl,
+    focusNote: project.focusNote,
+    notes: project.notes.slice(0, 10).map((n) => ({ author: n.author, createdAt: fmtDate(n.createdAt), body: n.body })),
+    today: fmtDate(new Date()),
+  });
 
   return (
     <div className="flex flex-col gap-5 lg:pr-14">
@@ -102,6 +123,8 @@ export default async function ProjectDetailPage({
           )}
         </div>
       </div>
+
+      <ProjectContextButton base={contextBase} />
 
       {project.description && (
         <details id="contexto" open className="group scroll-mt-24 rounded-lg border border-border bg-card [&_summary]:list-none">

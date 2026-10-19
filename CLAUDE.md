@@ -125,6 +125,13 @@ estacionamiento de ideas (→ bandeja) y nota «para retomar». El temporizador 
 
 **Proyectos: contexto y enlaces.** Cada proyecto puede llevar `description` (Markdown de `renderCornell`; en los sembrados la escribe `projects[].description` de `content/<code>.ts` y el seed la mantiene) y varios enlaces `ProjectLink` (nombre + URL http/https; anexar/modificar/eliminar con `canContribute`). Renombrar un proyecto sembrado: dejar el título viejo en `formerTitles` para que el seed conserve su checklist y bitácora.
 
+**Contexto de proyecto para IA.** En `/[subject]/proyectos/[id]`, el botón «Copiar contexto para IA»
+(`project-context-button.tsx`; el texto lo arma el servidor con `projectContextPrompt` en
+`lib/prompts.ts`) copia asignatura, descripción completa, subtareas con su avance, enlaces,
+«dónde me quedé» y las últimas 10 notas, más reglas para la IA. «Ver y personalizar» deja añadir
+qué se le va a pedir (reemplaza el marcador `[escribe aquí lo que quieres pedirle a la IA]`; si
+cambias ese texto en el prompt, cámbialo también en el componente). No menciona TDAH.
+
 **Prompt de ejercicios.** El panel «Ejercicios» de cada módulo tiene el botón «Prompt para IA»
 (`exerciseSolutionPrompt` en `lib/prompts.ts`): arma un texto con el contexto del módulo
 (glosario, fórmulas, descripción) + el enunciado que pegues, y exige que la IA devuelva dos

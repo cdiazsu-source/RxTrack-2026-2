@@ -301,6 +301,85 @@ export function exerciseSolutionPrompt(opts: {
 }
 
 /**
+ * Prompt de contexto de un proyecto: lo que cualquier IA necesita saber para
+ * ayudar sin tener que preguntar «¿en qué estás trabajando?». Incluye la
+ * descripción completa, el avance del checklist, los enlaces y las últimas
+ * notas de la bitácora. La persona lo pega en su asistente.
+ */
+export function projectContextPrompt(opts: {
+  subjectName: string;
+  subjectCode: string;
+  professors: string[];
+  projectTitle: string;
+  category: string | null;
+  status: string;
+  description: string | null;
+  checklist: { text: string; done: boolean }[];
+  links: { name: string; url: string }[];
+  driveUrl: string | null;
+  focusNote: string | null;
+  notes: { author: string; createdAt: string; body: string }[];
+  today: string;
+  ask?: string;
+}): string {
+  const done = opts.checklist.filter((c) => c.done).length;
+  const checklist = opts.checklist.length
+    ? opts.checklist.map((c) => `- [${c.done ? "x" : " "}] ${c.text}`).join("\n")
+    : "(sin subtareas registradas)";
+  const links = [
+    ...(opts.driveUrl ? [{ name: "Documento principal (Drive)", url: opts.driveUrl }] : []),
+    ...opts.links.map((l) => ({ name: l.name || "Enlace", url: l.url })),
+  ];
+  const linkLines = links.length ? links.map((l) => `- ${l.name}: ${l.url}`).join("\n") : "(sin enlaces anexados)";
+  const notes = opts.notes.length
+    ? opts.notes.map((n) => `- ${n.createdAt} · ${n.author}: ${n.body.replace(/\s*\n\s*/g, " ")}`).join("\n")
+    : "(sin notas todavía)";
+
+  return [
+    "Voy a pedirte ayuda con un proyecto de mi carrera. Lee primero todo el contexto y, antes de responder, dime en 2–3 líneas qué entendiste que estoy haciendo y qué falta, para confirmar que vamos alineados.",
+    "",
+    "──────── QUIÉN SOY ────────",
+    "Estudiante de pregrado de Química Farmacéutica (Universidad Nacional de Colombia, Facultad de Ciencias). Escríbeme en español, claro, paso a paso y sin dar nada por sabido: si usas un concepto, defínelo; si haces un cálculo, muéstralo completo (datos, fórmula, unidades, conversión de factores y conclusión).",
+    "",
+    "──────── ASIGNATURA ────────",
+    `${opts.subjectName} (${opts.subjectCode})`,
+    opts.professors.length ? `Docentes: ${opts.professors.join(", ")}` : null,
+    "",
+    "──────── PROYECTO ────────",
+    `Título: ${opts.projectTitle}`,
+    opts.category ? `Categoría: ${opts.category}` : null,
+    `Estado: ${opts.status}`,
+    `Fecha de hoy: ${opts.today}`,
+    "",
+    "Descripción y avance (texto del proyecto, en Markdown):",
+    opts.description?.trim() || "(el proyecto no tiene descripción)",
+    "",
+    `──────── SUBTAREAS (${done} de ${opts.checklist.length} hechas) ────────`,
+    checklist,
+    "",
+    "──────── DOCUMENTOS Y ENLACES ────────",
+    linkLines,
+    "(No puedes abrir los enlaces; si necesitas su contenido, te lo pego.)",
+    "",
+    opts.focusNote?.trim() ? `──────── DÓNDE ME QUEDÉ ────────\n${opts.focusNote.trim()}\n` : null,
+    "──────── ÚLTIMAS NOTAS DE LA BITÁCORA (la más reciente primero) ────────",
+    notes,
+    "",
+    "──────── REGLAS ────────",
+    "- Básate solo en este contexto y en conocimiento verificable. Si falta un dato (concentraciones, normas, resultados), dímelo y pregúntamelo en vez de inventarlo.",
+    "- No inventes referencias bibliográficas ni DOI; si propones fuentes, indícame qué debo verificar.",
+    "- Si ves contradicciones o vacíos en lo que ya está escrito, señálalos.",
+    "",
+    "──────── LO QUE NECESITO AHORA ────────",
+    opts.ask?.trim() || "[escribe aquí lo que quieres pedirle a la IA]",
+    "",
+  ]
+    .filter((l): l is string => l !== null)
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+/**
  * Prompt para dividir un paso que se siente grande o confuso en micro-pasos
  * (Modo Enfoque → «Se me complicó»). La persona lo pega en su IA y escribe cada
  * paso devuelto en el formulario «Dividir este paso».
