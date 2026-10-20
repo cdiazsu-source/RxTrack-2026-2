@@ -1,4 +1,5 @@
 import type { SubjectContent } from "./_schema";
+import { afCapitulos } from "./af-capitulos";
 
 /**
  * Administración Farmacéutica (UNAL) — desde el programa oficial
@@ -36,24 +37,28 @@ export const af: SubjectContent = {
       title: "Módulo 1: Economía y teoría económica",
       description:
         "Objeto de estudio de la administración y la economía. **Agentes y circuito económico**; bienes y servicios. **Sistemas económicos**: capitalista, planificada, mixta, tradicional, keynesiana; liberalismo radical. Enfoques de la administración: **Taylor, Fayol, Weber** y sus críticas.",
+      chapter: afCapitulos["economia-teoria-economica"],
     },
     {
       slug: "planeacion",
       title: "Módulo 2: Planeación",
       description:
         "Concepto, importancia y proceso de la **planeación**. Tipos de planes. **Análisis FODA**. Planeación **estratégica** y planeación **social**.",
+      chapter: afCapitulos["planeacion"],
     },
     {
       slug: "organizacion",
       title: "Módulo 3: Organización",
       description:
         "Concepto y principios. **Estructuras organizacionales**, división del trabajo y coordinación. **Poder y distribución de autoridad**, delegación. Administración en un mundo globalizado. Componentes de la **gestión de Recursos Humanos**: selección, diseño del puesto, entrevistas, pruebas.",
+      chapter: afCapitulos["organizacion"],
     },
     {
       slug: "direccion",
       title: "Módulo 4: Dirección",
       description:
         "Concepto de dirección y **habilidades de un director**: liderar, comunicar, motivar y trabajar en equipo.",
+      chapter: afCapitulos["direccion"],
     },
     {
       slug: "control",
@@ -87,6 +92,29 @@ export const af: SubjectContent = {
     { term: "Fallas del mercado", moduleSlug: "mercado-estado-bienestar", definition: "Situaciones en que el mercado no asigna eficientemente los recursos: externalidades, bienes públicos, información asimétrica, poder de mercado. Justifican la intervención del Estado." },
     { term: "Economía del bienestar", moduleSlug: "mercado-estado-bienestar", definition: "Rama que evalúa las asignaciones económicas según su efecto en el bienestar social, la equidad y la eficiencia (óptimo de Pareto, funciones de bienestar social)." },
     { term: "Acción colectiva", moduleSlug: "mercado-estado-bienestar", definition: "Acción coordinada de un grupo para lograr un objetivo común; enfrenta el problema del **free-rider** cuando el beneficio es un bien público." },
+    { term: "Administración", moduleSlug: "economia-teoria-economica", definition: "Proceso de **planificar, organizar, dirigir y controlar** recursos para lograr objetivos de manera eficiente y efectiva. Es una ciencia con principios sistemáticos." },
+    { term: "Superávit", moduleSlug: "economia-teoria-economica", definition: "Meta fundamental de la administración: que lo obtenido supere lo invertido. Se mide con la productividad." },
+    { term: "Productividad", moduleSlug: "economia-teoria-economica", definition: "Relación entre las **salidas** (productos o servicios) y los **insumos** empleados, considerando la calidad." },
+    { term: "Efectividad", moduleSlug: "economia-teoria-economica", definition: "Lograr los objetivos propuestos." },
+    { term: "Eficiencia", moduleSlug: "economia-teoria-economica", definition: "Alcanzar los objetivos con el **mínimo de recursos**." },
+    { term: "Planeación", moduleSlug: "planeacion", definition: "Función básica de seleccionar objetivos y definir las acciones para lograrlos; cierra la brecha entre la situación actual y la futura." },
+    { term: "Tipos de planes", moduleSlug: "planeacion", definition: "Propósitos, metas, estrategias, políticas, procedimientos, reglas, programas y presupuestos." },
+    { term: "Objetivos SMART", moduleSlug: "planeacion", definition: "Objetivos **E**specíficos, **M**edibles, **A**lcanzables, **R**elevantes y con **L**ímite de **T**iempo (en inglés: Specific, Measurable, Achievable, Relevant, Time-bound)." },
+    { term: "APO (Administración por Objetivos)", moduleSlug: "planeacion", definition: "Sistema que orienta las actividades de la organización hacia sus metas. Se asocia con Peter Drucker." },
+    { term: "Misión", moduleSlug: "planeacion", definition: "Propósito fundamental de la organización: define sus clientes, su mercado y su tecnología. Se asocia con Peter Drucker." },
+    { term: "Estrategias FO, DO, FA, DA", moduleSlug: "planeacion", definition: "Las cuatro estrategias que salen de cruzar la matriz DOFA: **FO** (fortalezas + oportunidades), **DO** (debilidades + oportunidades), **FA** (fortalezas + amenazas), **DA** (debilidades + amenazas)." },
+    { term: "Dosis unitaria", moduleSlug: "planeacion", definition: "Sistema de distribución física de medicamentos en el hospital, aplicado en las diapositivas como ejemplo de planeación del servicio farmacéutico." },
+    { term: "Organización formal e informal", moduleSlug: "organizacion", definition: "**Formal:** la definida en el organigrama. **Informal:** la que surge espontáneamente de las relaciones entre las personas." },
+    { term: "Amplitud de control", moduleSlug: "organizacion", definition: "Número de personas que dependen directamente de un jefe. Estructuras **altas**: costosas y filtran la comunicación. Estructuras **planas**: requieren delegación y personas competentes." },
+    { term: "Departamentalización", moduleSlug: "organizacion", definition: "Forma de agrupar las actividades: funcional, geográfica, por clientes, por productos, matricial y por Unidades Estratégicas de Negocio (UEN)." },
+    { term: "UEN (Unidad Estratégica de Negocio)", moduleSlug: "organizacion", definition: "Forma de departamentalizar agrupando las actividades alrededor de una línea de negocio con estrategia propia." },
+    { term: "Autoridad y poder", moduleSlug: "organizacion", definition: "**Autoridad:** derecho que da el puesto a decidir y mandar. **Poder:** capacidad de influir en otros, venga o no del puesto." },
+    { term: "Empowerment", moduleSlug: "organizacion", definition: "Dar a las personas la capacidad de decidir sin autorización previa." },
+    { term: "Relaciones de línea y de staff", moduleSlug: "organizacion", definition: "**Línea:** áreas operativas. **Staff:** áreas de asesoría y apoyo." },
+    { term: "Cultura organizacional", moduleSlug: "organizacion", definition: "Valores compartidos en la organización. Los entornos pueden ser autocráticos o participativos." },
+    { term: "Dirección", moduleSlug: "direccion", definition: "Tercera función del proceso administrativo cíclico: influir en las personas para que contribuyan a las metas de la organización." },
+    { term: "Liderazgo directivo y participativo", moduleSlug: "direccion", definition: "**Directivo o autocrático:** el líder decide y ordena. **Participativo:** el líder involucra al equipo en las decisiones." },
+    { term: "Comunicación descendente y multidireccional", moduleSlug: "direccion", definition: "**Descendente:** fluye de arriba hacia abajo. **Multidireccional:** fluye en todos los sentidos entre los miembros de la organización." },
   ],
 
   evaluation: [
@@ -114,5 +142,9 @@ export const af: SubjectContent = {
     { kind: "libro", reference: "Robbins S.P., Coulter M. Administración. 10ª ed. Pearson Educación. 2010." },
     { kind: "libro", reference: "D. Mura J. Administración: una aproximación íntegra al diseño organizacional. 2015." },
     { kind: "libro", reference: "Castillo Clavero A. y col. Casos prácticos de Administración y Dirección de Empresas. Ed. Pirámide. 2007." },
+    { kind: "libro", reference: "David F.R. Conceptos de administración estratégica. (Autor de referencia del Módulo 2; edición por confirmar con las diapositivas)." },
+    { kind: "libro", reference: "Drucker P. (misión y Administración por Objetivos). (Autor de referencia del Módulo 2; obra por confirmar con las diapositivas)." },
+    { kind: "libro", reference: "Ross J., Kami M. (estrategia). (Autores de referencia del Módulo 2; obra por confirmar con las diapositivas)." },
+    { kind: "libro", reference: "Gruber W. (sistemas de información). (Autor de referencia de las diapositivas; obra por confirmar)." },
   ],
 };
