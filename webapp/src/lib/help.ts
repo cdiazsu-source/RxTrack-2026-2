@@ -36,7 +36,7 @@ export const HELP: Record<string, string> = {
   apuntes:
     "Un apunte por clase, con tres campos independientes (cada uno guarda borrador local en cada tecla): «Apuntes» (Cornell, Markdown), «Transcripción» (texto del audio) y «Diapositivas / Notas de clase» (texto de las diapositivas o el PDF; suele llegar después). La «Etapa» (Crudos → Transcrita → Cornell IA → Revisada) sube sola al agregar transcripción/Cornell; «Revisada» la marcas tú y ya no baja. Los dos botones de prompt solo arman texto para tu IA: uno extrae el texto de las diapositivas, otro redacta los apuntes Cornell.",
   checklist:
-    "Subtareas del módulo o del proyecto. Las agregas, marcas, editas, reordenas o borras libremente; el perfil de solo lectura también puede. El `db:seed` nunca las crea, desmarca ni borra: son 100% de la persona. La barra cuenta hechas / total y alimenta el «Sigue esto».",
+    "Subtareas del módulo o del proyecto. Las agregas, marcas, editas, reordenas o borras libremente; el perfil de solo lectura también puede. El `db:seed` nunca las crea, desmarca ni borra: son 100% de la persona. Cada subtarea admite una descripción breve opcional (qué hay que hacer · con qué · cómo sé que está listo) que se muestra debajo del título; se escribe al agregar o al editar. La barra cuenta hechas / total y alimenta el «Sigue esto».",
   ejercicios:
     "Problemas resueltos del módulo, de uno en uno. El enunciado se ve siempre; la solución aparece al pulsar «Ver solución». Vienen de `modules[].exercises[]` en el content y el `db:seed` los sincroniza (empareja por el texto del enunciado); los que agregues dentro de la app se quedan. No guarda tu progreso por ejercicio. «Prompt para IA» arma un texto (con el glosario y las fórmulas del módulo y tu enunciado) para pegarlo en tu asistente; le pide la solución ya en el Markdown de la app. La app no llama a ninguna IA: tú copias el prompt y pegas la respuesta en «Agregar».",
   recursos:
@@ -56,7 +56,7 @@ export const HELP: Record<string, string> = {
   "modo-enfoque":
     "Una pantalla limpia con UN solo paso del proyecto a la vez. Empiezas con 2 minutos (luego decides si sigues) o con un bloque de 10–45 min; el tiempo se ve en un anillo y en la pestaña. «Hecho» marca la subtarea del checklist; «Se me complicó» te deja dividir el paso, copiar un prompt para que una IA lo divida, o dejarlo para después. Lo que se te cruce lo anotas sin salir y va a la bandeja, ligado a la asignatura. Al cerrar un bloque dejas escrito dónde quedaste. La app no llama a ninguna IA. Salir con Esc no detiene el bloque.",
   bitacora:
-    "Notas de avance del proyecto: qué se hizo, qué sigue, algún bloqueo. Puede escribir cualquier sesión con acceso (también el perfil de solo lectura). Cada nota guarda quién la escribió y su cargo, puede ligarse a una subtarea del checklist y mencionar a Cesar / Diana. Todo esto alimenta «Últimas actualizaciones» de la portada.",
+    "Notas de avance del proyecto: qué se hizo, qué sigue, algún bloqueo. Puede escribir cualquier sesión con acceso (también el perfil de solo lectura). El autor es obligatorio y se elige entre los integrantes del «Equipo del proyecto» (sin integrantes no se puede publicar). Cada nota guarda quién la escribió y su cargo, puede llevar enlaces con nombre (p. ej. «Link Canva»), puede ligarse a una subtarea del checklist y mencionar a Cesar / Diana. Todo esto alimenta «Últimas actualizaciones» de la portada.",
 
   // ---- Otras secciones de la asignatura ----
   fechas:

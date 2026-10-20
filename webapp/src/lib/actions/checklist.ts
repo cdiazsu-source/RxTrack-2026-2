@@ -5,6 +5,11 @@ import { blockedForContribute } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
 
+/** Descripción breve: se recorta a 600 caracteres; vacía = sin descripción. */
+function readDescription(formData: FormData): string | null {
+  return String(formData.get("description") ?? "").trim().slice(0, 600) || null;
+}
+
 export type ChecklistParent = { type: "module" | "project" | "labReport"; id: string };
 
 function parentWhere(parent: ChecklistParent) {
@@ -54,6 +59,7 @@ export async function addChecklistItem(parent: ChecklistParent, formData: FormDa
     data: {
       ...where,
       text,
+      description: readDescription(formData),
       order: (last?.order ?? -1) + 1,
     },
   });
@@ -74,7 +80,7 @@ export async function updateChecklistItem(itemId: string, formData: FormData) {
   if (await blockedForContribute()) return;
   const text = String(formData.get("text") ?? "").trim();
   if (!text) return;
-  await prisma.checklistItem.update({ where: { id: itemId }, data: { text } });
+  await prisma.checklistItem.update({ where: { id: itemId }, data: { text, description: readDescription(formData) } });
   revalidateAll();
 }
 

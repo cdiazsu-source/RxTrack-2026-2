@@ -5,6 +5,7 @@ import { getSession } from "@/lib/session";
 import { PEOPLE } from "@/lib/auth";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
+import { cleanHttpUrl } from "@/lib/url";
 
 /**
  * La bitácora la puede escribir cualquier sesión válida (incluido el perfil
@@ -36,12 +37,29 @@ function resolveMentions(raw: FormDataEntryValue[]): string[] {
   return PEOPLE.filter((p) => names.includes(p));
 }
 
+/** Empareja linkName[i] con linkUrl[i]; descarta URLs no http(s). Sin nombre usa el dominio. */
+function resolveLinks(formData: FormData): { name: string; url: string }[] {
+  const names = formData.getAll("linkName");
+  const urls = formData.getAll("linkUrl");
+  const out: { name: string; url: string }[] = [];
+  urls.forEach((raw, i) => {
+    const url = cleanHttpUrl(String(raw ?? ""));
+    if (!url) return;
+    const name = String(names[i] ?? "").trim().slice(0, 120) || new URL(url).hostname;
+    out.push({ name, url });
+  });
+  return out.slice(0, 20);
+}
+
 export async function addProjectNote(projectId: string, formData: FormData) {
   const session = await getSession();
   if (!session.authed) return;
   const body = String(formData.get("body") ?? "").trim();
   const author = String(formData.get("author") ?? "").trim();
   if (!body || !author) return;
+  // Solo pueden publicar los integrantes registrados en el proyecto.
+  const member = await prisma.projectMember.findFirst({ where: { projectId, name: author }, select: { name: true } });
+  if (!member) return;
 
   const checklistItemId = await resolveChecklistItem(formData.get("checklistItemId"), projectId);
   const mentions = resolveMentions(formData.getAll("mentions"));
@@ -50,7 +68,7 @@ export async function addProjectNote(projectId: string, formData: FormData) {
     where: { id: projectId },
     data: {
       notes: {
-        create: { body, author, authorRole: ROLE_LABEL[session.level], checklistItemId, mentions },
+        create: { body, author, authorRole: ROLE_LABEL[session.level], checklistItemId, mentions, links: resolveLinks(formData) },
       },
     },
     select: { subjectId: true },
@@ -69,7 +87,7 @@ export async function updateProjectNote(noteId: string, projectId: string, formD
 
   await prisma.projectNote.update({
     where: { id: noteId },
-    data: { body, checklistItemId, mentions },
+    data: { body, checklistItemId, mentions, links: resolveLinks(formData) },
   });
   revalidateAll();
 }

@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { blockedForRead, blockedForContribute } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
+import { cleanHttpUrl } from "@/lib/url";
 
 export async function createProject(subjectId: string, subjectSlug: string, formData: FormData) {
   if (await blockedForRead()) return;
@@ -66,16 +67,6 @@ export async function deleteProject(projectId: string, subjectSlug: string) {
   await prisma.project.delete({ where: { id: projectId } });
   revalidateAll();
   redirect(`/${subjectSlug}/proyectos`);
-}
-
-/** Solo http(s): evita `javascript:` y similares en un href. */
-function cleanHttpUrl(raw: string): string | null {
-  try {
-    const u = new URL(raw.trim());
-    return u.protocol === "https:" || u.protocol === "http:" ? u.toString() : null;
-  } catch {
-    return null;
-  }
 }
 
 export async function addProjectLink(projectId: string, formData: FormData) {

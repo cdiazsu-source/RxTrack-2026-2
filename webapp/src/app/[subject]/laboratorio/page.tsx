@@ -44,7 +44,7 @@ export default async function LaboratorioPage({ params }: { params: { subject: s
     driveUrl: r.driveUrl,
     content: r.content,
     order: r.order,
-    checklistItems: r.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done, order: c.order })),
+    checklistItems: r.checklistItems.map((c) => ({ id: c.id, text: c.text, description: c.description, done: c.done, order: c.order })),
   }));
 
   return (

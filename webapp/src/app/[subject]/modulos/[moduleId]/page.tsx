@@ -252,7 +252,7 @@ export default async function ModuleDetailPage({
       <section id="checklist" className="scroll-mt-24">
         <Checklist
           parent={{ type: "module", id: mod.id }}
-          items={mod.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done, order: c.order }))}
+          items={mod.checklistItems.map((c) => ({ id: c.id, text: c.text, description: c.description, done: c.done, order: c.order }))}
           title="Checklist del módulo"
         />
       </section>

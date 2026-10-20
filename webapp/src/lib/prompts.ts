@@ -599,17 +599,20 @@ export function projectContextPrompt(opts: {
   category: string | null;
   status: string;
   description: string | null;
-  checklist: { text: string; done: boolean }[];
+  checklist: { text: string; done: boolean; description?: string | null }[];
+  team?: { name: string; role: string | null }[];
   links: { name: string; url: string }[];
   driveUrl: string | null;
   focusNote: string | null;
-  notes: { author: string; createdAt: string; body: string }[];
+  notes: { author: string; createdAt: string; body: string; links?: { name: string; url: string }[] }[];
   today: string;
   ask?: string;
 }): string {
   const done = opts.checklist.filter((c) => c.done).length;
   const checklist = opts.checklist.length
-    ? opts.checklist.map((c) => `- [${c.done ? "x" : " "}] ${c.text}`).join("\n")
+    ? opts.checklist
+        .map((c) => `- [${c.done ? "x" : " "}] ${c.text}${c.description ? ` — ${c.description.replace(/\s*\n\s*/g, " ")}` : ""}`)
+        .join("\n")
     : "(sin subtareas registradas)";
   const links = [
     ...(opts.driveUrl ? [{ name: "Documento principal (Drive)", url: opts.driveUrl }] : []),
@@ -617,7 +620,12 @@ export function projectContextPrompt(opts: {
   ];
   const linkLines = links.length ? links.map((l) => `- ${l.name}: ${l.url}`).join("\n") : "(sin enlaces anexados)";
   const notes = opts.notes.length
-    ? opts.notes.map((n) => `- ${n.createdAt} · ${n.author}: ${n.body.replace(/\s*\n\s*/g, " ")}`).join("\n")
+    ? opts.notes
+        .map((n) => {
+          const nl = n.links?.length ? ` [Enlaces: ${n.links.map((l) => `${l.name} ${l.url}`).join("; ")}]` : "";
+          return `- ${n.createdAt} · ${n.author}: ${n.body.replace(/\s*\n\s*/g, " ")}${nl}`;
+        })
+        .join("\n")
     : "(sin notas todavía)";
 
   return [
@@ -642,6 +650,9 @@ export function projectContextPrompt(opts: {
     `──────── SUBTAREAS (${done} de ${opts.checklist.length} hechas) ────────`,
     checklist,
     "",
+    opts.team?.length
+      ? ["──────── EQUIPO DEL PROYECTO ────────", ...opts.team.map((m) => `- ${m.name}${m.role ? ` (${m.role})` : ""}`), ""].join("\n")
+      : null,
     "──────── DOCUMENTOS Y ENLACES ────────",
     linkLines,
     "(No puedes abrir los enlaces; si necesitas su contenido, te lo pego.)",

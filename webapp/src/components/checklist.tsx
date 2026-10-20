@@ -13,6 +13,7 @@ import {
 } from "@/lib/actions/checklist";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
 import { HelpHint } from "@/components/help-hint";
@@ -21,7 +22,9 @@ import { clearDraft, loadDraft, saveDraft } from "@/lib/draft";
 import { cn } from "@/lib/utils";
 import { useCanContribute } from "@/components/access-context";
 
-export type ChecklistItemView = { id: string; text: string; done: boolean; order: number };
+export type ChecklistItemView = { id: string; text: string; description?: string | null; done: boolean; order: number };
+
+const DESCRIPTION_PLACEHOLDER = "Descripción breve (opcional): qué hay que hacer · con qué · cómo sé que está listo";
 
 function Row({
   item,
@@ -53,6 +56,7 @@ function Row({
         className="flex flex-col gap-2 rounded-md border border-border p-3"
       >
         <Input name="text" defaultValue={item.text} required />
+        <Textarea name="description" defaultValue={item.description ?? ""} rows={3} maxLength={600} placeholder={DESCRIPTION_PLACEHOLDER} className="text-sm" />
         <div className="flex gap-2">
           <Button type="submit" size="sm">Guardar</Button>
           <Button type="button" variant="ghost" size="sm" onClick={() => setEditing(false)}>Cancelar</Button>
@@ -97,6 +101,9 @@ function Row({
             </span>
           )}
           <span className={cn("text-sm leading-snug", done && "text-muted-foreground line-through")}>{item.text}</span>
+          {item.description && (
+            <span className={cn("whitespace-pre-line text-xs leading-snug text-muted-foreground", done && "opacity-70")}>{item.description}</span>
+          )}
         </span>
       </label>
       {canEdit && (
@@ -186,7 +193,8 @@ function AddItemForm({ parent, onAdded }: { parent: ChecklistParent; onAdded: ()
         />
         <Button type="submit" size="sm">Agregar</Button>
       </div>
-      <span className="text-[11px] text-muted-foreground">Se guarda un borrador mientras escribes.</span>
+      <Textarea name="description" rows={2} maxLength={600} placeholder={DESCRIPTION_PLACEHOLDER} className="text-sm" />
+      <span className="text-[11px] text-muted-foreground">Se guarda un borrador del título mientras escribes.</span>
     </form>
   );
 }

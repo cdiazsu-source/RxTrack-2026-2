@@ -18,8 +18,10 @@ import { NotesLog, type NoteView } from "@/components/notes-log";
 import { HelpHint } from "@/components/help-hint";
 import { FocusMode } from "@/components/focus-mode";
 import { ProjectLinks } from "@/components/project-links";
+import { ProjectMembers } from "@/components/project-members";
 import { renderCornell } from "@/lib/markdown-lite";
 import { projectContextPrompt } from "@/lib/prompts";
+import { parseNoteLinks } from "@/lib/url";
 import { ProjectContextButton } from "@/components/project-context-button";
 
 const STATUS_LABEL = { POR_INICIAR: "Por iniciar", EN_CURSO: "En curso", COMPLETADO: "Completado" } as const;
@@ -42,6 +44,7 @@ export default async function ProjectDetailPage({
     include: {
       checklistItems: { orderBy: { order: "asc" } },
       links: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] },
+      members: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] },
       notes: {
         orderBy: { createdAt: "desc" },
         include: { checklistItem: { select: { text: true, done: true } } },
@@ -61,8 +64,9 @@ export default async function ProjectDetailPage({
     checklistItemText: n.checklistItem?.text ?? null,
     checklistItemDone: n.checklistItem?.done ?? false,
     mentions: n.mentions,
+    links: parseNoteLinks(n.links),
   }));
-  const checkItems = project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done }));
+  const checkItems = project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done, description: c.description }));
 
   const contextBase = projectContextPrompt({
     subjectName: subject.name,
@@ -72,11 +76,14 @@ export default async function ProjectDetailPage({
     category: project.category,
     status: STATUS_LABEL[project.status],
     description: project.description,
-    checklist: checkItems.map((c) => ({ text: c.text, done: c.done })),
+    checklist: checkItems.map((c) => ({ text: c.text, done: c.done, description: c.description })),
+    team: project.members.map((m) => ({ name: m.name, role: m.role })),
     links: project.links.map((l) => ({ name: l.name, url: l.url })),
     driveUrl: project.driveUrl,
     focusNote: project.focusNote,
-    notes: project.notes.slice(0, 10).map((n) => ({ author: n.author, createdAt: fmtDate(n.createdAt), body: n.body })),
+    notes: project.notes
+      .slice(0, 10)
+      .map((n) => ({ author: n.author, createdAt: fmtDate(n.createdAt), body: n.body, links: parseNoteLinks(n.links) })),
     today: fmtDate(new Date()),
   });
 
@@ -85,6 +92,7 @@ export default async function ProjectDetailPage({
       <SectionRail
         items={[
           ...(project.description ? [{ id: "contexto", label: "Contexto del proyecto", icon: "info" as const }] : []),
+          { id: "equipo", label: "Equipo del proyecto", icon: "team" },
           { id: "enlaces", label: "Documentos y enlaces", icon: "link" },
           { id: "enfoque", label: "Modo Enfoque", icon: "target" },
           { id: "checklist", label: "Subtareas", icon: "checks" },
@@ -139,6 +147,10 @@ export default async function ProjectDetailPage({
         </details>
       )}
 
+      <section id="equipo" className="scroll-mt-24">
+        <ProjectMembers projectId={project.id} members={project.members.map((m) => ({ id: m.id, name: m.name, role: m.role }))} />
+      </section>
+
       <section id="enlaces" className="scroll-mt-24">
         <ProjectLinks projectId={project.id} links={project.links.map((l) => ({ id: l.id, name: l.name, url: l.url }))} />
       </section>
@@ -160,12 +172,12 @@ export default async function ProjectDetailPage({
       <section id="checklist" className="scroll-mt-24">
         <Checklist
           parent={{ type: "project", id: project.id }}
-          items={project.checklistItems.map((c) => ({ id: c.id, text: c.text, done: c.done, order: c.order }))}
+          items={project.checklistItems.map((c) => ({ id: c.id, text: c.text, description: c.description, done: c.done, order: c.order }))}
         />
       </section>
 
       <section id="bitacora" className="scroll-mt-24">
-        <NotesLog projectId={project.id} notes={notes} checklistItems={checkItems} people={PEOPLE} />
+        <NotesLog projectId={project.id} notes={notes} checklistItems={checkItems} people={PEOPLE} members={project.members.map((m) => m.name)} />
       </section>
     </div>
   );

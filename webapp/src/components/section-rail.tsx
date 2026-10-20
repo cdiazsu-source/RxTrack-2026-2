@@ -22,6 +22,7 @@ import {
   Sparkles,
   NotebookPen,
   StickyNote,
+  Users,
   Target,
   X,
   type LucideIcon,
@@ -49,6 +50,7 @@ const ICONS = {
   chat: MessageSquare,
   camera: Camera,
   sparkles: Sparkles,
+  team: Users,
 } satisfies Record<string, LucideIcon>;
 
 const scrollBehavior = (): ScrollBehavior =>

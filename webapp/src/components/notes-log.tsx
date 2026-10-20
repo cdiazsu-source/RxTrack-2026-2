@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AtSign, ListChecks, Pencil, Trash2 } from "lucide-react";
+import { AtSign, ExternalLink, Link2, ListChecks, Pencil, Trash2, X } from "lucide-react";
 
 import { addProjectNote, deleteProjectNote, updateProjectNote } from "@/lib/actions/notes";
 import { Button } from "@/components/ui/button";
@@ -21,9 +21,56 @@ export type NoteView = {
   checklistItemText: string | null;
   checklistItemDone: boolean;
   mentions: string[];
+  links: { name: string; url: string }[];
 };
 
 type CheckItem = { id: string; text: string; done: boolean };
+type NoteLink = { name: string; url: string };
+
+/** Filas nombre + URL: se envían como linkName / linkUrl repetidos. */
+function NoteLinksFields({ defaultLinks = [] }: { defaultLinks?: NoteLink[] }) {
+  const [rows, setRows] = useState<NoteLink[]>(defaultLinks);
+
+  return (
+    <div className="flex flex-col gap-2">
+      {rows.map((r, i) => (
+        <div key={i} className="flex flex-wrap items-center gap-2">
+          <Input
+            name="linkName"
+            defaultValue={r.name}
+            placeholder="Nombre (p. ej. Link Canva)"
+            maxLength={120}
+            className="w-48"
+            aria-label="Nombre del enlace"
+          />
+          <Input
+            name="linkUrl"
+            type="url"
+            required
+            defaultValue={r.url}
+            placeholder="https://…"
+            className="min-w-0 flex-1 basis-56"
+            aria-label="URL del enlace"
+          />
+          <button
+            type="button"
+            onClick={() => setRows((cur) => cur.filter((_, j) => j !== i))}
+            className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-destructive"
+            aria-label="Quitar enlace"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ))}
+      <div>
+        <Button type="button" size="sm" variant="ghost" onClick={() => setRows((cur) => [...cur, { name: "", url: "" }])}>
+          <Link2 className="h-3.5 w-3.5" />
+          Anexar enlace
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 /** Selector de subtarea + casillas de mención, compartido por el alta y la edición. */
 function LinkFields({
@@ -83,14 +130,17 @@ export function NotesLog({
   notes,
   checklistItems = [],
   people = [],
+  members = [],
 }: {
   projectId: string;
   notes: NoteView[];
   checklistItems?: CheckItem[];
   people?: string[];
+  members?: string[];
 }) {
   const sorted = [...notes].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(0); // remonta los enlaces del alta tras publicar
 
   return (
     <Card>
@@ -105,15 +155,33 @@ export function NotesLog({
           action={async (fd) => {
             await addProjectNote(projectId, fd);
             (document.getElementById(`note-form-${projectId}`) as HTMLFormElement | null)?.reset();
+            setFormKey((k) => k + 1);
           }}
           id={`note-form-${projectId}`}
           className="flex flex-col gap-2"
         >
           <Textarea name="body" placeholder="Nota de avance: qué se hizo, qué sigue, algún bloqueo…" required />
+          <NoteLinksFields key={formKey} />
           <LinkFields checklistItems={checklistItems} people={people} />
           <div className="flex flex-wrap items-center gap-2">
-            <Input name="author" placeholder="Tu nombre" required className="w-48" />
-            <Button type="submit" size="sm">Publicar nota</Button>
+            <select
+              name="author"
+              required
+              defaultValue=""
+              disabled={members.length === 0}
+              aria-label="¿Quién publica la nota?"
+              className="w-56 rounded-md border border-input bg-background px-2 py-2 text-sm"
+            >
+              <option value="" disabled>
+                {members.length === 0 ? "— agrega integrantes primero —" : "¿Quién publica? (obligatorio)"}
+              </option>
+              {members.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+            <Button type="submit" size="sm" disabled={members.length === 0}>Publicar nota</Button>
           </div>
         </form>
 
@@ -132,6 +200,7 @@ export function NotesLog({
                     className="flex flex-col gap-2"
                   >
                     <Textarea name="body" defaultValue={n.body} required />
+                    <NoteLinksFields defaultLinks={n.links} />
                     <LinkFields
                       checklistItems={checklistItems}
                       people={people}
@@ -155,6 +224,23 @@ export function NotesLog({
                     </p>
                   )}
                   <p className="whitespace-pre-line text-sm leading-snug">{n.body}</p>
+                  {n.links.length > 0 && (
+                    <ul className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
+                      {n.links.map((l, i) => (
+                        <li key={i} className="min-w-0">
+                          <a
+                            href={l.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex max-w-full items-center gap-1.5 text-sm text-primary hover:underline"
+                          >
+                            <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                            <span className="truncate">{l.name}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {n.mentions.length > 0 && (
                     <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                       <AtSign className="h-3 w-3 shrink-0" aria-hidden />

@@ -187,6 +187,8 @@ model ChecklistItem {
   labReportId String?
   labReport   LabReport? @relation(fields: [labReportId], references: [id], onDelete: Cascade)
   text        String     @db.Text
+  /// Descripción breve opcional: qué hay que hacer, con qué, cómo sé que está listo.
+  description String?    @db.Text
   done        Boolean    @default(false)
   order       Int
 
@@ -289,6 +291,7 @@ model Project {
   checklistItems ChecklistItem[]
   notes          ProjectNote[]
   links          ProjectLink[]
+  members        ProjectMember[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -303,6 +306,22 @@ model ProjectLink {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   name      String
   url       String
+  order     Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+}
+
+/// Integrante del equipo de un proyecto. Solo sirve para llevar el control del
+/// equipo (quién publica notas): no tiene usuario ni acceso a la app.
+model ProjectMember {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String
+  /// Aporte o rol dentro del proyecto (opcional): "Redacción", "Diseño"…
+  role      String?
   order     Int     @default(0)
 
   createdAt DateTime @default(now())
@@ -327,6 +346,9 @@ model ProjectNote {
 
   /// Nombres de las personas mencionadas ("Cesar" | "Diana"). Sin FK: son 2.
   mentions String[] @default([])
+
+  /// Enlaces anexados a la nota: [{ name, url }] (p. ej. "Link Canva").
+  links Json @default("[]")
 
   createdAt DateTime @default(now())
 

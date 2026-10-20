@@ -123,7 +123,7 @@ estacionamiento de ideas (→ bandeja) y nota «para retomar». El temporizador 
 `Project.focusMinutes`. **Regla de producto: la interfaz nunca menciona el diagnóstico
 (TDAH) ni lo describe como tal** — es solo «Modo Enfoque».
 
-**Proyectos: contexto y enlaces.** Cada proyecto puede llevar `description` (Markdown de `renderCornell`; en los sembrados la escribe `projects[].description` de `content/<code>.ts` y el seed la mantiene) y varios enlaces `ProjectLink` (nombre + URL http/https; anexar/modificar/eliminar con `canContribute`). Renombrar un proyecto sembrado: dejar el título viejo en `formerTitles` para que el seed conserve su checklist y bitácora.
+**Proyectos: contexto y enlaces.** Cada proyecto puede llevar `description` (Markdown de `renderCornell`; en los sembrados la escribe `projects[].description` de `content/<code>.ts` y el seed la mantiene) y varios enlaces `ProjectLink` (nombre + URL http/https; anexar/modificar/eliminar con `canContribute`). Cada `ChecklistItem` admite `description` (texto breve opcional, máx. 600 caracteres; se muestra bajo el título y entra en «Copiar contexto para IA»). Equipo del proyecto: `ProjectMember` (nombre + rol opcional, sin usuario; solo control del equipo; CRUD con `canContribute`). La bitácora exige autor y solo acepta integrantes del proyecto (validado en `addProjectNote`); `ProjectNote.links` (Json `[{name,url}]`) guarda enlaces con nombre por nota. Renombrar un proyecto sembrado: dejar el título viejo en `formerTitles` para que el seed conserve su checklist y bitácora.
 
 **Contexto de proyecto para IA.** En `/[subject]/proyectos/[id]`, el botón «Copiar contexto para IA»
 (`project-context-button.tsx`; el texto lo arma el servidor con `projectContextPrompt` en
