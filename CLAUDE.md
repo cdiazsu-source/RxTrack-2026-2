@@ -82,10 +82,18 @@ Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en
   del Módulo II de AIF (subgrupo J5).
 
 - `profe` / `SITE_PASSWORD_PROFE` (por defecto `123`) — `level: "read"` acotado a **toda** la
-  asignatura `af` (Administración Farmacéutica). Saludo propio «Hola profe!» (`greeting` en la cuenta,
-  `greetingFor()` en `lib/auth.ts`; se muestra en el panel de la asignatura y en la portada) y
+  asignatura `af` (Administración Farmacéutica) más la **portada en vista reducida** (`homeView: true`,
+  `canViewHome()`; aterriza en `/`). La portada del profe es `RestrictedHome`: solo saludo y la lista
+  de asignaturas, con las que no están en su alcance deshabilitadas («Pídele a Cesar Diaz que te
+  brinde acceso a esta asignatura.»); no lee avance, tareas, actividad ni notas, ni toca la racha.
+  Saludos propios que se alternan «escribiéndose» (`greetings` en la cuenta, `greetingsFor()`,
+  componente `typewriter-greeting.tsx`; sale en la portada y en el panel de `/af`) y
   `mentionable: false` (no aparece en las @menciones de la bitácora). El usuario no distingue
-  mayúsculas (`checkCredentials` normaliza a minúsculas).
+  mayúsculas (`checkCredentials` normaliza a minúsculas). Tiene `trackAccess: true`: `AccountActivity`
+  (por usuario: `lastLoginAt`, `lastSeenAt`, `loginCount`) se escribe al iniciar sesión (`login`) y, con
+  la sesión ya abierta, en el layout raíz como mucho cada 5 min (`lib/activity.ts`); no cuenta cuando
+  Cesar la ve con «Ver como». Cesar lo ve en la portada (`guest-access-card.tsx`); para otra cuenta
+  basta ponerle `trackAccess: true`.
 
 `getSession()` devuelve `{ authed, level, name, viewingAs, scope }`; `canEdit()`
 sigue siendo `level === "full"`. El alcance acotado lo aplica **el middleware**

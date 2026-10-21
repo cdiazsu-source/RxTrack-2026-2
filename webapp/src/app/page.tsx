@@ -3,7 +3,11 @@ import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
 import { getSession, canEdit } from "@/lib/session";
-import { greetingFor } from "@/lib/auth";
+import { canViewHome } from "@/lib/auth";
+import { Greeting } from "@/components/greeting";
+import { RestrictedHome } from "@/components/restricted-home";
+import { GuestAccessCard } from "@/components/guest-access-card";
+import { getGuestActivity } from "@/lib/activity";
 import { listSubjects } from "@/lib/subjects";
 import { getSubjectProgress } from "@/lib/queries";
 import { buildFeed } from "@/lib/feed";
@@ -24,6 +28,25 @@ export const dynamic = "force-dynamic";
 
 export default async function SemesterPage() {
   const [session, subjects, canManageTasks] = await Promise.all([getSession(), listSubjects(), canEdit()]);
+
+  // Sesión acotada con vista de portada (Profe): solo las asignaturas de su alcance, sin
+  // tareas, racha, actividad ni notas. Sale antes de leer nada más y de tocar la racha.
+  if (session.authed && session.scope && canViewHome(session.name)) {
+    return (
+      <RestrictedHome
+        name={session.name}
+        subjects={subjects.map((s) => ({
+          id: s.id,
+          code: s.code,
+          name: s.name,
+          allowed: session.scope!.some((sc) => sc.subject === s.id),
+        }))}
+      />
+    );
+  }
+
+  // Solo Cesar (acceso total, sin "Ver como") ve cuándo entraron las cuentas invitadas.
+  const guests = canManageTasks && session.authed && !session.viewingAs && !session.scope ? await getGuestActivity() : [];
 
   const [progressBySubject, meta, feed, allDates, streakDays, taskRows, taskModules, pendingNotes, pendingNotesCount] = await Promise.all([
     Promise.all(subjects.map((s) => getSubjectProgress(s.id))),
@@ -87,8 +110,10 @@ export default async function SemesterPage() {
         ]}
       />
       {session.authed && (
-        <h1 className="font-display text-2xl font-semibold tracking-tight">{greetingFor(session.name)}</h1>
+        <Greeting name={session.name} />
       )}
+
+      <GuestAccessCard guests={guests} />
 
       <ResumeBanner route={meta?.resumeRoute ?? null} label={meta?.resumeLabel ?? null} note={meta?.resumeNote ?? null} />
 

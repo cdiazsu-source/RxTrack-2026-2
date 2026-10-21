@@ -6,7 +6,8 @@
  *  - Diana (SITE_PASSWORD_READ):   ve todo, no edita.
  *  - JOSE  (SITE_PASSWORD_JOSE):   solo /aif/laboratorio, con control total ahí.
  *  - Karen (SITE_PASSWORD_KAREN):  solo /aif (toda la asignatura), con control total.
- *  - Profe (SITE_PASSWORD_PROFE):  solo /af (Administración Farmacéutica), solo lectura.
+ *  - Profe (SITE_PASSWORD_PROFE):  /af (Administración Farmacéutica) + la portada en vista
+ *                                  reducida (las demás asignaturas, deshabilitadas); solo lectura.
  *  - (cuenta acotada a una asignatura): ve solo /{subject}, no edita.
  *
  * El nombre, el nivel y el alcance viajan firmados (HMAC-SHA256) en la cookie.
@@ -36,8 +37,12 @@ type Account = {
   username: string;
   password: string;
   profile: Profile;
-  /** Saludo propio de la portada de la cuenta; sin él, "Hola, <nombre>." */
-  greeting?: string;
+  /** Saludos propios de la cuenta; con varios, se alternan "escribiéndose". Sin ellos, "Hola, <nombre>." */
+  greetings?: string[];
+  /** true = se registra cuándo entra (AccountActivity) y Cesar lo ve en la portada. */
+  trackAccess?: boolean;
+  /** true = además de su alcance, ve la portada en vista reducida (sin datos de otras asignaturas). */
+  homeView?: boolean;
   /** false = no aparece entre las personas que se pueden @mencionar en la bitácora. */
   mentionable?: boolean;
 };
@@ -83,7 +88,9 @@ const ACCOUNTS: Account[] = [
     username: "profe",
     password: process.env.SITE_PASSWORD_PROFE || "123",
     profile: { name: "Profe", level: "read", scope: [{ subject: "af" }] },
-    greeting: "Hola profe!",
+    greetings: ["Hola, profe Zoraya!", "Hola, profe Jesús Becerra!"],
+    homeView: true,
+    trackAccess: true,
     mentionable: false,
   },
 ];
@@ -91,14 +98,33 @@ const ACCOUNTS: Account[] = [
 /** Nombres de las personas con cuenta — para @menciones en la bitácora. */
 export const PEOPLE = ACCOUNTS.filter((a) => a.mentionable !== false).map((a) => a.profile.name);
 
-/** Saludo de la portada de una persona. */
-export function greetingFor(name: string): string {
-  return ACCOUNTS.find((a) => a.profile.name === name)?.greeting ?? `Hola, ${name}.`;
+/** Saludos de una persona (uno o varios). */
+export function greetingsFor(name: string): string[] {
+  return ACCOUNTS.find((a) => a.profile.name === name)?.greetings ?? [`Hola, ${name}.`];
 }
 
-/** ¿La cuenta tiene un saludo propio? (las que no, no muestran saludo en su asignatura) */
+/** ¿La cuenta tiene saludos propios? (las que no, no muestran saludo en su asignatura) */
 export function hasCustomGreeting(name: string): boolean {
-  return !!ACCOUNTS.find((a) => a.profile.name === name)?.greeting;
+  return !!ACCOUNTS.find((a) => a.profile.name === name)?.greetings;
+}
+
+/** Cuentas con seguimiento de accesos (sin contraseñas). */
+export const ACCOUNT_DIRECTORY = ACCOUNTS.map((a) => ({
+  username: a.username,
+  name: a.profile.name,
+  detail: describeProfile(a.profile),
+  trackAccess: !!a.trackAccess,
+}));
+
+/** Usuario de la cuenta con seguimiento que tiene ese nombre, o null. */
+export function trackedUsername(name: string): string | null {
+  const a = ACCOUNTS.find((x) => x.profile.name === name);
+  return a?.trackAccess ? a.username : null;
+}
+
+/** ¿La cuenta acotada también puede ver la portada (en vista reducida)? */
+export function canViewHome(name: string): boolean {
+  return !!ACCOUNTS.find((a) => a.profile.name === name)?.homeView;
 }
 
 /** Cookie de "Ver como": guarda el usuario del perfil que Cesar está viendo. */
@@ -177,6 +203,7 @@ export function checkCredentials(username: string, password: string): Profile | 
 /** A dónde llevar a la persona tras iniciar sesión: la primera asignatura (y
  *  sección, si aplica) de su alcance; la portada si no tiene alcance. */
 export function landingPath(profile: Profile): string {
+  if (canViewHome(profile.name)) return "/";
   const first = profile.scope?.[0];
   if (!first) return "/";
   return first.section ? `/${first.subject}/${first.section}` : `/${first.subject}`;

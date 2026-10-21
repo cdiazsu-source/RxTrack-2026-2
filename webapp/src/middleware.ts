@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { SESSION_COOKIE, VIEW_AS_COOKIE, landingPath, verifyToken, viewProfileByKey } from "@/lib/auth";
+import { SESSION_COOKIE, VIEW_AS_COOKIE, canViewHome, landingPath, verifyToken, viewProfileByKey } from "@/lib/auth";
 
 /** Archivos estáticos servidos desde /public que no pasan por el control de acceso. */
 const PUBLIC_FILE = /\.(?:svg|png|ico|webmanifest|js|json|txt|woff2?|map)$/;
@@ -29,12 +29,15 @@ export async function middleware(req: NextRequest) {
 
   if (scope && scope.length > 0) {
     const { pathname } = req.nextUrl;
+    const who = viewing?.name ?? profile.name;
     const homes = scope.map((s) => (s.section ? `/${s.subject}/${s.section}` : `/${s.subject}`));
     const allowed =
-      PUBLIC_FILE.test(pathname) || homes.some((home) => pathname === home || pathname.startsWith(`${home}/`));
+      PUBLIC_FILE.test(pathname) ||
+      (pathname === "/" && canViewHome(who)) ||
+      homes.some((home) => pathname === home || pathname.startsWith(`${home}/`));
     if (!allowed) {
       const url = req.nextUrl.clone();
-      url.pathname = landingPath({ name: profile.name, level: profile.level, scope });
+      url.pathname = landingPath({ name: who, level: profile.level, scope });
       url.search = "";
       return NextResponse.redirect(url);
     }

@@ -29,6 +29,20 @@ export function relativeDays(date: Date | string | null | undefined): string {
 
 export type Urgency = "past" | "today" | "soon" | "upcoming" | "far" | "none";
 
+/** Tiempo transcurrido desde un instante: "hace 5 min", "hace 3 h", "hace 2 días". */
+export function relativeAgo(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  const t = (typeof date === "string" ? new Date(date) : date).getTime();
+  if (Number.isNaN(t)) return "";
+  const min = Math.max(0, Math.round((Date.now() - t) / 60000));
+  if (min < 1) return "hace un momento";
+  if (min < 60) return `hace ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `hace ${h} h`;
+  const d = Math.round(h / 24);
+  return d === 1 ? "hace 1 día" : `hace ${d} días`;
+}
+
 /** Tono para la cuenta regresiva. Nunca "rojo agresivo": el máximo es `past`,
  *  que la UI pinta ámbar + negrita. */
 export function urgencyOf(date: Date | string | null | undefined): Urgency {

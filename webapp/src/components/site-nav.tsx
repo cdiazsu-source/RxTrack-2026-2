@@ -14,10 +14,10 @@ import { QuickCapture } from "@/components/quick-capture";
 import { ViewAsMenu } from "@/components/view-as-menu";
 import { SIDE_ICON_BTN, SIDE_ICON_TIP } from "@/components/side-icon";
 import { subjectIcon } from "@/lib/subject-icons";
-import { BRAND_SUBTITLE } from "@/lib/brand";
+import { BRAND_CREDIT, BRAND_SUBTITLE } from "@/lib/brand";
 
 /** Fecha del último cambio a la app. Actualízala a mano al publicar cambios. */
-const LAST_MODIFIED = "18 oct 2026";
+const LAST_MODIFIED = "21 oct 2026";
 
 /** Contenedor del contenido: reserva el ancho del menú lateral en pantallas grandes. */
 export function MainFrame({ sidebar, children }: { sidebar: boolean; children: React.ReactNode }) {
@@ -106,6 +106,7 @@ export function SiteNav({
   viewingName = "",
   viewProfiles = [],
   scope = null,
+  homeView = false,
 }: {
   canEdit: boolean;
   subjects: SwitcherSubject[];
@@ -120,6 +121,8 @@ export function SiteNav({
   viewProfiles?: ViewProfile[];
   /** Sesión con acceso acotado (JOSE, Karen, Paula): solo marca + sus asignaturas + salir. */
   scope?: SubjectScope[] | null;
+  /** La sesión acotada también ve la portada (vista reducida): se añade «Semestre» a la barra. */
+  homeView?: boolean;
 }) {
   const pathname = usePathname();
   if (pathname === "/login") return null;
@@ -131,11 +134,23 @@ export function SiteNav({
           <span className="flex min-w-0 flex-col leading-tight">
             <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
             <span className="text-[10px] text-muted-foreground sm:text-[11px]">{BRAND_SUBTITLE}</span>
+            <span className="text-[10px] text-muted-foreground sm:text-[11px]">{BRAND_CREDIT}</span>
           </span>
           <div className="flex items-center gap-3">
             {viewingAs && <ViewingPill name={viewingName} />}
-            {scope.length > 1 && (
+            {(scope.length > 1 || homeView) && (
               <nav className="flex items-center gap-1.5">
+                {homeView && (
+                  <Link
+                    href="/"
+                    className={cn(
+                      "press rounded-md px-2.5 py-1 text-sm font-medium transition-colors",
+                      pathname === "/" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                    )}
+                  >
+                    Semestre
+                  </Link>
+                )}
                 {scope.map((s) => {
                   const href = s.section ? `/${s.subject}/${s.section}` : `/${s.subject}`;
                   const label = subjects.find((sub) => sub.id === s.subject)?.code ?? s.subject.toUpperCase();
@@ -205,6 +220,7 @@ export function SiteNav({
         <span className="flex min-w-0 flex-col leading-tight">
           <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
           <span className="text-[10px] font-medium text-muted-foreground">{BRAND_SUBTITLE}</span>
+          <span className="text-[10px] text-muted-foreground">{BRAND_CREDIT}</span>
         </span>
       </Link>
 
@@ -280,6 +296,7 @@ export function SiteNav({
           <Link href="/" className="flex flex-col leading-tight">
             <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
             <span className="max-w-[15rem] text-[10px] text-muted-foreground">{BRAND_SUBTITLE}</span>
+            <span className="text-[10px] text-muted-foreground">{BRAND_CREDIT}</span>
           </Link>
 
           {link("/", "Semestre", Layers)}

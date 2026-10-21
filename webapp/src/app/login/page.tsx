@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getSession } from "@/lib/session";
 import { landingPath } from "@/lib/auth";
-import { BRAND_SUBTITLE } from "@/lib/brand";
+import { BRAND_CREDIT, BRAND_SUBTITLE } from "@/lib/brand";
 import { login } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
         <CardHeader>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">RxTrack 2026-2s</p>
           <p className="text-sm text-muted-foreground">{BRAND_SUBTITLE}</p>
+          <p className="text-xs text-muted-foreground">{BRAND_CREDIT}</p>
           <CardTitle className="text-lg">Ingreso</CardTitle>
         </CardHeader>
         <CardContent>

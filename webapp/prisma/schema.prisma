@@ -602,3 +602,12 @@ model PersonalEvent {
 
   @@index([date])
 }
+
+/// Accesos de las cuentas invitadas con seguimiento (p. ej. profe): cuándo entraron por última vez.
+/// Una fila por usuario (minúsculas). Solo Cesar lo ve, en la portada.
+model AccountActivity {
+  username    String    @id
+  lastLoginAt DateTime?
+  lastSeenAt  DateTime?
+  loginCount  Int       @default(0)
+}

@@ -8,7 +8,8 @@ import { AccessProvider } from "@/components/access-context";
 import { canEdit, canContribute, getSession, realLevel } from "@/lib/session";
 import { listSubjects } from "@/lib/subjects";
 import { prisma } from "@/lib/prisma";
-import { listViewProfiles } from "@/lib/auth";
+import { canViewHome, listViewProfiles, trackedUsername } from "@/lib/auth";
+import { recordSeen } from "@/lib/activity";
 
 import "./globals.css";
 
@@ -53,6 +54,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const realFull = realLvl === "full";
   // Sesión con acceso acotado (JOSE, Karen, Paula), real o vista con "Ver como": barra mínima.
   const scope = session.authed ? session.scope : null;
+  // Cuentas invitadas con seguimiento: se anota la visita (no cuenta cuando Cesar las ve con "Ver como").
+  const tracked = session.authed && !session.viewingAs ? trackedUsername(session.name) : null;
+  if (tracked) await recordSeen(tracked);
 
   return (
     <html lang="es" className={`${ancizarSans.variable} ${ancizarSerif.variable}`}>
@@ -67,6 +71,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             viewingName={viewingAs && session.authed ? session.name : ""}
             viewProfiles={realFull ? listViewProfiles() : []}
             scope={scope}
+            homeView={session.authed && !!session.scope && canViewHome(session.name)}
           />
           <MainFrame sidebar={!scope}>{children}</MainFrame>
           <Toaster />
