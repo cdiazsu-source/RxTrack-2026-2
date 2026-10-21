@@ -97,6 +97,91 @@ function ViewingPill({ name, className }: { name: string; className?: string }) 
   );
 }
 
+/**
+ * Menú lateral de las sesiones acotadas con vista de portada (Profe): solo lo que puede
+ * usar. Sin Calendario, Repaso, Bandeja, búsqueda, captura rápida ni «Ver como», y solo
+ * con las asignaturas de su alcance (las demás ni se listan).
+ */
+function RestrictedSidebar({
+  subjects,
+  pathname,
+  viewingAs,
+  viewingName,
+  readOnly,
+}: {
+  subjects: SwitcherSubject[];
+  pathname: string;
+  viewingAs: boolean;
+  viewingName: string;
+  readOnly: boolean;
+}) {
+  return (
+    <aside
+      aria-label="Navegación principal"
+      className="site-nav fixed inset-y-0 left-0 z-40 hidden w-56 flex-col bg-card pb-2 pl-3 pt-4 shadow-[inset_-1px_0_0_hsl(var(--border))] lg:flex"
+    >
+      <Link href="/" className="flex items-center gap-2.5 px-3 pb-2 outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <span className="flex h-7 w-7 items-center justify-center rounded-[7px] bg-primary text-primary-foreground">
+          <Pill className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+        </span>
+        <span className="flex min-w-0 flex-col leading-tight">
+          <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
+          <span className="text-[10px] font-medium text-muted-foreground">{BRAND_SUBTITLE}</span>
+          <span className="text-[10px] text-muted-foreground">{BRAND_CREDIT}</span>
+        </span>
+      </Link>
+
+      <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul className="flex flex-col gap-1 pt-1">
+          <SideItem href="/" active={pathname === "/"}>
+            <LayoutDashboard className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
+            <span className="flex-1">Semestre</span>
+          </SideItem>
+        </ul>
+
+        <p className="px-3 pb-1 pt-3 text-xs font-semibold text-muted-foreground [@media(min-height:761px)]:pt-4">
+          {subjects.length === 1 ? "Asignatura" : "Asignaturas"}
+        </p>
+        <ul className="flex flex-col gap-0.5">
+          {subjects.map((sub) => {
+            const Icon = subjectIcon(sub.id);
+            return (
+              <SideItem
+                key={sub.id}
+                dense
+                href={`/${sub.id}`}
+                title={`${sub.code} · ${sub.name}`}
+                active={pathname === `/${sub.id}` || pathname.startsWith(`/${sub.id}/`)}
+              >
+                <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
+                <span className="min-w-0 flex-1 truncate">{sub.name}</span>
+              </SideItem>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <div className="mr-3 border-t border-border pt-1.5">
+        {viewingAs && <ViewingPill name={viewingName} className="mb-1.5 w-full" />}
+        <div className="flex items-center justify-between">
+          <form action={logout}>
+            <button type="submit" aria-label="Salir" className={SIDE_ICON_BTN}>
+              <LogOut className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+              <span className={SIDE_ICON_TIP}>Salir</span>
+            </button>
+          </form>
+        </div>
+        <div className="flex items-center justify-between gap-2 px-1 pt-0.5 text-[11px] text-muted-foreground">
+          <span>Actualizado: {LAST_MODIFIED}</span>
+          {readOnly && !viewingAs && (
+            <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 font-medium text-secondary-foreground">Lectura</span>
+          )}
+        </div>
+      </div>
+    </aside>
+  );
+}
+
 export function SiteNav({
   canEdit,
   subjects,
@@ -129,7 +214,22 @@ export function SiteNav({
 
   if (scope && scope.length > 0) {
     return (
-      <header className="site-nav sticky top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70">
+      <>
+      {homeView && (
+        <RestrictedSidebar
+          subjects={subjects.filter((sub) => scope.some((s) => s.subject === sub.id))}
+          pathname={pathname}
+          viewingAs={viewingAs}
+          viewingName={viewingName}
+          readOnly={!canEdit}
+        />
+      )}
+      <header
+        className={cn(
+          "site-nav sticky top-0 z-40 border-b border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/70",
+          homeView && "lg:hidden",
+        )}
+      >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
           <span className="flex min-w-0 flex-col leading-tight">
             <span className="font-display text-xl font-semibold tracking-tight text-primary">RxTrack</span>
@@ -182,6 +282,7 @@ export function SiteNav({
           </div>
         </div>
       </header>
+      </>
     );
   }
 

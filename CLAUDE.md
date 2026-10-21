@@ -86,6 +86,8 @@ Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en
   `canViewHome()`; aterriza en `/`). La portada del profe es `RestrictedHome`: solo saludo y la lista
   de asignaturas, con las que no están en su alcance deshabilitadas («Pídele a Cesar Diaz que te
   brinde acceso a esta asignatura.»); no lee avance, tareas, actividad ni notas, ni toca la racha.
+  Su menú lateral es `RestrictedSidebar` (en `site-nav.tsx`): solo Semestre, su asignatura y Salir; sin
+  Calendario, Repaso, Bandeja, búsqueda, captura rápida ni «Ver como», y sin listar las demás asignaturas.
   Saludos propios que se alternan «escribiéndose» (`greetings` en la cuenta, `greetingsFor()`,
   componente `typewriter-greeting.tsx`; sale en la portada y en el panel de `/af`) y
   `mentionable: false` (no aparece en las @menciones de la bitácora). El usuario no distingue

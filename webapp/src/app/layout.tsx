@@ -73,7 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             scope={scope}
             homeView={session.authed && !!session.scope && canViewHome(session.name)}
           />
-          <MainFrame sidebar={!scope}>{children}</MainFrame>
+          <MainFrame sidebar={!scope || (session.authed && canViewHome(session.name))}>{children}</MainFrame>
           <Toaster />
           <PwaRegister />
         </AccessProvider>
