@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
 import { getSession, canEdit } from "@/lib/session";
+import { greetingFor } from "@/lib/auth";
 import { listSubjects } from "@/lib/subjects";
 import { getSubjectProgress } from "@/lib/queries";
 import { buildFeed } from "@/lib/feed";
@@ -86,7 +87,7 @@ export default async function SemesterPage() {
         ]}
       />
       {session.authed && (
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Hola, {session.name}.</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">{greetingFor(session.name)}</h1>
       )}
 
       <ResumeBanner route={meta?.resumeRoute ?? null} label={meta?.resumeLabel ?? null} note={meta?.resumeNote ?? null} />

@@ -6,6 +6,7 @@
  *  - Diana (SITE_PASSWORD_READ):   ve todo, no edita.
  *  - JOSE  (SITE_PASSWORD_JOSE):   solo /aif/laboratorio, con control total ahí.
  *  - Karen (SITE_PASSWORD_KAREN):  solo /aif (toda la asignatura), con control total.
+ *  - Profe (SITE_PASSWORD_PROFE):  solo /af (Administración Farmacéutica), solo lectura.
  *  - (cuenta acotada a una asignatura): ve solo /{subject}, no edita.
  *
  * El nombre, el nivel y el alcance viajan firmados (HMAC-SHA256) en la cookie.
@@ -31,7 +32,15 @@ export type Profile = { name: string; level: AccessLevel; scope?: SubjectScope[]
  * Cuentas. La lista vive aquí, no en la base. Para añadir a alguien: otra fila.
  * Las contraseñas se pueden sobreescribir con variables de entorno en Vercel.
  */
-type Account = { username: string; password: string; profile: Profile };
+type Account = {
+  username: string;
+  password: string;
+  profile: Profile;
+  /** Saludo propio de la portada de la cuenta; sin él, "Hola, <nombre>." */
+  greeting?: string;
+  /** false = no aparece entre las personas que se pueden @mencionar en la bitácora. */
+  mentionable?: boolean;
+};
 
 const ACCOUNTS: Account[] = [
   {
@@ -67,10 +76,30 @@ const ACCOUNTS: Account[] = [
     password: process.env.SITE_PASSWORD_KAREN || "TQM",
     profile: { name: "Karen", level: "full", scope: [{ subject: "aif" }] },
   },
+  {
+    // Profesor de Administración Farmacéutica: solo lectura y solo /af. Clave
+    // simple a propósito (el repo es público): da acceso de lectura a un curso.
+    // Se puede reemplazar con SITE_PASSWORD_PROFE en Vercel.
+    username: "profe",
+    password: process.env.SITE_PASSWORD_PROFE || "123",
+    profile: { name: "Profe", level: "read", scope: [{ subject: "af" }] },
+    greeting: "Hola profe!",
+    mentionable: false,
+  },
 ];
 
 /** Nombres de las personas con cuenta — para @menciones en la bitácora. */
-export const PEOPLE = ACCOUNTS.map((a) => a.profile.name);
+export const PEOPLE = ACCOUNTS.filter((a) => a.mentionable !== false).map((a) => a.profile.name);
+
+/** Saludo de la portada de una persona. */
+export function greetingFor(name: string): string {
+  return ACCOUNTS.find((a) => a.profile.name === name)?.greeting ?? `Hola, ${name}.`;
+}
+
+/** ¿La cuenta tiene un saludo propio? (las que no, no muestran saludo en su asignatura) */
+export function hasCustomGreeting(name: string): boolean {
+  return !!ACCOUNTS.find((a) => a.profile.name === name)?.greeting;
+}
 
 /** Cookie de "Ver como": guarda el usuario del perfil que Cesar está viendo. */
 export const VIEW_AS_COOKIE = "rxtrack_view_as";

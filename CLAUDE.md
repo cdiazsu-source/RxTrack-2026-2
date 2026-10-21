@@ -81,6 +81,12 @@ Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en
   `scope: { subject: "aif" }` (sin `section`); pareja de Cesar en el laboratorio
   del Módulo II de AIF (subgrupo J5).
 
+- `profe` / `SITE_PASSWORD_PROFE` (por defecto `123`) — `level: "read"` acotado a **toda** la
+  asignatura `af` (Administración Farmacéutica). Saludo propio «Hola profe!» (`greeting` en la cuenta,
+  `greetingFor()` en `lib/auth.ts`; se muestra en el panel de la asignatura y en la portada) y
+  `mentionable: false` (no aparece en las @menciones de la bitácora). El usuario no distingue
+  mayúsculas (`checkCredentials` normaliza a minúsculas).
+
 `getSession()` devuelve `{ authed, level, name, viewingAs, scope }`; `canEdit()`
 sigue siendo `level === "full"`. El alcance acotado lo aplica **el middleware**
 (no hay authz por recurso en las server actions). La portada saluda con

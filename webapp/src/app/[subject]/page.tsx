@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { greetingFor, hasCustomGreeting } from "@/lib/auth";
 import { getSubjectBySlug } from "@/lib/subjects";
 import { getModulesWithProgress } from "@/lib/queries";
 import { pct } from "@/lib/progress";
@@ -64,6 +65,9 @@ export default async function SubjectDashboard({ params }: { params: { subject: 
           { id: "modulos", label: "Módulos y fechas", icon: "book" },
         ]}
       />
+      {session.authed && session.scope && hasCustomGreeting(session.name) && (
+        <h1 className="font-display text-2xl font-semibold tracking-tight">{greetingFor(session.name)}</h1>
+      )}
       {subject.descriptionSummary && (
         <Card>
           <CardContent className="pt-5">
