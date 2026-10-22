@@ -45,7 +45,15 @@ type Account = {
   homeView?: boolean;
   /** false = no aparece entre las personas que se pueden @mencionar en la bitácora. */
   mentionable?: boolean;
+  /** true = no ve nada de parciales/talleres/simulacros de semestres anteriores (Insumos, su tarjeta en
+   *  «Preparar parcial» y los simulacros de examen del laboratorio). */
+  hidePastExams?: boolean;
+  /** Si se define, el saludo propio solo sale en esa asignatura (y en la portada). */
+  greetingSubject?: string;
 };
+
+/** Asignaturas del semestre (slug de cada una, ver content/index.ts), para cuentas con acceso a todas. */
+const ALL_SUBJECT_SLUGS = ["aif", "ft2", "fg", "af", "spf", "bfc"];
 
 const ACCOUNTS: Account[] = [
   {
@@ -82,16 +90,19 @@ const ACCOUNTS: Account[] = [
     profile: { name: "Karen", level: "full", scope: [{ subject: "aif" }] },
   },
   {
-    // Profesor de Administración Farmacéutica: solo lectura y solo /af. Clave
-    // simple a propósito (el repo es público): da acceso de lectura a un curso.
-    // Se puede reemplazar con SITE_PASSWORD_PROFE en Vercel.
+    // Profesor: solo lectura, con acceso a todas las asignaturas y a la portada reducida, pero sin
+    // nada de parciales/talleres/simulacros anteriores (hidePastExams). Clave simple a propósito (el
+    // repo es público). Se puede reemplazar con SITE_PASSWORD_PROFE en Vercel.
+    // Los saludos son de los profesores de Administración Farmacéutica: solo salen en /af.
     username: "profe",
     password: process.env.SITE_PASSWORD_PROFE || "123",
-    profile: { name: "Profe", level: "read", scope: [{ subject: "af" }] },
+    profile: { name: "Profe", level: "read", scope: ALL_SUBJECT_SLUGS.map((subject) => ({ subject })) },
     greetings: ["Hola, profe Zoraya!", "Hola, profe Jesús Becerra!"],
+    greetingSubject: "af",
     homeView: true,
     trackAccess: true,
     mentionable: false,
+    hidePastExams: true,
   },
 ];
 
@@ -106,6 +117,22 @@ export function greetingsFor(name: string): string[] {
 /** ¿La cuenta tiene saludos propios? (las que no, no muestran saludo en su asignatura) */
 export function hasCustomGreeting(name: string): boolean {
   return !!ACCOUNTS.find((a) => a.profile.name === name)?.greetings;
+}
+
+/** ¿Mostrar el saludo propio de la cuenta en esta asignatura? (si define `greetingSubject`, solo ahí) */
+export function greetingShownIn(name: string, subjectSlug: string): boolean {
+  const a = ACCOUNTS.find((x) => x.profile.name === name);
+  return !!a?.greetings && (!a.greetingSubject || a.greetingSubject === subjectSlug);
+}
+
+/** ¿La cuenta NO debe ver parciales, talleres ni simulacros de semestres anteriores? */
+export function hidesPastExams(name: string): boolean {
+  return !!ACCOUNTS.find((a) => a.profile.name === name)?.hidePastExams;
+}
+
+/** Secciones de la asignatura que esa cuenta no ve (hoy: Insumos para quien oculta lo anterior). */
+export function hiddenSectionsFor(name: string): string[] {
+  return hidesPastExams(name) ? ["insumos"] : [];
 }
 
 /** Cuentas con seguimiento de accesos (sin contraseñas). */
@@ -129,6 +156,14 @@ export function canViewHome(name: string): boolean {
 
 /** Cookie de "Ver como": guarda el usuario del perfil que Cesar está viendo. */
 export const VIEW_AS_COOKIE = "rxtrack_view_as";
+
+/** Cookie del modo desarrollador (solo una preferencia "1"/ausente: la autoridad es el token firmado). */
+export const DEV_MODE_COOKIE = "rxtrack_dev";
+
+/** ¿Este perfil puede usar el modo desarrollador? Solo la cuenta de Cesar (acceso total, sin alcance). */
+export function canUseDevMode(profile: Profile | null): boolean {
+  return !!profile && profile.name === "Cesar" && profile.level === "full" && !profile.scope;
+}
 
 /** Perfil que se puede "ver como". Sin contraseñas: es seguro enviarlo al cliente. */
 export type ViewProfile = {

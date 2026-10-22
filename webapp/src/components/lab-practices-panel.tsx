@@ -13,6 +13,8 @@ import { inlineLite, renderCornell } from "@/lib/markdown-lite";
 import { renderFormula } from "@/lib/formula-markup";
 import { MermaidDiagram } from "@/components/mermaid-diagram";
 import { LabModuleLinkButton } from "@/components/lab-module-link-button";
+import { LabPracticeLog, type LabNoteView } from "@/components/lab-practice-log";
+import { practiceKey } from "@/lib/lab-log";
 import type { ExerciseContent, LabModuleContent, LabPracticeContent } from "@/lib/subject-content";
 
 /** Preparación para el quiz de la práctica: de una pregunta en una, con
@@ -124,7 +126,11 @@ function PracticeItem({
   subjectSlug,
   moduleTitle,
   labModule,
+  notes,
+  canWriteLog,
 }: {
+  notes: LabNoteView[];
+  canWriteLog: boolean;
   p: LabPracticeContent;
   subjectName: string;
   subjectSummary: string | null;
@@ -256,6 +262,9 @@ function PracticeItem({
           </>
         )}
 
+        <SectionLabel>Bitácora de la práctica ({notes.length})</SectionLabel>
+        <LabPracticeLog subjectId={subjectSlug} practiceKey={practiceKey(p)} notes={notes} canWrite={canWriteLog} />
+
         <SectionLabel>Prompt de contexto</SectionLabel>
         <details className="group/prompt mt-1 rounded-lg border border-primary/30 bg-primary/[0.03]">
           <summary className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm font-medium text-primary [&::-webkit-details-marker]:hidden">
@@ -308,7 +317,12 @@ export function LabPracticesPanel({
   subjectObjective,
   subjectSlug,
   moduleTitleBySlug,
+  notesByPractice,
+  canWriteLog,
 }: {
+  /** Entradas de bitácora por clave de práctica (ver `practiceKey`). */
+  notesByPractice: Record<string, LabNoteView[]>;
+  canWriteLog: boolean;
   labRules: string[];
   labModules: LabModuleContent[];
   /** Enlace al Excel de cada agrupación, por nombre ("Módulo I" → url). */
@@ -330,6 +344,8 @@ export function LabPracticesPanel({
       subjectSlug={subjectSlug}
       moduleTitle={p.moduleSlug ? moduleTitleBySlug[p.moduleSlug] ?? null : null}
       labModule={labModule}
+      notes={notesByPractice[practiceKey(p)] ?? []}
+      canWriteLog={canWriteLog}
     />
   );
 

@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
 import { getSubjectBySlug } from "@/lib/subjects";
+import { getSession } from "@/lib/session";
+import { hidesPastExams } from "@/lib/auth";
 import { InsumosSection, type PastMaterialView } from "@/components/insumos-section";
 import { PromptBox } from "@/components/prompt-box";
 import { patternsPrompt } from "@/lib/prompts";
@@ -12,6 +14,8 @@ export const dynamic = "force-dynamic";
 export default async function InsumosPage({ params }: { params: { subject: string } }) {
   const subject = await getSubjectBySlug(params.subject);
   if (!subject) notFound();
+  const session = await getSession();
+  if (session.authed && hidesPastExams(session.name)) notFound();
 
   const rows = await prisma.pastMaterial.findMany({
     where: { subjectId: subject.id },

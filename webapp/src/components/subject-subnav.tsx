@@ -10,14 +10,17 @@ export function SubjectSubnav({
   slug,
   sections,
   lockedSection = null,
+  hiddenSections = [],
 }: {
   slug: string;
   sections: string[];
+  /** Secciones que esta sesión no debe ver (p. ej. Insumos para el profe). */
+  hiddenSections?: string[];
   /** Si la sesión tiene acceso acotado a una sola sección, mostrar solo esa pestaña. */
   lockedSection?: string | null;
 }) {
   const pathname = usePathname();
-  const all = visibleSubjectSections(sections);
+  const all = visibleSubjectSections(sections).filter((s) => !hiddenSections.includes(s.segment));
   const items = lockedSection ? all.filter((s) => s.segment === lockedSection) : all;
 
   return (

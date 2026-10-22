@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getSubjectBySlug } from "@/lib/subjects";
+import { getSession } from "@/lib/session";
+import { hidesPastExams } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
 import { KeyDateModulesEditor } from "@/components/keydate-modules-editor";
@@ -39,6 +41,10 @@ export default async function PrepararParcialPage({
   const covered = keyDate.moduleIds.length ? keyDate.moduleIds : [];
   const inScope = (mid: string | null) => covered.length === 0 || (mid ? covered.includes(mid) : false);
 
+  // Cuentas que no ven nada de semestres anteriores (profe): ni se consultan los insumos.
+  const viewer = await getSession();
+  const hidePast = viewer.authed && hidesPastExams(viewer.name);
+
   const [sessions, checklist, formulas, glossary, past] = await Promise.all([
     prisma.session.findMany({
       where: { module: { subjectId: subject.id } },
@@ -59,10 +65,12 @@ export default async function PrepararParcialPage({
       orderBy: { term: "asc" },
       select: { id: true, term: true, definition: true, moduleId: true },
     }),
-    prisma.pastMaterial.findMany({
-      where: { subjectId: subject.id },
-      select: { id: true, title: true, kind: true, semester: true, patterns: true, moduleId: true },
-    }),
+    hidePast
+      ? Promise.resolve([])
+      : prisma.pastMaterial.findMany({
+          where: { subjectId: subject.id },
+          select: { id: true, title: true, kind: true, semester: true, patterns: true, moduleId: true },
+        }),
   ]);
 
   const s = sessions.filter((x) => inScope(x.moduleId));
@@ -170,7 +178,7 @@ export default async function PrepararParcialPage({
         </Card>
       )}
 
-      {p.length > 0 && (
+      {p.length > 0 && !hidePast && (
         <Card>
           <CardHeader><CardTitle>Insumos de semestres previos ({p.length})</CardTitle></CardHeader>
           <CardContent>

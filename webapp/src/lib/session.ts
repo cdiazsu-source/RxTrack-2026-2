@@ -3,8 +3,10 @@ import { cookies } from "next/headers";
 import {
   type AccessLevel,
   type SubjectScope,
+  DEV_MODE_COOKIE,
   SESSION_COOKIE,
   VIEW_AS_COOKIE,
+  canUseDevMode,
   verifyToken,
   viewProfileByKey,
 } from "@/lib/auth";
@@ -34,6 +36,18 @@ export async function getSession(): Promise<Session> {
 export async function realLevel(): Promise<AccessLevel | null> {
   const profile = await verifyToken(cookies().get(SESSION_COOKIE)?.value);
   return profile?.level ?? null;
+}
+
+/** ¿La persona REAL de la sesión puede usar el modo desarrollador? (solo Cesar, aunque use "Ver como") */
+export async function canUseDeveloperMode(): Promise<boolean> {
+  return canUseDevMode(await verifyToken(cookies().get(SESSION_COOKIE)?.value));
+}
+
+/** ¿Está activo el modo desarrollador? Requiere ser Cesar, haberlo encendido y no estar en "Ver como". */
+export async function developerModeOn(): Promise<boolean> {
+  if (cookies().get(DEV_MODE_COOKIE)?.value !== "1") return false;
+  if (!(await canUseDeveloperMode())) return false;
+  return !(await getSession().then((s) => s.authed && s.viewingAs));
 }
 
 /** ¿La sesión puede editar? Solo el perfil "full" (y no en modo vista). */

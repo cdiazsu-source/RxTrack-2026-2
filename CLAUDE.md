@@ -81,15 +81,22 @@ Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en
   `scope: { subject: "aif" }` (sin `section`); pareja de Cesar en el laboratorio
   del Módulo II de AIF (subgrupo J5).
 
-- `profe` / `SITE_PASSWORD_PROFE` (por defecto `123`) — `level: "read"` acotado a **toda** la
-  asignatura `af` (Administración Farmacéutica) más la **portada en vista reducida** (`homeView: true`,
-  `canViewHome()`; aterriza en `/`). La portada del profe es `RestrictedHome`: solo saludo y la lista
-  de asignaturas, con las que no están en su alcance deshabilitadas («Pídele a Cesar Diaz que te
-  brinde acceso a esta asignatura.»); no lee avance, tareas, actividad ni notas, ni toca la racha.
-  Su menú lateral es `RestrictedSidebar` (en `site-nav.tsx`): solo Semestre, su asignatura y Salir; sin
-  Calendario, Repaso, Bandeja, búsqueda, captura rápida ni «Ver como», y sin listar las demás asignaturas.
+- `profe` / `SITE_PASSWORD_PROFE` (por defecto `123`) — `level: "read"` acotado a **todas** las
+  asignaturas (`ALL_SUBJECT_SLUGS` en `lib/auth.ts`; una asignatura nueva hay que añadirla ahí) más la
+  **portada en vista reducida** (`homeView: true`, `canViewHome()`; aterriza en `/`). La portada del profe
+  es `RestrictedHome`: solo saludo y la lista de asignaturas (una fuera de su alcance saldría deshabilitada
+  con «Pídele a Cesar Diaz que te brinde acceso a esta asignatura.»); no lee avance, tareas, actividad ni
+  notas de la portada, ni toca la racha. **`hidePastExams: true`**: no ve nada de parciales, talleres ni
+  simulacros anteriores — se oculta la pestaña Insumos (`hiddenSectionsFor()` → `SubjectSubnav`), el
+  middleware redirige `/{asignatura}/insumos` al panel y la página da 404, «Preparar parcial» no consulta
+  ni muestra la tarjeta de insumos, y el laboratorio quita `examExercises` («Simulacros de examen»). Si se
+  añade otro lugar que muestre material de semestres anteriores, hay que filtrarlo con `hidesPastExams()`.
+  Su token lleva el alcance de cuando inició sesión: un cambio de alcance solo le llega al volver a entrar.
+  Su menú lateral es `RestrictedSidebar` (en `site-nav.tsx`): Semestre, sus asignaturas y Salir; sin
+  Calendario, Repaso, Bandeja, búsqueda, captura rápida ni «Ver como».
   Saludos propios que se alternan «escribiéndose» (`greetings` en la cuenta, `greetingsFor()`,
-  componente `typewriter-greeting.tsx`; sale en la portada y en el panel de `/af`) y
+  componente `typewriter-greeting.tsx`; sale en la portada y, por `greetingSubject: "af"`, solo en el
+  panel de `/af`: son los profesores de esa asignatura) y
   `mentionable: false` (no aparece en las @menciones de la bitácora). El usuario no distingue
   mayúsculas (`checkCredentials` normaliza a minúsculas). Tiene `trackAccess: true`: `AccountActivity`
   (por usuario: `lastLoginAt`, `lastSeenAt`, `loginCount`) se escribe al iniciar sesión (`login`) y, con
@@ -141,6 +148,8 @@ estacionamiento de ideas (→ bandeja) y nota «para retomar». El temporizador 
 
 **Proyectos: contexto y enlaces.** Cada proyecto puede llevar `description` (Markdown de `renderCornell`; en los sembrados la escribe `projects[].description` de `content/<code>.ts` y el seed la mantiene) y varios enlaces `ProjectLink` (nombre + URL http/https; anexar/modificar/eliminar con `canContribute`). Cada `ChecklistItem` admite `description` (texto breve opcional, máx. 600 caracteres; se muestra bajo el título y entra en «Copiar contexto para IA»). Equipo del proyecto: `ProjectMember` (nombre + rol opcional, sin usuario; solo control del equipo; CRUD con `canContribute`). La bitácora exige autor y solo acepta integrantes del proyecto (validado en `addProjectNote`); `ProjectNote.links` (Json `[{name,url}]`) guarda enlaces con nombre por nota. Renombrar un proyecto sembrado: dejar el título viejo en `formerTitles` para que el seed conserve su checklist y bitácora.
 
+**Bitácora de prácticas de laboratorio.** Cada práctica (sembrada desde `labPractices` del content, no está en BD) tiene su bitácora en `LabPracticeNote`, identificada por `practiceKey` = `"<labModule>|<número>"` (`lib/lab-log.ts`; si cambias `labModule` o `number` de una práctica, sus entradas quedan huérfanas). Tipos: OBSERVACION, DATO, INCIDENTE, PENDIENTE. El autor es la sesión (`session.name`); escriben todos menos el perfil `read` con alcance (profe), que solo lee (`canWriteLabLog`). UI en `components/lab-practice-log.tsx`, acciones en `lib/actions/lab-notes.ts`.
+
 **Contexto de proyecto para IA.** En `/[subject]/proyectos/[id]`, el botón «Copiar contexto para IA»
 (`project-context-button.tsx`; el texto lo arma el servidor con `projectContextPrompt` en
 `lib/prompts.ts`) copia asignatura, descripción completa, subtareas con su avance, enlaces,
@@ -176,6 +185,23 @@ de material y de usos viven en el cliente; la página del módulo pasa los datos
 bloques ya en el Markdown de `renderCornell` (enunciado y solución con Interpretación / Factor de
 conversión / Conclusión), listos para pegar en «Agregar». Si cambia `markdown-lite.ts`, actualizar
 las reglas de formato dentro de ese prompt (p. ej. `_{ }` solo funciona dentro de ```formula).
+
+**Modo desarrollador (solo Cesar).** Interruptor «Modo desarrollador» en el menú lateral (barra superior en
+móvil; `components/dev-mode-toggle.tsx`). Es una preferencia del navegador: la cookie `rxtrack_dev=1`
+(`DEV_MODE_COOKIE`, `setDevMode` en `lib/actions/dev-mode.ts`); la autoridad es el token firmado
+(`canUseDevMode` en `lib/auth.ts`: nombre Cesar, nivel full, sin alcance), así que ninguna otra cuenta lo
+ve ni lo activa, y se apaga solo mientras se usa «Ver como» (`developerModeOn()` en `lib/session.ts`).
+Encendido, `[subject]/layout.tsx` pinta bajo las pestañas el `DevPromptPanel` (`components/dev-prompt-panel.tsx`,
+plegado por defecto): según la URL (`devSectionFromPath`, `lib/dev-section.ts`, 14 secciones: panel, módulos,
+módulo, laboratorio, proyectos, proyecto, fechas, preparar parcial, repaso, glosario, fórmulas, bibliografía,
+insumos, prompt IA) pide al servidor `getDevPrompt` (`lib/actions/dev-prompt.ts`), que añade datos reales de la
+asignatura (solo conteos y títulos) a la ficha de la sección. El panel reemplaza `DEV_IDEA_PLACEHOLDER` por la
+idea de Cesar (guardada en `localStorage` por sección) y la copia. Es un prompt IA → IA: describe el proyecto,
+la sección (rutas y archivos reales, datos, permisos, límites) y le exige a la otra IA responder con preguntas,
+consejos de adaptación, impacto por capa, riesgos, plan y un «BRIEF PARA LA IA DEL PROYECTO» que se pega de
+vuelta aquí. **Mantenimiento: `lib/dev-context.ts` describe el código a mano** (contexto común + una ficha por
+sección). Si cambias archivos, modelos, permisos o comportamiento de una sección, actualiza su ficha; si cambias
+`schema.prisma`, el «mapa de datos» común. No menciona el diagnóstico (el texto se muestra en la interfaz).
 
 ## Estado
 

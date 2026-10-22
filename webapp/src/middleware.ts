@@ -1,6 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { SESSION_COOKIE, VIEW_AS_COOKIE, canViewHome, landingPath, verifyToken, viewProfileByKey } from "@/lib/auth";
+import {
+  SESSION_COOKIE,
+  VIEW_AS_COOKIE,
+  canViewHome,
+  hiddenSectionsFor,
+  landingPath,
+  verifyToken,
+  viewProfileByKey,
+} from "@/lib/auth";
 
 /** Archivos estáticos servidos desde /public que no pasan por el control de acceso. */
 const PUBLIC_FILE = /\.(?:svg|png|ico|webmanifest|js|json|txt|woff2?|map)$/;
@@ -38,6 +46,14 @@ export async function middleware(req: NextRequest) {
     if (!allowed) {
       const url = req.nextUrl.clone();
       url.pathname = landingPath({ name: who, level: profile.level, scope });
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+    // Secciones ocultas para esta cuenta (p. ej. Insumos): vuelve al panel de la asignatura.
+    const [subjectSeg, sectionSeg] = pathname.split("/").filter(Boolean);
+    if (sectionSeg && hiddenSectionsFor(who).includes(sectionSeg)) {
+      const url = req.nextUrl.clone();
+      url.pathname = `/${subjectSeg}`;
       url.search = "";
       return NextResponse.redirect(url);
     }

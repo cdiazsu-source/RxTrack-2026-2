@@ -12,6 +12,7 @@ import { SubjectSwitcher, type SwitcherSubject } from "@/components/subject-swit
 import { SearchDialog } from "@/components/search-dialog";
 import { QuickCapture } from "@/components/quick-capture";
 import { ViewAsMenu } from "@/components/view-as-menu";
+import { DevModeToggle } from "@/components/dev-mode-toggle";
 import { SIDE_ICON_BTN, SIDE_ICON_TIP } from "@/components/side-icon";
 import { subjectIcon } from "@/lib/subject-icons";
 import { BRAND_CREDIT, BRAND_SUBTITLE } from "@/lib/brand";
@@ -192,6 +193,8 @@ export function SiteNav({
   viewProfiles = [],
   scope = null,
   homeView = false,
+  devAvailable = false,
+  devOn = false,
 }: {
   canEdit: boolean;
   subjects: SwitcherSubject[];
@@ -208,6 +211,10 @@ export function SiteNav({
   scope?: SubjectScope[] | null;
   /** La sesión acotada también ve la portada (vista reducida): se añade «Semestre» a la barra. */
   homeView?: boolean;
+  /** Cesar: puede encender el modo desarrollador. */
+  devAvailable?: boolean;
+  /** El modo desarrollador está encendido. */
+  devOn?: boolean;
 }) {
   const pathname = usePathname();
   if (pathname === "/login") return null;
@@ -368,6 +375,11 @@ export function SiteNav({
 
       <div className="mr-3 border-t border-border pt-1.5">
         {viewingAs && <ViewingPill name={viewingName} className="mb-1.5 w-full" />}
+        {devAvailable && !viewingAs && (
+          <div className="mb-1">
+            <DevModeToggle on={devOn} variant="side" />
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <SearchDialog variant="icon" />
           <QuickCapture variant="icon" />
@@ -421,6 +433,7 @@ export function SiteNav({
                     Lectura
                   </span>
                 )}
+                {devAvailable && <DevModeToggle on={devOn} variant="bar" />}
                 {realFull && <ViewAsMenu profiles={viewProfiles} variant="bar" />}
               </>
             )}

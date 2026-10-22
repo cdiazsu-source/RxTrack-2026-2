@@ -77,6 +77,7 @@ model Subject {
   flashcards     Flashcard[]
   labReports     LabReport[]
   labModuleLinks LabModuleLink[]
+  labPracticeNotes LabPracticeNote[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -610,4 +611,24 @@ model AccountActivity {
   lastLoginAt DateTime?
   lastSeenAt  DateTime?
   loginCount  Int       @default(0)
+}
+
+/// Entrada de bitácora de una práctica de laboratorio. Las prácticas viven en
+/// content/<code>.ts (no en la BD), así que se identifican por `practiceKey`
+/// ("<agrupación>|<número>", ver lib/lab-log.ts). Guarda snapshot de autor.
+model LabPracticeNote {
+  id          String   @id @default(cuid())
+  subjectId   String
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  practiceKey String
+  /// OBSERVACION | DATO | INCIDENTE | PENDIENTE (se valida en la acción).
+  kind        String   @default("OBSERVACION")
+  body        String   @db.Text
+  author      String
+  authorRole  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId, practiceKey])
 }

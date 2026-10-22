@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 
 import { getSubjectBySlug } from "@/lib/subjects";
-import { getSession } from "@/lib/session";
+import { developerModeOn, getSession } from "@/lib/session";
+import { hiddenSectionsFor } from "@/lib/auth";
 import { SubjectSubnav } from "@/components/subject-subnav";
 import { SubjectFolderButton } from "@/components/subject-folder-button";
+import { DevPromptPanel } from "@/components/dev-prompt-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +16,7 @@ export default async function SubjectLayout({
   children: React.ReactNode;
   params: { subject: string };
 }) {
-  const [subject, session] = await Promise.all([getSubjectBySlug(params.subject), getSession()]);
+  const [subject, session, devOn] = await Promise.all([getSubjectBySlug(params.subject), getSession(), developerModeOn()]);
   if (!subject) notFound();
 
   // Sesión con acceso acotado (JOSE, Paula): solo sus asignaturas, y la
@@ -36,7 +38,9 @@ export default async function SubjectLayout({
         slug={subject.id}
         sections={subject.sections}
         lockedSection={scopeEntry?.section ?? null}
+        hiddenSections={session.authed ? hiddenSectionsFor(session.name) : []}
       />
+      {devOn && !scope && <DevPromptPanel slug={subject.id} />}
       {children}
     </div>
   );

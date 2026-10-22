@@ -430,7 +430,7 @@ export interface ResearchSession {
  * «Prompt de investigación» de un módulo: junta TODO lo que la app sabe del módulo
  * (descripción, desarrollo, glosario, fórmulas, ejercicios, apuntes de clase) y le
  * pide a la IA que investigue los términos y escriba un texto científico amplio que
- * sirva de insumo único para generar después un podcast, tarjetas de estudio, una guía
+ * sirva de base única para generar después un podcast, tarjetas de estudio, una guía
  * y/o un quiz. La persona lo pega en su IA (idealmente una con búsqueda web).
  */
 export function moduleResearchPrompt(opts: {
@@ -499,7 +499,7 @@ export function moduleResearchPrompt(opts: {
   if (uses.includes("podcast"))
     bloquesUso.push(
       [
-        "#### Insumos para podcast",
+        "#### Material para podcast",
         "* **Gancho de apertura** (2–3 frases con una pregunta o un dato sorprendente y verificable).",
         "* **Estructura de un episodio de 15–20 minutos:** apertura, tres bloques con su idea central y su analogía hablada, y cierre con la idea que debe quedar.",
         "* **Una historia o caso real** del tema (con año y fuente) que se pueda contar en voz alta.",
@@ -510,14 +510,14 @@ export function moduleResearchPrompt(opts: {
   if (uses.includes("tarjetas"))
     bloquesUso.push(
       [
-        "#### Insumos para tarjetas de estudio",
+        "#### Material para tarjetas de estudio",
         "Entre 30 y 60 tarjetas ATÓMICAS (una sola idea por tarjeta) en una tabla Markdown `| Frente | Reverso | Tipo |`, mezclando tipos: definición, «¿por qué?», comparación, cálculo corto con unidades, completar la frase y «error común». Los frentes deben ser preguntas concretas, no títulos; los reversos, de 1–3 líneas. Sin repetir el mismo dato en dos tarjetas.",
       ].join("\n"),
     );
   if (uses.includes("guia"))
     bloquesUso.push(
       [
-        "#### Insumos para guía de estudio",
+        "#### Material para guía de estudio",
         "* **Mapa conceptual** en viñetas jerárquicas (concepto → subconceptos → relaciones con verbos: «determina», «aumenta», «depende de»).",
         "* **Tabla comparativa** de los conceptos fáciles de confundir.",
         "* **Lista «debo saber hacer»** (verbos de acción: calcular, explicar, clasificar, interpretar) con un nivel de dificultad.",
@@ -527,7 +527,7 @@ export function moduleResearchPrompt(opts: {
   if (uses.includes("quiz"))
     bloquesUso.push(
       [
-        "#### Insumos para quiz",
+        "#### Material para quiz",
         "15 preguntas de práctica (mezcla de opción múltiple con 4 opciones, verdadero/falso con justificación y cálculo corto), cada una con su respuesta y una justificación de 1–3 líneas, ordenadas de fácil a difícil.",
       ].join("\n"),
     );
@@ -535,7 +535,7 @@ export function moduleResearchPrompt(opts: {
   return (
     `Eres un investigador y profesor universitario experto en ${opts.subjectName} (pregrado de Química Farmacéutica, Universidad Nacional de Colombia), ` +
     `con rigor científico y gran capacidad didáctica. Voy a darte TODO el material de UN módulo de mi curso. ` +
-    `Tu tarea: INVESTIGAR los términos y conceptos del módulo y escribir un TEXTO CIENTÍFICO AMPLIO que sea mi insumo único para producir después ` +
+    `Tu tarea: INVESTIGAR los términos y conceptos del módulo y escribir un TEXTO CIENTÍFICO AMPLIO que sea mi base única para producir después ` +
     `${uses.map((u) => usos[u]).join(", ")}.\n` +
     sec(
       "LA ASIGNATURA",
@@ -568,7 +568,7 @@ export function moduleResearchPrompt(opts: {
     `#### 7. Resumen ejecutivo\n(10 líneas)\n` +
     `#### 8. Fuentes\n(lista verificable: autores, año, título, revista o editorial, y DOI o URL. SOLO incluye las que realmente conoces o encontraste; NO inventes referencias ni DOI. Marca con [verificar] lo que no puedas confirmar)\n` +
     (bloquesUso.length
-      ? `**C. Termina con estas secciones de insumos** (todas derivadas del texto anterior, sin datos nuevos):\n${bloquesUso.join("\n")}\n`
+      ? `**C. Termina con estas secciones de material de estudio** (todas derivadas del texto anterior, sin datos nuevos):\n${bloquesUso.join("\n")}\n`
       : "") +
     `\n══════════ REGLAS ══════════\n` +
     `- Rigor primero: no inventes cifras, fechas ni referencias. Si dudas de un dato, escribe [verificar].\n` +

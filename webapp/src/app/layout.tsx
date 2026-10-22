@@ -5,7 +5,7 @@ import { SiteNav, MainFrame } from "@/components/site-nav";
 import { PwaRegister } from "@/components/pwa-register";
 import { Toaster } from "@/components/ui/toast";
 import { AccessProvider } from "@/components/access-context";
-import { canEdit, canContribute, getSession, realLevel } from "@/lib/session";
+import { canEdit, canContribute, canUseDeveloperMode, developerModeOn, getSession, realLevel } from "@/lib/session";
 import { listSubjects } from "@/lib/subjects";
 import { prisma } from "@/lib/prisma";
 import { canViewHome, listViewProfiles, trackedUsername } from "@/lib/auth";
@@ -41,11 +41,13 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [editable, contributor, session, realLvl, subjects, inboxCount] = await Promise.all([
+  const [editable, contributor, session, realLvl, devAvailable, devOn, subjects, inboxCount] = await Promise.all([
     canEdit(),
     canContribute(),
     getSession(),
     realLevel(),
+    canUseDeveloperMode(),
+    developerModeOn(),
     listSubjects(),
     prisma.inboxItem.count({ where: { triagedAt: null } }).catch(() => 0),
   ]);
@@ -72,6 +74,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             viewProfiles={realFull ? listViewProfiles() : []}
             scope={scope}
             homeView={session.authed && !!session.scope && canViewHome(session.name)}
+            devAvailable={devAvailable}
+            devOn={devOn}
           />
           <MainFrame sidebar={!scope || (session.authed && canViewHome(session.name))}>{children}</MainFrame>
           <Toaster />

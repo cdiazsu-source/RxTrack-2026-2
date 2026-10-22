@@ -56,7 +56,7 @@ function Toggle({
 /**
  * «Prompt de investigación» del módulo: junta descripción, desarrollo, glosario, fórmulas,
  * ejercicios y apuntes, y le pide a la IA un texto científico amplio, con los términos
- * investigados, que sirva de insumo para podcast, tarjetas, guía y quiz. La app no llama a
+ * investigados, que sirva de base para podcast, tarjetas, guía y quiz. La app no llama a
  * ninguna IA: solo arma el texto para que lo pegues en tu asistente.
  */
 export function ModuleResearchPrompt({ data }: { data: ModuleResearchData }) {
@@ -136,7 +136,7 @@ export function ModuleResearchPrompt({ data }: { data: ModuleResearchData }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <p className="text-xs font-medium text-muted-foreground">El texto debe servir de insumo para:</p>
+          <p className="text-xs font-medium text-muted-foreground">El texto debe servir de base para:</p>
           <div className="flex flex-wrap gap-2">
             {USES.map((u) => (
               <button
