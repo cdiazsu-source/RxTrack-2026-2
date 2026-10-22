@@ -179,6 +179,8 @@ resumen, fuentes) más secciones de insumos según lo marcado: podcast, tarjetas
 inventar referencias ni DOI (marcar [verificar]) y permite entregarlo por partes («sigue»). Los toggles
 de material y de usos viven en el cliente; la página del módulo pasa los datos como props.
 
+**Enlaces por sesión de apuntes.** Cada sesión (`session-notes.tsx`) admite varios enlaces `SessionLink` con nombre propio (OneNote, Gemini, diapositivas, fotos, Drive, video, otro): el tipo (`kind`, `lib/session-links.ts`) solo elige el ícono y el nombre sugerido, y se adivina por el dominio al pegar la URL. Solo http(s) (`cleanHttpUrl`); anexar/modificar/eliminar con `canContribute` (`addSessionLink`/`updateSessionLink`/`deleteSessionLink` en `lib/actions/sessions.ts`, UI en `components/session-links.tsx`). Convive con el antiguo `slidesUrl` («Diapositivas (enlace)»), que no se migró.
+
 **Prompt de ejercicios.** El panel «Ejercicios» de cada módulo tiene el botón «Prompt para IA»
 (`exerciseSolutionPrompt` en `lib/prompts.ts`): arma un texto con el contexto del módulo
 (glosario, fórmulas, descripción) + el enunciado que pegues, y exige que la IA devuelva dos

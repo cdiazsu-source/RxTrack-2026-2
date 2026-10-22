@@ -8,6 +8,8 @@ import { revalidateAll } from "@/lib/revalidate";
 import { touchSubject } from "@/lib/subjects";
 import { parseDateInput } from "@/lib/utils";
 import { semesterWeekNumber } from "@/lib/academic-week";
+import { cleanHttpUrl } from "@/lib/url";
+import { SESSION_LINK_KIND_NAME, asSessionLinkKind } from "@/lib/session-links";
 
 async function subjectIdOfModule(moduleId: string) {
   const m = await prisma.module.findUnique({ where: { id: moduleId }, select: { subjectId: true } });
@@ -105,5 +107,37 @@ export async function setSessionSlidesUrl(sessionId: string, formData: FormData)
 export async function deleteSession(sessionId: string) {
   if (await blockedForContribute()) return;
   await prisma.session.delete({ where: { id: sessionId } });
+  revalidateAll();
+}
+
+/** Enlaces de la sesión (OneNote, Gemini, diapositivas, fotos…): nombre propio + tipo (ícono). */
+function readSessionLink(formData: FormData) {
+  const url = cleanHttpUrl(String(formData.get("url") ?? ""));
+  if (!url) return null;
+  const kind = asSessionLinkKind(formData.get("kind"));
+  const name = String(formData.get("name") ?? "").trim().slice(0, 120) || SESSION_LINK_KIND_NAME[kind] || new URL(url).hostname;
+  return { url, kind, name };
+}
+
+export async function addSessionLink(sessionId: string, formData: FormData) {
+  if (await blockedForContribute()) return;
+  const d = readSessionLink(formData);
+  if (!d) return;
+  const last = await prisma.sessionLink.findFirst({ where: { sessionId }, orderBy: { order: "desc" }, select: { order: true } });
+  await prisma.sessionLink.create({ data: { sessionId, ...d, order: (last?.order ?? -1) + 1 } });
+  revalidateAll();
+}
+
+export async function updateSessionLink(linkId: string, formData: FormData) {
+  if (await blockedForContribute()) return;
+  const d = readSessionLink(formData);
+  if (!d) return;
+  await prisma.sessionLink.update({ where: { id: linkId }, data: d });
+  revalidateAll();
+}
+
+export async function deleteSessionLink(linkId: string) {
+  if (await blockedForContribute()) return;
+  await prisma.sessionLink.delete({ where: { id: linkId } }).catch(() => undefined);
   revalidateAll();
 }

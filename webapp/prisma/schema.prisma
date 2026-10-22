@@ -169,11 +169,30 @@ model Session {
   /// se marca a mano y ya no baja.
   status     SessionStatus @default(CRUDA)
 
+  /// Enlaces con nombre propio (OneNote, Gemini, diapositivas, fotos…).
+  links SessionLink[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([moduleId])
   @@index([updatedAt])
+}
+
+/// Enlace anexado a la sesión de apuntes. `kind` solo elige el ícono; el nombre lo pone la persona.
+model SessionLink {
+  id        String  @id @default(cuid())
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name      String
+  url       String
+  /// ONENOTE | IA | DIAPOSITIVAS | FOTOS | DRIVE | VIDEO | OTRO (se valida en la acción).
+  kind      String  @default("OTRO")
+  order     Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
 }
 
 /// Subtarea. Cuelga de un Module (entregables del temario) O de un Project

@@ -36,7 +36,7 @@ export default async function ModuleDetailPage({
     prisma.module.findFirst({
       where: { id: params.moduleId, subjectId: subject.id },
       include: {
-        sessions: { orderBy: { number: "asc" } },
+        sessions: { orderBy: { number: "asc" }, include: { links: { orderBy: { order: "asc" } } } },
         checklistItems: { orderBy: { order: "asc" } },
         resources: { orderBy: { order: "asc" } },
         labMaterials: { orderBy: { order: "asc" } },
@@ -67,6 +67,7 @@ export default async function ModuleDetailPage({
     content: s.content,
     transcript: s.transcript,
     slidesUrl: s.slidesUrl,
+    links: s.links.map((l) => ({ id: l.id, name: l.name, url: l.url, kind: l.kind })),
     slidesText: s.slidesText,
     author: s.author,
     status: s.status,

@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HelpHint } from "@/components/help-hint";
 import { PromptBox } from "@/components/prompt-box";
 import { DriveLinkEditor } from "@/components/drive-link-editor";
+import { SessionLinks, type SessionLinkView } from "@/components/session-links";
 import { SymbolToolbar } from "@/components/symbol-toolbar";
 import { useCanContribute } from "@/components/access-context";
 import { renderCornell } from "@/lib/markdown-lite";
@@ -78,6 +79,7 @@ export type SessionView = {
   content: string;
   transcript: string | null;
   slidesUrl: string | null;
+  links: SessionLinkView[];
   slidesText: string | null;
   author: string | null;
   status: SessionStatus;
@@ -402,6 +404,8 @@ function SessionArticle({
           </button>
         )}
       </div>
+
+      <SessionLinks sessionId={s.id} links={s.links} />
 
       {showSlides && s.slidesText && (
         <div
