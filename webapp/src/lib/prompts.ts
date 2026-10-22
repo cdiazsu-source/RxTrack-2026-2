@@ -14,7 +14,7 @@ export interface PromptModule {
  * autosuficiente (asignatura + agrupación del laboratorio + equipo + práctica en
  * detalle) para pegarlo en cualquier IA y poder hacerle preguntas puntuales.
  */
-export function labPracticePrompt(opts: {
+export interface LabPromptOpts {
   subjectName: string;
   /** Resumen y objetivo de la asignatura (contexto general para la IA). */
   subjectSummary?: string | null;
@@ -35,7 +35,10 @@ export function labPracticePrompt(opts: {
     dataRequested: string[];
     studyTopics?: string[];
   };
-}): string {
+}
+
+/** Bloque de contexto compartido: asignatura + laboratorio + práctica completa. */
+function labPracticeContext(opts: LabPromptOpts): string {
   const p = opts.practice;
   const lm = opts.labModule ?? null;
   const bloque = (titulo: string, items: string[]) =>
@@ -57,11 +60,6 @@ export function labPracticePrompt(opts: {
     : "";
 
   return (
-    `Eres un asistente experto en química analítica, análisis instrumental y ` +
-    `prácticas de laboratorio farmacéutico. Voy a hacerte preguntas puntuales ` +
-    `sobre UNA práctica de laboratorio. Primero lee TODO el contexto de abajo ` +
-    `(asignatura, laboratorio y práctica); después responde solo con base en él ` +
-    `y en tu conocimiento técnico.\n\n` +
     asignatura +
     laboratorio +
     `\n══════════ PRÁCTICA ${lm ? `(${lm.name}) ` : ""}${p.number} — ${p.title} ══════════\n\n` +
@@ -71,7 +69,18 @@ export function labPracticePrompt(opts: {
     `\nPROCEDIMIENTO:\n${stripMarkup(p.procedure)}\n` +
     bloque("ECUACIONES QUE NECESITO", p.equations) +
     bloque("DATOS QUE DEBO REGISTRAR", p.dataRequested.map(stripMarkup)) +
-    bloque("TEMAS DE CONSULTA", (p.studyTopics ?? []).map(stripMarkup)) +
+    bloque("TEMAS DE CONSULTA", (p.studyTopics ?? []).map(stripMarkup))
+  );
+}
+
+export function labPracticePrompt(opts: LabPromptOpts): string {
+  return (
+    `Eres un asistente experto en química analítica, análisis instrumental y ` +
+    `prácticas de laboratorio farmacéutico. Voy a hacerte preguntas puntuales ` +
+    `sobre UNA práctica de laboratorio. Primero lee TODO el contexto de abajo ` +
+    `(asignatura, laboratorio y práctica); después responde solo con base en él ` +
+    `y en tu conocimiento técnico.\n\n` +
+    labPracticeContext(opts) +
     `\nCÓMO QUIERO QUE ME RESPONDAS:\n` +
     `- Paso a paso, con paciencia y sin dar por sabido nada: no tengo buenas bases en química analítica.\n` +
     `- En cada cálculo: interpreta primero qué se está calculando, muestra los FACTORES DE CONVERSIÓN con las unidades que se cancelan, y cierra con una conclusión.\n` +
@@ -80,6 +89,56 @@ export function labPracticePrompt(opts: {
     `Con este contexto, respóndeme lo que te pregunte sobre esta práctica: ` +
     `montaje, cálculos con mis datos, interpretación de resultados, fuentes de ` +
     `error, tratamiento estadístico, qué esperar y cómo redactar la discusión.`
+  );
+}
+
+export interface LabLogPromptEntry {
+  /** Fecha y hora ya formateadas. */
+  when: string;
+  /** Tipo en texto: "Observación", "Dato medido", "Incidente", "Pendiente". */
+  kind: string;
+  author: string;
+  body: string;
+}
+
+/**
+ * Prompt de seguimiento de una práctica: contexto completo + la bitácora que la
+ * persona ha escrito (cronológica) para que la IA ubique en qué paso va, diga qué
+ * sigue y explique/interprete el fundamento detrás de cada paso del procedimiento.
+ */
+export function labLogPrompt(opts: LabPromptOpts & { entries: LabLogPromptEntry[]; today: string }): string {
+  const bitacora = opts.entries.length
+    ? opts.entries.map((e, i) => `${i + 1}. [${e.when}] (${e.kind}, ${e.author}) ${e.body.replace(/\n+/g, " ⏎ ")}`).join("\n")
+    : "(Todavía no he escrito nada en la bitácora: asume que estoy por empezar la práctica.)";
+
+  return (
+    `Eres un tutor experto en química analítica, análisis instrumental y prácticas de laboratorio ` +
+    `farmacéutico. Me acompañas MIENTRAS hago UNA práctica: quiero entender en qué paso estoy, qué ` +
+    `sigue, y por qué se hace cada paso. Lee TODO el contexto y mi bitácora antes de responder.\n\n` +
+    labPracticeContext(opts) +
+    `\n══════════ MI BITÁCORA (de la más antigua a la más reciente; hoy es ${opts.today}) ══════════\n` +
+    `Es lo que yo mismo fui anotando durante la práctica. Los tipos son: Observación (lo que vi o hice), ` +
+    `Dato medido (valores con sus unidades), Incidente (algo que salió mal o distinto) y Pendiente (algo que me falta).\n\n` +
+    `${bitacora}\n\n` +
+    `══════════ QUÉ NECESITO DE TI ══════════\n` +
+    `Responde con estas secciones, en este orden:\n\n` +
+    `1. DÓNDE ESTOY. Numera los pasos del PROCEDIMIENTO y dime, con base SOLO en mi bitácora, cuáles ` +
+    `ya están hechos, cuál estoy haciendo ahora y cuáles no tienen evidencia. Cita la entrada de la bitácora ` +
+    `que te hace pensar eso. Si una entrada es ambigua o falta información, no la supongas: dímelo y pregúntame.\n\n` +
+    `2. QUÉ SIGUE. El siguiente paso concreto y lo que debo tener listo antes de hacerlo (material, reactivos, ` +
+    `condiciones), qué dato debo registrar en ese momento y qué precauciones tomar. Si hay Incidentes o Pendientes ` +
+    `sin resolver en mi bitácora, dime cómo afectan lo que sigue y qué hacer con ellos.\n\n` +
+    `3. EL FUNDAMENTO DE CADA PASO. Para el paso actual, el siguiente y cada uno de los demás (aunque ya los haya hecho), ` +
+    `explícame con tus propias palabras e interpretándolo: qué se hace, POR QUÉ se hace así (el principio químico o ` +
+    `físico detrás), qué pasaría si se omite o se hace mal, y qué debería ver o medir para saber que salió bien. ` +
+    `Usa analogías sencillas y no uses ningún término técnico ni sigla sin explicarlo antes.\n\n` +
+    `4. INTERPRETACIÓN DE LO QUE YA TENGO. Revisa mis Datos medidos: ¿las unidades y los órdenes de magnitud tienen sentido? ` +
+    `¿son coherentes con lo esperado en esta práctica? Si hay cálculos posibles con lo que ya medí, hazlos paso a paso: ` +
+    `qué se calcula, FACTORES DE CONVERSIÓN con las unidades que se cancelan, y una conclusión. Señala posibles fuentes de error.\n\n` +
+    `5. PREGUNTAS PARA MÍ. Máximo 5 preguntas, solo las que de verdad necesites para orientarme mejor en el próximo mensaje.\n\n` +
+    `Reglas: no inventes datos que no escribí; si falta uno, pídemelo. Si hay una reacción, escríbela balanceada y explica ` +
+    `la estequiometría; si un reactivo puede estar hidratado, dime con qué masa molar trabajas y por qué. No tengo buenas ` +
+    `bases en química analítica: ve despacio y no des nada por sabido.`
   );
 }
 

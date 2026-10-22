@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, Eye, Sparkles } from "lucide-react";
 
@@ -8,13 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HelpHint } from "@/components/help-hint";
 import { PromptBox } from "@/components/prompt-box";
-import { labPracticePrompt } from "@/lib/prompts";
+import { labLogPrompt, labPracticePrompt, type LabPromptOpts } from "@/lib/prompts";
+import { APP_TIME_ZONE, formatDateTime } from "@/lib/utils";
 import { inlineLite, renderCornell } from "@/lib/markdown-lite";
 import { renderFormula } from "@/lib/formula-markup";
 import { MermaidDiagram } from "@/components/mermaid-diagram";
 import { LabModuleLinkButton } from "@/components/lab-module-link-button";
 import { LabPracticeLog, type LabNoteView } from "@/components/lab-practice-log";
-import { practiceKey } from "@/lib/lab-log";
+import { LAB_NOTE_KIND_LABEL, asLabNoteKind, practiceKey } from "@/lib/lab-log";
 import type { ExerciseContent, LabModuleContent, LabPracticeContent } from "@/lib/subject-content";
 
 /** Preparación para el quiz de la práctica: de una pregunta en una, con
@@ -151,6 +152,36 @@ function PracticeItem({
     ),
   );
 
+  const promptOpts: LabPromptOpts = {
+    subjectName,
+    subjectSummary,
+    subjectObjective,
+    moduleTitle,
+    labModule,
+    practice: {
+      number: p.number,
+      title: p.title,
+      fundamento: p.fundamento,
+      desarrollo: p.desarrollo,
+      keyPoints: p.keyPoints,
+      procedure: p.procedure,
+      equations: equationLines,
+      dataRequested: p.dataRequested,
+      studyTopics: p.studyTopics,
+    },
+  };
+
+  // Fecha de hoy solo en el cliente (evita desajuste de hidratación).
+  const [today, setToday] = useState("");
+  useEffect(() => setToday(new Intl.DateTimeFormat("es-CO", { day: "2-digit", month: "long", year: "numeric", timeZone: APP_TIME_ZONE }).format(new Date())), []);
+  const logPrompt = labLogPrompt({
+    ...promptOpts,
+    today: today || "hoy",
+    entries: [...notes]
+      .sort((a, b) => +new Date(a.createdAt) - +new Date(b.createdAt))
+      .map((n) => ({ when: formatDateTime(n.createdAt), kind: LAB_NOTE_KIND_LABEL[asLabNoteKind(n.kind)], author: n.author, body: n.body })),
+  });
+
   return (
     <details className="group rounded-lg border border-border bg-card [&_summary]:list-none">
       <summary className="flex cursor-pointer items-center justify-between gap-2 p-4">
@@ -265,6 +296,24 @@ function PracticeItem({
         <SectionLabel>Bitácora de la práctica ({notes.length})</SectionLabel>
         <LabPracticeLog subjectId={subjectSlug} practiceKey={practiceKey(p)} notes={notes} canWrite={canWriteLog} />
 
+        <details className="group/log mt-2 rounded-lg border border-primary/30 bg-primary/[0.03]">
+          <summary className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm font-medium text-primary [&::-webkit-details-marker]:hidden">
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5" />
+              Copiar prompt: ¿en qué paso voy, qué sigue y por qué se hace cada paso?
+            </span>
+            <ChevronRight className="h-4 w-4 shrink-0 transition-transform group-open/log:rotate-90" aria-hidden />
+          </summary>
+          <div className="border-t border-primary/20 p-3 pt-2">
+            <p className="mb-2 text-xs text-muted-foreground">
+              Junta el contexto completo de la práctica con las {notes.length} {notes.length === 1 ? "entrada" : "entradas"} de tu
+              bitácora. Pídele a la IA que ubique en qué paso estás, qué sigue, y que explique e interprete el fundamento de cada paso.
+              Vuelve a copiarlo después de anotar algo nuevo.
+            </p>
+            <PromptBox rows={12} text={logPrompt} />
+          </div>
+        </details>
+
         <SectionLabel>Prompt de contexto</SectionLabel>
         <details className="group/prompt mt-1 rounded-lg border border-primary/30 bg-primary/[0.03]">
           <summary className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm font-medium text-primary [&::-webkit-details-marker]:hidden">
@@ -281,24 +330,7 @@ function PracticeItem({
             </p>
             <PromptBox
               rows={12}
-              text={labPracticePrompt({
-                subjectName,
-                subjectSummary,
-                subjectObjective,
-                moduleTitle,
-                labModule,
-                practice: {
-                  number: p.number,
-                  title: p.title,
-                  fundamento: p.fundamento,
-                  desarrollo: p.desarrollo,
-                  keyPoints: p.keyPoints,
-                  procedure: p.procedure,
-                  equations: equationLines,
-                  dataRequested: p.dataRequested,
-                  studyTopics: p.studyTopics,
-                },
-              })}
+              text={labPracticePrompt(promptOpts)}
             />
           </div>
         </details>
