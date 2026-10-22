@@ -44,7 +44,11 @@ export default async function LaboratorioPage({ params }: { params: { subject: s
     (notesByPractice[n.practiceKey] ??= []).push({
       id: n.id,
       kind: n.kind,
+      step: n.step,
       body: n.body,
+      data: n.data,
+      why: n.why,
+      meaning: n.meaning,
       author: n.author,
       authorRole: n.authorRole,
       createdAt: n.createdAt.toISOString(),

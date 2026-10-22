@@ -15,7 +15,7 @@ import { renderFormula } from "@/lib/formula-markup";
 import { MermaidDiagram } from "@/components/mermaid-diagram";
 import { LabModuleLinkButton } from "@/components/lab-module-link-button";
 import { LabPracticeLog, type LabNoteView } from "@/components/lab-practice-log";
-import { LAB_NOTE_KIND_LABEL, asLabNoteKind, practiceKey } from "@/lib/lab-log";
+import { LAB_NOTE_KIND_LABEL, asLabNoteKind, parsePracticeSteps, practiceKey, stepLabel } from "@/lib/lab-log";
 import type { ExerciseContent, LabModuleContent, LabPracticeContent } from "@/lib/subject-content";
 
 /** Preparación para el quiz de la práctica: de una pregunta en una, con
@@ -174,12 +174,25 @@ function PracticeItem({
   // Fecha de hoy solo en el cliente (evita desajuste de hidratación).
   const [today, setToday] = useState("");
   useEffect(() => setToday(new Intl.DateTimeFormat("es-CO", { day: "2-digit", month: "long", year: "numeric", timeZone: APP_TIME_ZONE }).format(new Date())), []);
+  const stepsById = new Map(parsePracticeSteps(p.procedure).map((x) => [x.id, x]));
   const logPrompt = labLogPrompt({
     ...promptOpts,
     today: today || "hoy",
     entries: [...notes]
       .sort((a, b) => +new Date(a.createdAt) - +new Date(b.createdAt))
-      .map((n) => ({ when: formatDateTime(n.createdAt), kind: LAB_NOTE_KIND_LABEL[asLabNoteKind(n.kind)], author: n.author, body: n.body })),
+      .map((n) => {
+        const st = n.step ? stepsById.get(n.step) : undefined;
+        return {
+          when: formatDateTime(n.createdAt),
+          kind: LAB_NOTE_KIND_LABEL[asLabNoteKind(n.kind)],
+          author: n.author,
+          step: st ? stepLabel(st, 140) : null,
+          body: n.body,
+          data: n.data,
+          why: n.why,
+          meaning: n.meaning,
+        };
+      }),
   });
 
   return (
@@ -294,7 +307,7 @@ function PracticeItem({
         )}
 
         <SectionLabel>Bitácora de la práctica ({notes.length})</SectionLabel>
-        <LabPracticeLog subjectId={subjectSlug} practiceKey={practiceKey(p)} notes={notes} canWrite={canWriteLog} />
+        <LabPracticeLog subjectId={subjectSlug} practiceKey={practiceKey(p)} notes={notes} canWrite={canWriteLog} procedure={p.procedure} promptOpts={promptOpts} />
 
         <details className="group/log mt-2 rounded-lg border border-primary/30 bg-primary/[0.03]">
           <summary className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm font-medium text-primary [&::-webkit-details-marker]:hidden">

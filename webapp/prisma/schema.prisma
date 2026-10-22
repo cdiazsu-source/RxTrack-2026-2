@@ -623,7 +623,16 @@ model LabPracticeNote {
   practiceKey String
   /// OBSERVACION | DATO | INCIDENTE | PENDIENTE (se valida en la acción).
   kind        String   @default("OBSERVACION")
+  /// Paso del procedimiento ("<grupo>.<n>", ver parsePracticeSteps en lib/lab-log.ts); null = entrada libre.
+  step        String?
+  /// "Qué hice".
   body        String   @db.Text
+  /// Datos con unidades y cálculo.
+  data        String?  @db.Text
+  /// Por qué se hace así (fundamento, con palabras propias o pegado de una IA).
+  why         String?  @db.Text
+  /// Qué significa / qué concluyo / qué duda queda.
+  meaning     String?  @db.Text
   author      String
   authorRole  String?
 

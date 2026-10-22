@@ -213,7 +213,7 @@ const SECTIONS: Record<DevSectionKey, SectionInfo> = {
     ],
     data: [
       "Desde el archivo de contenido (no BD): labRules[], labModules[], labPractices[].",
-      "BD: LabReport (number, title, status, grade, dueDate, driveUrl, content Markdown) con ChecklistItem[] (preparación), LabModuleLink (enlace por agrupación, único por asignatura+nombre), LabPracticeNote (bitácora de cada práctica, clave practiceKey).",
+      "BD (entradas de bitácora con paso, dato, porqué y significado): LabReport (number, title, status, grade, dueDate, driveUrl, content Markdown) con ChecklistItem[] (preparación), LabModuleLink (enlace por agrupación, único por asignatura+nombre), LabPracticeNote (bitácora de cada práctica, clave practiceKey).",
     ],
     behavior: [
       "Las prácticas y reglas son de solo lectura y salen de content/<codigo>.ts; cada práctica trae un prompt de contexto copiable y su propia «Bitácora de la práctica» (entradas con tipo Observación/Dato medido/Incidente/Pendiente, autor = quien inició sesión, fecha y hora; editable/borrable; escribe cualquier sesión salvo el profe, que solo lee) y un prompt copiable (labLogPrompt) que combina el contexto de la práctica con esa bitácora para que una IA diga en qué paso va la persona, qué sigue y explique el fundamento de cada paso.",

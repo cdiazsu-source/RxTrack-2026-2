@@ -98,7 +98,26 @@ export interface LabLogPromptEntry {
   /** Tipo en texto: "Observación", "Dato medido", "Incidente", "Pendiente". */
   kind: string;
   author: string;
+  /** Paso del procedimiento al que corresponde (texto ya armado), si lo eligió. */
+  step?: string | null;
+  /** «Qué hice». */
   body: string;
+  data?: string | null;
+  /** Mi explicación del porqué (puede venir de una IA). */
+  why?: string | null;
+  meaning?: string | null;
+}
+
+/** Una entrada de bitácora como líneas de texto para el prompt. */
+function entryLines(e: LabLogPromptEntry, i: number): string {
+  const one = (t: string) => t.replace(/\n+/g, " ⏎ ");
+  return (
+    `${i + 1}. [${e.when}] (${e.kind}, ${e.author})${e.step ? ` — ${e.step}` : ""}\n` +
+    `   Qué hice: ${one(e.body)}` +
+    (e.data ? `\n   Dato: ${one(e.data)}` : "") +
+    (e.why ? `\n   Por qué (mi explicación): ${one(e.why)}` : "") +
+    (e.meaning ? `\n   Qué significa para mí: ${one(e.meaning)}` : "")
+  );
 }
 
 /**
@@ -108,7 +127,7 @@ export interface LabLogPromptEntry {
  */
 export function labLogPrompt(opts: LabPromptOpts & { entries: LabLogPromptEntry[]; today: string }): string {
   const bitacora = opts.entries.length
-    ? opts.entries.map((e, i) => `${i + 1}. [${e.when}] (${e.kind}, ${e.author}) ${e.body.replace(/\n+/g, " ⏎ ")}`).join("\n")
+    ? opts.entries.map(entryLines).join("\n")
     : "(Todavía no he escrito nada en la bitácora: asume que estoy por empezar la práctica.)";
 
   return (
@@ -117,7 +136,7 @@ export function labLogPrompt(opts: LabPromptOpts & { entries: LabLogPromptEntry[
     `sigue, y por qué se hace cada paso. Lee TODO el contexto y mi bitácora antes de responder.\n\n` +
     labPracticeContext(opts) +
     `\n══════════ MI BITÁCORA (de la más antigua a la más reciente; hoy es ${opts.today}) ══════════\n` +
-    `Es lo que yo mismo fui anotando durante la práctica. Los tipos son: Observación (lo que vi o hice), ` +
+    `Es lo que yo mismo fui anotando durante la práctica; cada entrada trae lo que hice, el dato, mi explicación del porqué y lo que concluí (los bloques vacíos son cosas que aún no he escrito). Los tipos son: Observación (lo que vi o hice), ` +
     `Dato medido (valores con sus unidades), Incidente (algo que salió mal o distinto) y Pendiente (algo que me falta).\n\n` +
     `${bitacora}\n\n` +
     `══════════ QUÉ NECESITO DE TI ══════════\n` +
@@ -131,7 +150,8 @@ export function labLogPrompt(opts: LabPromptOpts & { entries: LabLogPromptEntry[
     `3. EL FUNDAMENTO DE CADA PASO. Para el paso actual, el siguiente y cada uno de los demás (aunque ya los haya hecho), ` +
     `explícame con tus propias palabras e interpretándolo: qué se hace, POR QUÉ se hace así (el principio químico o ` +
     `físico detrás), qué pasaría si se omite o se hace mal, y qué debería ver o medir para saber que salió bien. ` +
-    `Usa analogías sencillas y no uses ningún término técnico ni sigla sin explicarlo antes.\n\n` +
+    `Usa analogías sencillas y no uses ningún término técnico ni sigla sin explicarlo antes. ` +
+    `Si ya escribí mi propio «Por qué», dime si está bien, qué le falta y corrígelo con tacto.\n\n` +
     `4. INTERPRETACIÓN DE LO QUE YA TENGO. Revisa mis Datos medidos: ¿las unidades y los órdenes de magnitud tienen sentido? ` +
     `¿son coherentes con lo esperado en esta práctica? Si hay cálculos posibles con lo que ya medí, hazlos paso a paso: ` +
     `qué se calcula, FACTORES DE CONVERSIÓN con las unidades que se cancelan, y una conclusión. Señala posibles fuentes de error.\n\n` +
@@ -139,6 +159,48 @@ export function labLogPrompt(opts: LabPromptOpts & { entries: LabLogPromptEntry[
     `Reglas: no inventes datos que no escribí; si falta uno, pídemelo. Si hay una reacción, escríbela balanceada y explica ` +
     `la estequiometría; si un reactivo puede estar hidratado, dime con qué masa molar trabajas y por qué. No tengo buenas ` +
     `bases en química analítica: ve despacio y no des nada por sabido.`
+  );
+}
+
+/**
+ * Prompt para entender UN paso: contexto de la práctica + el paso elegido + lo que la
+ * persona ya escribió en ese borrador de entrada. La respuesta se pega en «Por qué».
+ */
+export function labStepPrompt(
+  opts: LabPromptOpts & {
+    /** «C · Paso 2: …» o null si la entrada no está ligada a un paso. */
+    step: string | null;
+    draft: { body: string; data: string; why: string; meaning: string };
+  },
+): string {
+  const d = opts.draft;
+  const mine =
+    [
+      d.body && `Qué hice: ${d.body}`,
+      d.data && `Dato: ${d.data}`,
+      d.why && `Mi explicación actual del porqué: ${d.why}`,
+      d.meaning && `Lo que creo que significa: ${d.meaning}`,
+    ]
+      .filter(Boolean)
+      .join("\n") || "(Todavía no he escrito nada de este paso.)";
+
+  return (
+    `Eres un tutor experto en química analítica y prácticas de laboratorio farmacéutico. Estoy en medio de una práctica ` +
+    `y quiero ENTENDER un paso concreto, no solo hacerlo. Lee el contexto y luego explícamelo.\n\n` +
+    labPracticeContext(opts) +
+    `\n══════════ EL PASO QUE QUIERO ENTENDER ══════════\n` +
+    `${opts.step ?? "(No elegí un paso del procedimiento: deduce de lo que escribí cuál es.)"}\n\n` +
+    `LO QUE YA ESCRIBÍ DE ESTE PASO:\n${mine}\n\n` +
+    `══════════ QUÉ NECESITO DE TI ══════════\n` +
+    `1. QUÉ PASA FÍSICAMENTE. Qué ocurre en el vaso, el balón, la celda o el equipo en este paso, en lenguaje sencillo y con una analogía.\n` +
+    `2. POR QUÉ SE HACE ASÍ. El principio químico o físico detrás, y por qué esta forma y no otra (orden, cantidades, material, tiempos).\n` +
+    `3. QUÉ PASA SI SE HACE MAL. Los errores típicos, cómo se notarían en el resultado y cómo evitarlos.\n` +
+    `4. INTERPRETA MI DATO. Si escribí un dato, revisa unidades y orden de magnitud, rehaz el cálculo con factores de conversión ` +
+    `(las unidades que se cancelan a la vista), dime si es coherente y qué significa. Si no escribí dato, dime cuál debería registrar y cómo esperar que se vea.\n` +
+    `5. REVISA MI EXPLICACIÓN. Si escribí un «porqué» o un «qué significa», dime qué está bien, qué le falta y corrígelo con tacto.\n` +
+    `6. PARA MI BITÁCORA. Cierra con un bloque de máximo 4 frases, con mis propias palabras de estudiante, que yo pueda pegar en el campo «Por qué se hace así».\n\n` +
+    `Reglas: no uses términos ni siglas sin explicarlos antes; no inventes datos que no escribí (si falta uno, pídemelo); ` +
+    `si hay una reacción, escríbela balanceada y explica la estequiometría. No tengo buenas bases en química analítica: ve despacio.`
   );
 }
 
