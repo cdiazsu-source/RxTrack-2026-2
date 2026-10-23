@@ -46,19 +46,25 @@ async function courseLiveLines(key: DevSectionKey, entityId: string | null): Pro
         startDate: true,
         endDate: true,
         totalSessions: true,
-        sessions: { select: { attended: true, content: true, date: true, _count: { select: { links: true } } } },
-        tasks: { select: { done: true, dueDate: true } },
-        keeps: { select: { tag: true, pinned: true } },
-        links: { select: { sessionId: true, kind: true } },
+        sessions: { orderBy: [{ date: "asc" }, { number: "asc" }], select: { number: true, topic: true, attended: true, content: true, date: true, _count: { select: { links: true } } } },
+        tasks: { orderBy: [{ order: "asc" }, { createdAt: "asc" }], select: { text: true, done: true, dueDate: true } },
+        keeps: { select: { title: true, tag: true, pinned: true } },
+        links: { select: { name: true, sessionId: true, kind: true } },
       },
     });
     if (c) {
       const now = Date.now();
+      lines.push(`Id del curso (úsalo en el brief): ${entityId}.`);
       lines.push(`Curso abierto: «${c.title}» (estado ${c.status}, modalidad ${c.modality ?? "sin definir"}${c.provider ? ", con institución" : ""}${c.goal ? ", con meta escrita" : ", sin meta"}${c.schedule ? ", con horario" : ""}).`);
       lines.push(`Fechas: ${c.startDate ? formatDate(c.startDate) : "sin inicio"} a ${c.endDate ? formatDate(c.endDate) : "sin fin"}. Clases totales declaradas: ${c.totalSessions ?? "no definidas"}.`);
       lines.push(`Clases registradas: ${c.sessions.length} (asistidas ${c.sessions.filter((s) => s.attended).length}; con apuntes ${c.sessions.filter((s) => s.content.trim()).length}; enlaces de clase ${c.sessions.reduce((n, s) => n + s._count.links, 0)}).`);
       lines.push(`Tareas: ${c.tasks.filter((t) => t.done).length}/${c.tasks.length} hechas; pendientes vencidas ${c.tasks.filter((t) => !t.done && t.dueDate && +t.dueDate < now).length}; sin fecha ${c.tasks.filter((t) => !t.done && !t.dueDate).length}.`);
       lines.push(`Para el futuro: ${c.keeps.length} (${countBy(c.keeps, (k) => k.tag)}; fijados ${c.keeps.filter((k) => k.pinned).length}). Enlaces del curso: ${c.links.filter((l) => !l.sessionId).length} (${countBy(c.links.filter((l) => !l.sessionId), (l) => l.kind)}).`);
+      const day = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : "sin fecha");
+      if (c.sessions.length) lines.push(`Clases (solo tema, fecha y tamaño de los apuntes, no su texto): ${list(c.sessions.map((x) => `${x.number ?? "?"}. «${clip(x.topic)}» (${day(x.date)}${x.attended ? "" : ", no asistí"}, ${x.content.trim() ? `${x.content.length} car.` : "sin apuntes"}${x._count.links ? `, ${x._count.links} enlace(s)` : ""})`))}.`);
+      if (c.tasks.length) lines.push(`Tareas: ${list(c.tasks.map((t) => `${t.done ? "[x]" : "[ ]"} «${clip(t.text)}»${t.dueDate ? ` (${day(t.dueDate)})` : ""}`))}.`);
+      if (c.keeps.length) lines.push(`Guardados «para el futuro» (solo títulos): ${list(c.keeps.map((k) => `«${clip(k.title)}» [${k.tag}${k.pinned ? ", fijado" : ""}]`))}.`);
+      if (c.links.length) lines.push(`Enlaces (solo nombres y tipos, sin URL): ${list(c.links.map((l) => `«${clip(l.name, 40)}» [${l.kind}${l.sessionId ? ", de una clase" : ""}]`))}.`);
     }
   }
   return lines;

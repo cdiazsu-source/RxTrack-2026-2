@@ -199,7 +199,7 @@ Encendido, `[subject]/layout.tsx` pinta bajo las pestañas el `DevPromptPanel` (
 plegado por defecto): según la URL (`devSectionFromPath`, `lib/dev-section.ts`, 14 secciones: panel, módulos,
 módulo, laboratorio, proyectos, proyecto, fechas, preparar parcial, repaso, glosario, fórmulas, bibliografía,
 insumos, prompt IA; más 2 de «Cursos», que no cuelga de ninguna asignatura: `cursos` y `curso-detalle`, resueltas por
-`devCourseSectionFromPath` y con el panel en `app/cursos/layout.tsx` con `slug={null}`; `buildDevPrompt` acepta `subject: null`) pide al servidor `getDevPrompt` (`lib/actions/dev-prompt.ts`), que añade datos reales de la
+`devCourseSectionFromPath` y con el panel en `app/cursos/layout.tsx` con `slug={null}`; `buildDevPrompt` acepta `subject: null`; el prompt de `curso-detalle` es específico de ese curso — id, temas de clase, tareas, títulos de lo guardado y nombres de enlaces, nunca el texto — y trae un bloque `scopeNote` que obliga a clasificar la idea en A datos / B mejora general / C código solo de ese curso; su idea se guarda por curso en `localStorage`) pide al servidor `getDevPrompt` (`lib/actions/dev-prompt.ts`), que añade datos reales de la
 asignatura (solo conteos y títulos) a la ficha de la sección. El panel reemplaza `DEV_IDEA_PLACEHOLDER` por la
 idea de Cesar (guardada en `localStorage` por sección) y la copia. Es un prompt IA → IA: describe el proyecto,
 la sección (rutas y archivos reales, datos, permisos, límites) y le exige a la otra IA responder con preguntas,

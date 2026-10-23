@@ -10,7 +10,9 @@ import { toast } from "@/components/ui/toast";
 import { getDevPrompt } from "@/lib/actions/dev-prompt";
 import { DEV_IDEA_PLACEHOLDER, DEV_SECTION_LABEL, devCourseSectionFromPath, devSectionFromPath } from "@/lib/dev-section";
 
-const ideaKey = (key: string) => `rxtrack:dev:idea:${key}`;
+// Cada curso guarda su propia idea (SAP y Power BI no se pisan); el resto de secciones, una por sección.
+const ideaKey = (key: string, entityId: string | null) =>
+  key === "curso-detalle" && entityId ? `rxtrack:dev:idea:${key}:${entityId}` : `rxtrack:dev:idea:${key}`;
 
 /**
  * Modo desarrollador: bajo las pestañas de la asignatura, un prompt para llevarle a OTRA IA la
@@ -50,11 +52,11 @@ export function DevPromptPanel({ slug }: { slug: string | null }) {
   useEffect(() => {
     if (!key) return;
     try {
-      setIdea(window.localStorage.getItem(ideaKey(key)) ?? "");
+      setIdea(window.localStorage.getItem(ideaKey(key, entityId)) ?? "");
     } catch {
       setIdea("");
     }
-  }, [key]);
+  }, [key, entityId]);
 
   // Con el panel abierto, cada cambio de sección (o de módulo/proyecto) trae su prompt.
   useEffect(() => {
@@ -66,8 +68,8 @@ export function DevPromptPanel({ slug }: { slug: string | null }) {
     setIdea(v);
     if (!key) return;
     try {
-      if (v) window.localStorage.setItem(ideaKey(key), v);
-      else window.localStorage.removeItem(ideaKey(key));
+      if (v) window.localStorage.setItem(ideaKey(key, entityId), v);
+      else window.localStorage.removeItem(ideaKey(key, entityId));
     } catch {
       /* sin almacenamiento: la idea solo vive mientras la página esté abierta */
     }

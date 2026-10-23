@@ -32,6 +32,8 @@ type SectionInfo = {
   notes: string[];
   /** Preguntas de diseño que suelen aparecer al cambiar esta sección. */
   questions: string[];
+  /** Bloque opcional con instrucciones de alcance (p. ej. cambios puntuales por curso). */
+  scopeNote?: string;
 };
 
 // ---------------------------------------------------------------------------------------------
@@ -550,6 +552,8 @@ const SECTIONS: Record<DevSectionKey, SectionInfo> = {
       "¿Una plantilla de apuntes por tipo de curso (objetivo de la clase, pasos hechos, dudas)?",
       "¿Exportar el curso (Markdown/PDF) al terminar?",
     ],
+    scopeNote:
+      "**ALCANCE: ESTE CURSO EN PARTICULAR.** La idea que te doy puede ser un cambio PUNTUAL para el curso cuyo estado real aparece abajo (cada curso tiene el suyo: lo que sirve para SAP puede no servir para Power BI). Antes de aconsejarme, clasifica mi idea en una de tres: (A) solo DATOS de este curso, que se resuelve con las funciones que ya existen (crear clases, tareas, guardados, enlaces, cambiar campos del curso) sin tocar el código; (B) una mejora GENERAL de la sección Cursos que este curso aprovecharía y que debería valer para todos los cursos; (C) algo que de verdad solo aplica a este curso y exige código propio. Prefiere A, luego B, y deja C como último recurso: cualquier excepción por curso (p. ej. `if (course.title === ...)`) debe justificarse. Si es A, dime los pasos exactos en la interfaz o el contenido que debo cargar; si es B o C, el BRIEF debe indicar el id del curso y cómo comprobar el cambio con sus datos reales.",
   },
 };
 
@@ -623,7 +627,9 @@ ${bullets(s.notes)}
 
 **Preguntas de diseño que suelen aparecer al cambiar esta sección:**
 ${bullets(s.questions)}
-
+${s.scopeNote ? `
+${s.scopeNote}
+` : ""}
 # ESTADO ACTUAL (datos reales ${subject ? "de esta asignatura" : "de esta sección"})
 ${live.length ? bullets(live) : "- (sin datos)"}
 
