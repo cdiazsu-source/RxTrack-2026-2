@@ -20,6 +20,8 @@
  * Inline:
  *   **negrita**  *cursiva*  `código`  [texto](https://url)  <br> literal
  *   ![alt](/molecules/nombre.png)  (imagen; solo rutas propias bajo /molecules/*.svg|png)
+ *   ![alt](/diagramas/nombre.svg)  (diagrama propio, ancho; solo /diagramas/*.svg)
+ *   ![alt](/diagramas/nombre.svg)  (diagrama propio, ancho; solo /diagramas/*.svg, ver scripts/ft2-diagramas)
  */
 
 export function escapeHtml(str: string | null | undefined): string {
@@ -71,11 +73,12 @@ export function inlineLite(s: string): string {
   // se aceptan rutas propias bajo /molecules/*.svg|png (allowlist estricta,
   // nunca una URL externa ni data:), así que no hay forma de inyectar un
   // origen distinto.
-  e = e.replace(/!\[([^\]]*)\]\((\/molecules\/[a-z0-9_-]+\.(?:svg|png))\)/gi, (_m, alt, src) => {
-    // Los espectros (nombre-ir.svg) llevan ejes, leyenda y texto: necesitan
+  // ![alt](/diagramas/nombre.svg) — diagramas propios (scripts/ft2-diagramas), misma regla estricta.
+  e = e.replace(/!\[([^\]]*)\]\((\/(?:molecules\/[a-z0-9_-]+\.(?:svg|png)|diagramas\/[a-z0-9_-]+\.svg))\)/gi, (_m, alt, src) => {
+    // Los espectros (nombre-ir.svg) y los diagramas llevan ejes, leyenda y texto: necesitan
     // más ancho que un diagrama de estructura simple, por eso usan una
     // variante con max-width mayor (ver .cornell-img-wide en globals.css).
-    const isSpectrum = /-ir\.(?:svg|png)$/i.test(src);
+    const isSpectrum = /-ir\.(?:svg|png)$/i.test(src) || src.startsWith("/diagramas/");
     const cls = isSpectrum ? "cornell-img cornell-img-wide" : "cornell-img";
     return `<img src="${src}" alt="${alt}" class="${cls}" loading="lazy" />`;
   });

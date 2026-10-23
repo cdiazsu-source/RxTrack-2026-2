@@ -1,4 +1,7 @@
 import type { SubjectContent } from "./_schema";
+import { m3ChapterExtra, m3Exercises } from "./ft2-corte2-m3";
+import { m4Chapter, m4Exercises } from "./ft2-corte2-m4";
+import { corte2Formulas, corte2Glossary } from "./ft2-corte2-ref";
 
 /**
  * Farmacotecnia 2 (UNAL) — portado 1:1 desde el borrador
@@ -702,7 +705,8 @@ export const ft2: SubjectContent = {
         "* La **reología** describe cómo fluye el sistema completo: newtoniano vs. no newtoniano (pseudoplástico, dilatante, plástico), **tixotropía**/reopexia (dependencia del tiempo) y **viscoelasticidad** (mitad líquido, mitad sólido).",
         "* La ecuación de **Einstein** muestra que incluso sin efectos eléctricos, más partículas dispersas = más viscosidad.",
         "* Las Prácticas 3 y 4 son la comprobación experimental directa de la doble capa eléctrica y de la ley de Stokes, respectivamente.",
-      ].join("\n"),
+      ].join("\n") + "\n\n" + m3ChapterExtra,
+      exercises: m3Exercises,
     },
     {
       slug: "suspensiones",
@@ -712,6 +716,8 @@ export const ft2: SubjectContent = {
       hasLab: true,
       labProtocol:
         "Evaluación de la incidencia de los excipientes sobre la estabilidad de una suspensión (viscosamiento y apastelamiento).",
+      chapter: m4Chapter,
+      exercises: m4Exercises,
     },
     {
       slug: "emulsiones",
@@ -780,6 +786,7 @@ export const ft2: SubjectContent = {
     { term: "Inversión de fases", moduleSlug: "emulsiones", definition: "Fenómeno en el que una emulsión **cambia de tipo** (de aceite en agua a agua en aceite, o viceversa) por cambios en composición, temperatura o proporción de fases." },
     { term: "Gel", moduleSlug: "semisolidos-geles", definition: "Sistema semisólido formado por una **red tridimensional** de partículas o macromoléculas que inmoviliza un líquido en su interior." },
     { term: "Sinéresis", moduleSlug: "semisolidos-geles", definition: "**Exudación espontánea** de líquido desde un gel, causada por la contracción de su red estructural." },
+    ...corte2Glossary,
   ],
 
   formulas: [
@@ -818,15 +825,6 @@ export const ft2: SubjectContent = {
       moduleSlug: "coloides-reologia",
       derivation:
         "Describe cómo la presencia de partículas sólidas rígidas y esféricas **aumenta la viscosidad** de un líquido en el que están dispersas, incluso sin que haya interacción entre ellas. El coeficiente 2.5 proviene del análisis hidrodinámico de Einstein sobre cómo una esfera rígida perturba las líneas de flujo del líquido que la rodea. Solo aplica a **suspensiones muy diluidas** (φ menor a ~0.02–0.05); a concentraciones mayores las partículas empiezan a interactuar entre sí y la relación deja de ser lineal.\nη = viscosidad de la suspensión — Pa·s (SI) o poise (cgs).\nη_{0} = viscosidad del medio dispersante puro, sin partículas — Pa·s (SI) o poise (cgs).\nφ = fracción de volumen ocupada por las partículas dispersas respecto al volumen total de la suspensión — sin unidades (0 a 1).",
-    },
-    {
-      name: "Relación de sedimentación (índice de floculación)",
-      expression: "F = #{V_{u}|V_{o}}",
-      variables: "V_{u} = volumen final del sedimento floculado · V_{o} = volumen final del sedimento no floculado (referencia)",
-      description: "Compara el volumen de sedimentación de una suspensión floculada frente a una no floculada; valores de F cercanos o mayores a 1 indican **buena floculación**.",
-      moduleSlug: "suspensiones",
-      derivation:
-        "Compara qué tan voluminoso queda el sedimento de una suspensión **floculada** frente al de la misma suspensión en estado **no floculado** (de referencia), una vez que ambas terminan de sedimentar. Un valor de F cercano a 1 (o mayor) indica un sedimento voluminoso y fácil de resuspender —señal de buena floculación—; valores bajos indican un sedimento compacto y difícil de resuspender (apastelamiento).\nF = índice de floculación — sin unidades.\nV_{u} = volumen final (de equilibrio) del sedimento en la suspensión floculada — mL o cm³.\nV_{o} = volumen final (de equilibrio) del sedimento en la suspensión no floculada, usada como referencia — mL o cm³.",
     },
     {
       name: "Dilución",
@@ -889,6 +887,7 @@ export const ft2: SubjectContent = {
       derivation:
         "Son tres formas equivalentes de expresar **cuánto soluto hay por cada 100 unidades de solución o solvente**; la que corresponde usar depende de si el soluto y la solución se miden en masa o en volumen. %p/v se usa cuando el soluto es sólido y la solución es líquida (lo más común en formulaciones farmacéuticas); %p/p cuando ambos se expresan en masa (típico en semisólidos); %v/v cuando ambos son líquidos.\n%p/v = gramos de soluto por cada 100 mL de solución — % (equivale a g/100 mL).\n%p/p = gramos de soluto por cada 100 g de la mezcla total (solución o semisólido) — % (equivale a g/100 g).\n%v/v = mililitros de soluto líquido por cada 100 mL de solución — % (equivale a mL/100 mL).\ng = masa del soluto — gramos.\nmL = volumen del soluto o de la solución — mililitros.",
     },
+    ...corte2Formulas,
   ],
 
   evaluation: [
