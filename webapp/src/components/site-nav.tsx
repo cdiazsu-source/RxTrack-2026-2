@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Eye, Inbox, Layers, LayoutDashboard, LogOut, Pill } from "lucide-react";
+import { CalendarDays, Eye, GraduationCap, Inbox, Layers, LayoutDashboard, LogOut, Pill } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { SubjectScope, ViewProfile } from "@/lib/auth";
@@ -351,6 +351,12 @@ export function SiteNav({
             <span className="flex-1">Bandeja</span>
             {inboxCount > 0 && <SideBadge n={inboxCount} />}
           </SideItem>
+          {canEdit && (
+            <SideItem href="/cursos" active={sideActive("/cursos")}>
+              <GraduationCap className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
+              <span className="flex-1">Cursos</span>
+            </SideItem>
+          )}
         </ul>
 
         <p className="px-3 pb-1 pt-3 text-xs font-semibold text-muted-foreground [@media(min-height:761px)]:pt-4">Asignaturas</p>
@@ -416,6 +422,7 @@ export function SiteNav({
           {link("/calendario", "Calendario", CalendarDays)}
           {link("/repaso", "Repaso", Layers)}
           {link("/inbox", "Bandeja", Inbox, inboxCount)}
+          {canEdit && link("/cursos", "Cursos", GraduationCap)}
 
           <div className="ml-auto flex items-center gap-2">
             <span className="hidden whitespace-nowrap text-xs text-muted-foreground md:inline">

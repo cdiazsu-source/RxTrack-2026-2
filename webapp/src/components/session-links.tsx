@@ -3,7 +3,9 @@
 import { useState } from "react";
 import {
   ExternalLink,
+  FileText,
   FolderOpen,
+  Globe,
   Image as ImageIcon,
   Link2,
   NotebookText,
@@ -32,13 +34,15 @@ import {
 
 export type SessionLinkView = { id: string; name: string; url: string; kind: string };
 
-const ICON: Record<SessionLinkKind, LucideIcon> = {
+export const LINK_KIND_ICON: Record<SessionLinkKind, LucideIcon> = {
   ONENOTE: NotebookText,
   IA: Sparkles,
   DIAPOSITIVAS: Presentation,
   FOTOS: ImageIcon,
   DRIVE: FolderOpen,
   VIDEO: Video,
+  PLATAFORMA: Globe,
+  ARCHIVO: FileText,
   OTRO: Link2,
 };
 
@@ -73,7 +77,7 @@ function LinkForm({
       <input type="hidden" name="kind" value={kind} />
       <div className="flex flex-wrap gap-1.5" role="group" aria-label="Tipo de enlace">
         {SESSION_LINK_KINDS.map((k) => {
-          const Icon = ICON[k];
+          const Icon = LINK_KIND_ICON[k];
           const on = k === kind;
           return (
             <button
@@ -124,9 +128,23 @@ function LinkForm({
   );
 }
 
-/** Enlaces con nombre propio de una sesión de apuntes: OneNote, Gemini, diapositivas, fotos… */
-export function SessionLinks({ sessionId, links }: { sessionId: string; links: SessionLinkView[] }) {
-  const canEdit = useCanContribute();
+/** Enlaces con nombre propio (OneNote, Gemini, diapositivas, fotos, plataforma…). Genérico: lo usan las sesiones
+ *  de apuntes y los cursos, cada uno con sus propias acciones del servidor. */
+export function NamedLinks({
+  links,
+  canEdit,
+  onAdd,
+  onUpdate,
+  onDelete,
+  addLabel = "Agregar enlace",
+}: {
+  links: SessionLinkView[];
+  canEdit: boolean;
+  onAdd: (fd: FormData) => Promise<void>;
+  onUpdate: (linkId: string, fd: FormData) => Promise<void>;
+  onDelete: (linkId: string) => Promise<void>;
+  addLabel?: string;
+}) {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -136,7 +154,7 @@ export function SessionLinks({ sessionId, links }: { sessionId: string; links: S
     <div className="mt-3 flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
         {links.map((l) => {
-          const Icon = ICON[asSessionLinkKind(l.kind)];
+          const Icon = LINK_KIND_ICON[asSessionLinkKind(l.kind)];
           return editingId === l.id ? null : (
             <span key={l.id} className="inline-flex max-w-full items-center gap-0.5 rounded-md border border-border bg-muted/30 pl-2 text-sm">
               <a
@@ -162,7 +180,7 @@ export function SessionLinks({ sessionId, links }: { sessionId: string; links: S
                   <button
                     type="button"
                     onClick={async () => {
-                      await deleteSessionLink(l.id);
+                      await onDelete(l.id);
                       toast("Enlace eliminado", "info");
                     }}
                     className="rounded p-1 text-muted-foreground hover:bg-accent hover:text-destructive"
@@ -178,18 +196,32 @@ export function SessionLinks({ sessionId, links }: { sessionId: string; links: S
         {canEdit && !adding && (
           <Button type="button" size="sm" variant="outline" onClick={() => setAdding(true)}>
             <Plus className="h-3.5 w-3.5" />
-            Agregar enlace
+            {addLabel}
           </Button>
         )}
       </div>
       {editingId && (
         <LinkForm
           link={links.find((l) => l.id === editingId)}
-          action={updateSessionLink.bind(null, editingId)}
+          action={onUpdate.bind(null, editingId)}
           onDone={() => setEditingId(null)}
         />
       )}
-      {adding && <LinkForm action={addSessionLink.bind(null, sessionId)} onDone={() => setAdding(false)} />}
+      {adding && <LinkForm action={onAdd} onDone={() => setAdding(false)} />}
     </div>
+  );
+}
+
+/** Enlaces de una sesión de apuntes. */
+export function SessionLinks({ sessionId, links }: { sessionId: string; links: SessionLinkView[] }) {
+  const canEdit = useCanContribute();
+  return (
+    <NamedLinks
+      links={links}
+      canEdit={canEdit}
+      onAdd={addSessionLink.bind(null, sessionId)}
+      onUpdate={updateSessionLink}
+      onDelete={deleteSessionLink}
+    />
   );
 }

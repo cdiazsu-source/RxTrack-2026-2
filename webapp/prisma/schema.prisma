@@ -660,3 +660,107 @@ model LabPracticeNote {
 
   @@index([subjectId, practiceKey])
 }
+
+/// Curso personal (virtual o presencial) fuera del pregrado: SAP, Power BI… Solo lo usa Cesar.
+/// Los valores de `modality` (VIRTUAL|PRESENCIAL|HIBRIDO) y `status`
+/// (POR_INICIAR|EN_CURSO|PAUSADO|COMPLETADO) se validan en lib/courses.ts.
+model Course {
+  id            String    @id @default(cuid())
+  title         String
+  /// Institución o plataforma que lo dicta (SENA, Coursera, el instituto…).
+  provider      String?
+  modality      String?
+  status        String    @default("EN_CURSO")
+  /// Para qué lo tomo.
+  goal          String?   @db.Text
+  instructor    String?
+  /// Horario en texto libre ("Sábados 8–12 m").
+  schedule      String?
+  /// Lugar o enlace de conexión.
+  location      String?
+  startDate     DateTime?
+  endDate       DateTime?
+  /// Cuántas clases tiene en total (para el avance); null = no sé.
+  totalSessions Int?
+  order         Int       @default(0)
+
+  sessions CourseSession[]
+  tasks    CourseTask[]
+  links    CourseLink[]
+  keeps    CourseKeep[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Clase del curso con sus apuntes (Markdown de renderCornell).
+model CourseSession {
+  id       String    @id @default(cuid())
+  courseId String
+  course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  number   Int?
+  date     DateTime?
+  topic    String
+  content  String    @default("") @db.Text
+  /// Asistí (cuenta para el avance de clases).
+  attended Boolean   @default(true)
+
+  links CourseLink[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+model CourseTask {
+  id          String    @id @default(cuid())
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  text        String
+  description String?   @db.Text
+  dueDate     DateTime?
+  done        Boolean   @default(false)
+  doneAt      DateTime?
+  order       Int       @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([courseId])
+}
+
+/// Enlace con nombre propio del curso (sessionId null) o de una clase concreta.
+model CourseLink {
+  id        String         @id @default(cuid())
+  courseId  String
+  course    Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sessionId String?
+  session   CourseSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name      String
+  url       String
+  /// Mismo vocabulario que SessionLink.kind (lib/session-links.ts).
+  kind      String         @default("OTRO")
+  order     Int            @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([courseId])
+  @@index([sessionId])
+}
+
+/// «Para el futuro»: lo que quiero poder encontrar después (códigos de transacción, fórmulas DAX, atajos, tips).
+/// `tag`: TIP | CODIGO | FORMULA | ATAJO | IDEA | ENLACE_UTIL | OTRO.
+model CourseKeep {
+  id       String  @id @default(cuid())
+  courseId String
+  course   Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title    String
+  body     String  @db.Text
+  tag      String  @default("TIP")
+  pinned   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}

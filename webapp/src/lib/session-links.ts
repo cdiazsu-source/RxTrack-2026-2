@@ -1,6 +1,6 @@
-/** Tipos de enlace de una sesión de apuntes (client-safe). El tipo solo elige el ícono y el nombre sugerido. */
+/** Tipos de enlace con nombre propio (sesiones de apuntes y cursos; client-safe). El tipo solo elige el ícono y el nombre sugerido. */
 
-export const SESSION_LINK_KINDS = ["ONENOTE", "IA", "DIAPOSITIVAS", "FOTOS", "DRIVE", "VIDEO", "OTRO"] as const;
+export const SESSION_LINK_KINDS = ["ONENOTE", "IA", "DIAPOSITIVAS", "FOTOS", "DRIVE", "VIDEO", "PLATAFORMA", "ARCHIVO", "OTRO"] as const;
 export type SessionLinkKind = (typeof SESSION_LINK_KINDS)[number];
 
 export const SESSION_LINK_KIND_LABEL: Record<SessionLinkKind, string> = {
@@ -10,6 +10,8 @@ export const SESSION_LINK_KIND_LABEL: Record<SessionLinkKind, string> = {
   FOTOS: "Fotos",
   DRIVE: "Drive",
   VIDEO: "Video / grabación",
+  PLATAFORMA: "Plataforma / aula",
+  ARCHIVO: "Archivo / documento",
   OTRO: "Otro",
 };
 
@@ -21,6 +23,8 @@ export const SESSION_LINK_KIND_NAME: Record<SessionLinkKind, string> = {
   FOTOS: "Fotos de la clase",
   DRIVE: "Carpeta de Drive",
   VIDEO: "Grabación",
+  PLATAFORMA: "Plataforma del curso",
+  ARCHIVO: "Archivo",
   OTRO: "",
 };
 
@@ -40,6 +44,8 @@ export function guessSessionLinkKind(url: string): SessionLinkKind {
   if (/gemini|notebooklm|chatgpt|openai|claude\.ai|perplexity/.test(host)) return "IA";
   if (/photos\.google|photos\.app\.goo|flickr|imgur/.test(host)) return "FOTOS";
   if (/youtube|youtu\.be|vimeo|zoom|meet\.google|teams\.microsoft/.test(host)) return "VIDEO";
+  if (/\.sap\.com|sap\.com|powerbi|udemy|coursera|edx\.org|platzi|classroom|moodle|campus|aulavirtual|sena\.edu/.test(host)) return "PLATAFORMA";
+  if (/\.(pbix|xlsx?|docx?|pdf|csv)(\?|$)/.test(url.toLowerCase())) return "ARCHIVO";
   if (/slides|canva|prezi|docs\.google\.com\/presentation/.test(url.toLowerCase())) return "DIAPOSITIVAS";
   if (/drive\.google|docs\.google|dropbox/.test(host)) return "DRIVE";
   return "OTRO";
