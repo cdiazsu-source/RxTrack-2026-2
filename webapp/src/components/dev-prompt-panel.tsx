@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { getDevPrompt } from "@/lib/actions/dev-prompt";
-import { DEV_IDEA_PLACEHOLDER, DEV_SECTION_LABEL, devSectionFromPath } from "@/lib/dev-section";
+import { DEV_IDEA_PLACEHOLDER, DEV_SECTION_LABEL, devCourseSectionFromPath, devSectionFromPath } from "@/lib/dev-section";
 
 const ideaKey = (key: string) => `rxtrack:dev:idea:${key}`;
 
@@ -18,9 +18,10 @@ const ideaKey = (key: string) => `rxtrack:dev:idea:${key}`;
  * idea de cambio. El texto lo arma el servidor (`getDevPrompt`); aquí solo se pide, se le pone la
  * idea y se copia. La app no llama a ninguna IA.
  */
-export function DevPromptPanel({ slug }: { slug: string }) {
+export function DevPromptPanel({ slug }: { slug: string | null }) {
   const pathname = usePathname();
-  const section = devSectionFromPath(pathname, slug);
+  // slug null = fuera de las asignaturas (la sección «Cursos»).
+  const section = slug ? devSectionFromPath(pathname, slug) : devCourseSectionFromPath(pathname);
   const key = section?.key ?? null;
   const entityId = section?.entityId ?? null;
 
@@ -114,8 +115,8 @@ export function DevPromptPanel({ slug }: { slug: string }) {
       {open && (
         <div className="flex flex-col gap-3 border-t border-primary/20 p-3 pt-3">
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Le explica a otra IA cómo está armada esta sección (archivos, datos, permisos, límites y el estado real de la
-            asignatura) y le pide consejos para adaptar tu idea. Al final te devuelve un «brief» que le pasas tal cual a la
+            Le explica a otra IA cómo está armada esta sección (archivos, datos, permisos, límites y el estado real de los
+            datos) y le pide consejos para adaptar tu idea. Al final te devuelve un «brief» que le pasas tal cual a la
             IA del proyecto. La app no llama a ninguna IA: tú copias y pegas.
           </p>
 

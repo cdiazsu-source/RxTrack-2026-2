@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { developerModeOn } from "@/lib/session";
 import { getSubjectBySlug } from "@/lib/subjects";
-import { DEV_SECTION_KEYS, type DevSectionKey } from "@/lib/dev-section";
+import { DEV_COURSE_KEYS, DEV_SECTION_KEYS, type DevSectionKey } from "@/lib/dev-section";
 import { buildDevPrompt } from "@/lib/dev-context";
 import { formatDate } from "@/lib/utils";
 
@@ -15,6 +15,54 @@ const countBy = <T,>(rows: T[], f: (r: T) => string) => {
   for (const r of rows) m.set(f(r), (m.get(f(r)) ?? 0) + 1);
   return [...m.entries()].map(([k, n]) => `${k}: ${n}`).join(", ") || "ninguno";
 };
+
+/** Datos reales de «Cursos» (solo conteos y títulos; nunca el texto de los apuntes ni de lo guardado). */
+async function courseLiveLines(key: DevSectionKey, entityId: string | null): Promise<string[]> {
+  const lines: string[] = [];
+  if (key === "cursos") {
+    const cs = await prisma.course.findMany({
+      orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+      select: {
+        title: true,
+        status: true,
+        modality: true,
+        totalSessions: true,
+        _count: { select: { sessions: true, tasks: true, keeps: true, links: true } },
+      },
+    });
+    lines.push(`${cs.length} curso(s): ${list(cs.map((c) => `«${clip(c.title)}» [${c.status}${c.modality ? `, ${c.modality}` : ", sin modalidad"}, ${c._count.sessions}${c.totalSessions ? `/${c.totalSessions}` : ""} clases, ${c._count.tasks} tareas, ${c._count.keeps} guardados, ${c._count.links} enlaces]`))}.`);
+    lines.push(`Por estado: ${countBy(cs, (c) => c.status)}.`);
+  }
+  if (key === "curso-detalle" && entityId) {
+    const c = await prisma.course.findUnique({
+      where: { id: entityId },
+      select: {
+        title: true,
+        status: true,
+        modality: true,
+        goal: true,
+        provider: true,
+        schedule: true,
+        startDate: true,
+        endDate: true,
+        totalSessions: true,
+        sessions: { select: { attended: true, content: true, date: true, _count: { select: { links: true } } } },
+        tasks: { select: { done: true, dueDate: true } },
+        keeps: { select: { tag: true, pinned: true } },
+        links: { select: { sessionId: true, kind: true } },
+      },
+    });
+    if (c) {
+      const now = Date.now();
+      lines.push(`Curso abierto: «${c.title}» (estado ${c.status}, modalidad ${c.modality ?? "sin definir"}${c.provider ? ", con institución" : ""}${c.goal ? ", con meta escrita" : ", sin meta"}${c.schedule ? ", con horario" : ""}).`);
+      lines.push(`Fechas: ${c.startDate ? formatDate(c.startDate) : "sin inicio"} a ${c.endDate ? formatDate(c.endDate) : "sin fin"}. Clases totales declaradas: ${c.totalSessions ?? "no definidas"}.`);
+      lines.push(`Clases registradas: ${c.sessions.length} (asistidas ${c.sessions.filter((s) => s.attended).length}; con apuntes ${c.sessions.filter((s) => s.content.trim()).length}; enlaces de clase ${c.sessions.reduce((n, s) => n + s._count.links, 0)}).`);
+      lines.push(`Tareas: ${c.tasks.filter((t) => t.done).length}/${c.tasks.length} hechas; pendientes vencidas ${c.tasks.filter((t) => !t.done && t.dueDate && +t.dueDate < now).length}; sin fecha ${c.tasks.filter((t) => !t.done && !t.dueDate).length}.`);
+      lines.push(`Para el futuro: ${c.keeps.length} (${countBy(c.keeps, (k) => k.tag)}; fijados ${c.keeps.filter((k) => k.pinned).length}). Enlaces del curso: ${c.links.filter((l) => !l.sessionId).length} (${countBy(c.links.filter((l) => !l.sessionId), (l) => l.kind)}).`);
+    }
+  }
+  return lines;
+}
 
 /** Datos reales (solo conteos y títulos, nada sensible) de la sección que se está viendo. */
 async function liveLines(key: DevSectionKey, subjectId: string, entityId: string | null): Promise<string[]> {
@@ -163,9 +211,17 @@ async function liveLines(key: DevSectionKey, subjectId: string, entityId: string
  * Prompt del modo desarrollador para la sección indicada. Devuelve null si no hay modo
  * desarrollador activo (solo Cesar, sin «Ver como») o si la sección no existe.
  */
-export async function getDevPrompt(slug: string, key: string, entityId: string | null): Promise<string | null> {
+export async function getDevPrompt(slug: string | null, key: string, entityId: string | null): Promise<string | null> {
   if (!(await developerModeOn())) return null;
   if (!(DEV_SECTION_KEYS as readonly string[]).includes(key)) return null;
+
+  // «Cursos» no pertenece a ninguna asignatura.
+  if (DEV_COURSE_KEYS.includes(key as DevSectionKey)) {
+    const live = await courseLiveLines(key as DevSectionKey, entityId);
+    return buildDevPrompt({ key: key as DevSectionKey, subject: null, live, today: formatDate(new Date()) });
+  }
+
+  if (!slug) return null;
   const subject = await getSubjectBySlug(slug);
   if (!subject) return null;
 

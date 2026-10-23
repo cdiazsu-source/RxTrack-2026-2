@@ -18,6 +18,8 @@ export const DEV_SECTION_KEYS = [
   "bibliografia",
   "insumos",
   "prompt-ia",
+  "cursos",
+  "curso-detalle",
 ] as const;
 
 export type DevSectionKey = (typeof DEV_SECTION_KEYS)[number];
@@ -40,6 +42,8 @@ export const DEV_SECTION_LABEL: Record<DevSectionKey, string> = {
   bibliografia: "Bibliografía",
   insumos: "Insumos",
   "prompt-ia": "Prompt IA",
+  cursos: "Cursos (lista)",
+  "curso-detalle": "Curso (detalle)",
 };
 
 export type DevSection = { key: DevSectionKey; entityId: string | null };
@@ -59,3 +63,13 @@ export function devSectionFromPath(pathname: string, slug: string): DevSection |
   if ((DEV_SECTION_KEYS as readonly string[]).includes(seg)) return { key: seg as DevSectionKey, entityId: null };
   return null;
 }
+
+/** Secciones de «Cursos» (fuera de las asignaturas): `/cursos` y `/cursos/{id}`. */
+export function devCourseSectionFromPath(pathname: string): DevSection | null {
+  const [seg, id] = pathname.split("/").filter(Boolean);
+  if (seg !== "cursos") return null;
+  return id ? { key: "curso-detalle", entityId: id } : { key: "cursos", entityId: null };
+}
+
+/** Las secciones que no cuelgan de una asignatura (no necesitan `slug`). */
+export const DEV_COURSE_KEYS: readonly DevSectionKey[] = ["cursos", "curso-detalle"];

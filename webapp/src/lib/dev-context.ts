@@ -453,6 +453,104 @@ const SECTIONS: Record<DevSectionKey, SectionInfo> = {
     notes: ["Es el prompt más simple de la app (solo títulos y descripciones de módulos); los prompts por módulo, proyecto y ejercicio llevan mucho más contexto."],
     questions: ["¿Debe incluir glosario, fórmulas, apuntes o insumos?", "¿Prompts guardados/personalizados por asignatura?"],
   },
+
+  cursos: {
+    route: "/cursos",
+    purpose:
+      "Lista de los cursos personales de Cesar fuera de la carrera (hoy SAP y Power BI Avanzado; virtuales o presenciales): tarjetas con avance, el resumen «Lo que viene» con las tareas pendientes de todos los cursos y el alta de cursos nuevos. NO es una asignatura: no cuelga de /{asignatura} ni del seed.",
+    files: [
+      "webapp/src/app/cursos/page.tsx (la lista; calcula avance y «Lo que viene»)",
+      "webapp/src/app/cursos/layout.tsx (solo aloja el panel del modo desarrollador)",
+      "webapp/src/components/new-course.tsx, course-form.tsx (alta de curso)",
+      "webapp/src/components/progress-ring.tsx, ui/badge.tsx, ui/card.tsx",
+      "webapp/src/lib/courses.ts (constantes de modalidad/estado/etiquetas, canUseCourses, courseProgress)",
+      "webapp/src/lib/actions/courses.ts (createCourse y el resto de acciones de cursos)",
+      "webapp/src/components/site-nav.tsx (ítem «Cursos» del menú lateral y de la barra móvil, solo con canEdit)",
+    ],
+    data: [
+      "Course: title, provider, modality (VIRTUAL|PRESENCIAL|HIBRIDO, opcional), status (POR_INICIAR|EN_CURSO|PAUSADO|COMPLETADO), goal, instructor, schedule, location, startDate, endDate, totalSessions, order.",
+      "Para las tarjetas: conteo de CourseSession (y cuántas con attended) y CourseTask (done, dueDate). La última clase sale de CourseSession.date.",
+      "Las modalidades y estados son strings validados en lib/courses.ts (no enums de Postgres), para poder añadir valores sin migración.",
+    ],
+    behavior: [
+      "Avance de un curso (courseProgress): promedio de (clases asistidas ÷ totalSessions, solo si totalSessions está definido) y (tareas hechas ÷ tareas); COMPLETADO = 100 %; sin datos = 0.",
+      "«Lo que viene»: hasta 6 tareas pendientes de los cursos no completados, ordenadas por fecha de entrega (las sin fecha al final); vencidas o de hoy en ámbar.",
+      "Los cursos completados salen en una lista plegada aparte. Crear un curso redirige a su página de detalle.",
+      "Los cursos son datos manuales: no vienen de content/*.ts ni los toca el seed.",
+    ],
+    permissions: [
+      "Solo la sesión «full» sin alcance acotado (canUseCourses): Cesar. La página redirige a / a cualquier otra sesión y todas las acciones cortan en silencio.",
+      "Diana, el profe y las cuentas acotadas no lo ven; «Ver como» otra cuenta tampoco (toma su nivel). El ítem del menú sale solo con canEdit y fuera del menú acotado.",
+    ],
+    related: [
+      "Detalle de cada curso (/cursos/{id})",
+      "Calendario y búsqueda global: HOY no incluyen los cursos (ni sus tareas o fechas)",
+      "Portada «Semestre»: no muestra cursos",
+      "Bandeja de captura: independiente",
+    ],
+    notes: [
+      "Es la única sección fuera del esquema por asignatura: el panel del modo desarrollador la aloja en app/cursos/layout.tsx (no en [subject]/layout.tsx).",
+      "Las fechas de entrega de las tareas de curso no aparecen en el calendario ni en los recordatorios de la portada.",
+      "Un solo usuario (Cesar): no hay dueño por fila; si se compartiera con Diana habría que añadir owner a Course o permisos por curso.",
+      "El avance mezcla clases y tareas con el mismo peso; un curso sin totalSessions ni tareas muestra 0 %.",
+    ],
+    questions: [
+      "¿Los cursos deben aparecer en el calendario y en la búsqueda global?",
+      "¿Se comparten con otra cuenta (Diana) o siguen siendo privados?",
+      "¿Hace falta una vista «agenda» que junte las clases presenciales por horario?",
+      "¿Plantillas por tipo de curso (SAP, Power BI) con tareas o etiquetas precargadas?",
+    ],
+  },
+
+  "curso-detalle": {
+    route: "/cursos/{courseId}",
+    purpose:
+      "Página de un curso personal: cabecera con datos y avance, clases con sus apuntes y enlaces, tareas con fecha de entrega, «Para el futuro» (lo que Cesar quiere poder encontrar después: códigos, fórmulas, atajos, tips) y enlaces del curso. Incluye un prompt de contexto del curso para pegar en una IA.",
+    files: [
+      "webapp/src/app/cursos/[courseId]/page.tsx (la página; arma todos los datos y el CoursePromptData)",
+      "webapp/src/components/course-header.tsx (cabecera, cambio de estado, editar, eliminar, «Copiar contexto del curso para una IA»)",
+      "webapp/src/components/course-form.tsx (edición de los datos del curso)",
+      "webapp/src/components/course-sessions.tsx (clases y apuntes; borrador autoguardado en localStorage rxtrack:course:{id}:draft)",
+      "webapp/src/components/course-tasks.tsx (tareas con captura rápida y fecha)",
+      "webapp/src/components/course-keeps.tsx (Para el futuro: etiquetas, búsqueda, fijar, copiar)",
+      "webapp/src/components/course-links.tsx y session-links.tsx (NamedLinks: editor de enlaces con nombre propio, compartido con las sesiones de apuntes)",
+      "webapp/src/components/section-rail.tsx (menú rápido de secciones)",
+      "webapp/src/lib/actions/courses.ts, lib/courses.ts, lib/course-prompt.ts (courseContextPrompt), lib/session-links.ts (tipos de enlace)",
+    ],
+    data: [
+      "Course (ver la lista) con CourseSession (number auto = máximo + 1, date, topic, content en Markdown de renderCornell, attended), CourseTask (text, description ≤600, dueDate, done, doneAt, order), CourseLink (name, url http/https, kind; sessionId null = enlace del curso, con valor = de esa clase) y CourseKeep (title, body ≤20 000, tag TIP|CODIGO|FORMULA|ATAJO|IDEA|ENLACE_UTIL|OTRO, pinned).",
+      "kind de CourseLink comparte vocabulario con SessionLink: ONENOTE, IA, DIAPOSITIVAS, FOTOS, DRIVE, VIDEO, PLATAFORMA, ARCHIVO, OTRO; el tipo solo elige ícono y nombre sugerido, y se adivina por el dominio (guessSessionLinkKind).",
+      "Todo cuelga de Course con onDelete Cascade: borrar un curso borra sus clases, tareas, enlaces y guardados.",
+    ],
+    behavior: [
+      "Cinco secciones con ancla: resumen, clases, tareas, futuro y enlaces. La clase más reciente aparece abierta; los apuntes se muestran con renderCornell (render seguro).",
+      "Tareas: se agregan con Enter, las pendientes se ordenan por fecha de entrega, las hechas quedan plegadas, hay barra de avance.",
+      "Para el futuro: filtro por etiqueta (solo las usadas), buscador (aparece con más de 3 ítems), fijados arriba, copiar con un clic; CODIGO/FORMULA/ATAJO se muestran en monoespaciado.",
+      "«Copiar contexto del curso para una IA» arma courseContextPrompt con apuntes (recortados a 3500 caracteres por clase), tareas, guardados y enlaces, más lo que Cesar escriba que quiere pedir. La app no llama a ninguna IA.",
+      "Cambiar el estado desde la cabecera es inmediato; eliminar pide confirmación.",
+    ],
+    permissions: [
+      "Igual que la lista: solo canUseCourses (Cesar). Cada acción de lib/actions/courses.ts lo comprueba por su cuenta; no hay autorización por recurso.",
+    ],
+    related: [
+      "Lista de cursos (/cursos)",
+      "Sesiones de apuntes de las asignaturas (/{asignatura}/modulos/{id}): comparten el editor de enlaces NamedLinks y la idea de apuntes por clase, pero los modelos son distintos (CourseSession ≠ Session)",
+      "Prompts de IA (lib/prompts.ts): este es el único prompt de contexto que vive en lib/course-prompt.ts",
+    ],
+    notes: [
+      "CourseSession es un modelo aparte de Session: no tiene transcripción, diapositivas en texto, etapas (CRUDA→REVISADA) ni autor, ni pasa por el prompt Cornell.",
+      "No hay recordatorios: las fechas de entrega solo se ven aquí y en «Lo que viene» de /cursos.",
+      "Los apuntes y guardados son texto plano/Markdown; no hay adjuntar archivos ni imágenes (solo enlaces).",
+      "El borrador autoguardado es solo de la clase NUEVA, por curso, en el navegador.",
+      "Si se quisiera repaso espaciado (tarjetas), hoy Flashcard solo nace de glosario/fórmulas de una asignatura.",
+    ],
+    questions: [
+      "¿Tarjetas de repaso a partir de «Para el futuro»?",
+      "¿Adjuntar imágenes o capturas de pantalla (SAP/Power BI) y dónde guardarlas?",
+      "¿Una plantilla de apuntes por tipo de curso (objetivo de la clase, pasos hechos, dudas)?",
+      "¿Exportar el curso (Markdown/PDF) al terminar?",
+    ],
+  },
 };
 
 // ---------------------------------------------------------------------------------------------
@@ -461,7 +559,8 @@ const SECTIONS: Record<DevSectionKey, SectionInfo> = {
 
 export type DevPromptInput = {
   key: DevSectionKey;
-  subject: { id: string; code: string; name: string; sections: string[] };
+  /** null en las secciones que no cuelgan de una asignatura («Cursos»). */
+  subject: { id: string; code: string; name: string; sections: string[] } | null;
   /** Líneas con datos reales de ESTA asignatura/página (conteos, títulos…). */
   live: string[];
   /** Fecha de hoy, ya formateada. */
@@ -473,7 +572,10 @@ const bullets = (items: string[]) => items.map((x) => `- ${x}`).join("\n");
 export function buildDevPrompt({ key, subject, live, today }: DevPromptInput): string {
   const s = SECTIONS[key];
   const label = DEV_SECTION_LABEL[key];
-  const visible = subject.sections.length ? subject.sections.join(", ") : "todas";
+  const visible = subject && subject.sections.length ? subject.sections.join(", ") : "todas";
+  const where = subject
+    ? `Asignatura abierta ahora: ${subject.code} · ${subject.name} (slug «${subject.id}»). Secciones visibles en esa asignatura: ${visible}. Fecha de hoy: ${today}.`
+    : `Esta sección NO pertenece a ninguna asignatura: es un módulo personal de Cesar, aparte del temario y del seed. Fecha de hoy: ${today}.`;
 
   return `# ROL Y OBJETIVO
 Eres un asesor senior de producto y arquitectura de software. NO tienes acceso al repositorio ni a la aplicación: todo lo que sabes del proyecto está en este mensaje. Mi nombre es Cesar y soy el autor de la aplicación.
@@ -496,7 +598,7 @@ Si te falta información del código para opinar con seguridad, pídemela citand
 ${PROJECT_CONTEXT}
 
 # CONTEXTO DE LA SECCIÓN «${label.toUpperCase()}»
-Asignatura abierta ahora: ${subject.code} · ${subject.name} (slug «${subject.id}»). Secciones visibles en esa asignatura: ${visible}. Fecha de hoy: ${today}.
+${where}
 Ruta: ${s.route}
 
 **Para qué sirve:** ${s.purpose}
@@ -522,7 +624,7 @@ ${bullets(s.notes)}
 **Preguntas de diseño que suelen aparecer al cambiar esta sección:**
 ${bullets(s.questions)}
 
-# ESTADO ACTUAL (datos reales de esta asignatura)
+# ESTADO ACTUAL (datos reales ${subject ? "de esta asignatura" : "de esta sección"})
 ${live.length ? bullets(live) : "- (sin datos)"}
 
 # RECORDATORIOS FINALES

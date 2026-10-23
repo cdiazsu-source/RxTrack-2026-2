@@ -198,7 +198,8 @@ ve ni lo activa, y se apaga solo mientras se usa «Ver como» (`developerModeOn(
 Encendido, `[subject]/layout.tsx` pinta bajo las pestañas el `DevPromptPanel` (`components/dev-prompt-panel.tsx`,
 plegado por defecto): según la URL (`devSectionFromPath`, `lib/dev-section.ts`, 14 secciones: panel, módulos,
 módulo, laboratorio, proyectos, proyecto, fechas, preparar parcial, repaso, glosario, fórmulas, bibliografía,
-insumos, prompt IA) pide al servidor `getDevPrompt` (`lib/actions/dev-prompt.ts`), que añade datos reales de la
+insumos, prompt IA; más 2 de «Cursos», que no cuelga de ninguna asignatura: `cursos` y `curso-detalle`, resueltas por
+`devCourseSectionFromPath` y con el panel en `app/cursos/layout.tsx` con `slug={null}`; `buildDevPrompt` acepta `subject: null`) pide al servidor `getDevPrompt` (`lib/actions/dev-prompt.ts`), que añade datos reales de la
 asignatura (solo conteos y títulos) a la ficha de la sección. El panel reemplaza `DEV_IDEA_PLACEHOLDER` por la
 idea de Cesar (guardada en `localStorage` por sección) y la copia. Es un prompt IA → IA: describe el proyecto,
 la sección (rutas y archivos reales, datos, permisos, límites) y le exige a la otra IA responder con preguntas,
