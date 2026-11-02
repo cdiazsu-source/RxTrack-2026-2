@@ -3,12 +3,13 @@ import { Network } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { MALLA_STATUS_LABEL, asMallaStatus, canUseMalla, componentProgress, mallaTotals, type ComponentProgress, type MallaRow } from "@/lib/malla";
+import { MALLA_STATUS_LABEL, asMallaStatus, canUseMalla, componentProgress, mallaTotals, semesterStats, type ComponentProgress, type MallaRow } from "@/lib/malla";
 import { MALLA_GRADE_THRESHOLD, MALLA_PLAN_CREDITS } from "@/lib/malla-plan";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProgressRing } from "@/components/progress-ring";
 import { ProgressBar } from "@/components/ui/progress";
 import { MallaBoard } from "@/components/malla-board";
+import { MallaCharts } from "@/components/malla-charts";
 import { LoadPlanButton, MallaImport } from "@/components/malla-import";
 
 export const dynamic = "force-dynamic";
@@ -88,6 +89,7 @@ export default async function MallaPage() {
               ))}
             </CardContent>
           </Card>
+          <MallaCharts stats={semesterStats(rows)} average={t.average} />
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-label="Leyenda">
             <li>○ Por ver</li>
             <li className="text-primary">◔ En curso</li>

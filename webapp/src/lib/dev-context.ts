@@ -75,7 +75,7 @@ Lo usa principalmente su autor (Cesar, acceso total). Otras personas entran con 
 - Project (subjectId, title, category, status POR_INICIAR|EN_CURSO|COMPLETADO, driveUrl, order, isManual, focusNote, focusMinutes, description Markdown) → ProjectLink[], ProjectMember[] (solo control de equipo, sin usuario), ProjectNote[] (bitácora: body, author, authorRole, checklistItemId?, mentions[], links Json), ChecklistItem[].
 - GlossaryTerm (subjectId, moduleId?, term, definition, fromContent). Formula (subjectId, moduleId?, name, expression, variables, description, derivation, examples[], order, fromContent). BibliographyItem (subjectId, moduleId?, kind libro|revista, reference, url, fromContent). PastMaterial = "insumos" (subjectId, moduleId?, kind taller|simulacro, title, semester, url, patterns).
 - KeyDate (subjectId, name, date?, weight, note, moduleIds[], fromContent). EvaluationItem (subjectId, name, weight, grade?, gradeNote, order, owner "Cesar"|"Diana" → una fila por componente y por persona) → QuizGrade[] (grade, date, description; si existen, la nota del componente es su promedio).
-- Flashcard (subjectId, moduleId?, front, back, source GLOSARIO|FORMULA|MANUAL, sourceId, suspended, estado SM-2: dueDate, intervalDays, easeFactor, reps, lapses, lastReviewedAt).
+- Flashcard (subjectId, moduleId?, front, back, source GLOSARIO|FORMULA|MANUAL, sourceId, suspended, estado FSRS: dueDate, intervalDays, reps, lapses, lastReviewedAt, stability, difficulty, fsrsState 0 nueva|1 aprendiendo|2 repaso|3 reaprendiendo, learningSteps; easeFactor es herencia del SM-2 y ya no se usa) y FlashcardReviewLog (flashcardId, subjectId, rating 1-4, state previo, scheduledDays, stability, difficulty, reviewedAt).
 - Globales: SemesterMeta (fila única: racha, "continuar donde ibas", ajustes de enfoque), InboxItem (bandeja de captura rápida), AssignedTask (tareas que Cesar asigna), PersonalEvent (calendario), AccountActivity (último ingreso de cuentas invitadas).
 - Las referencias a módulo desde glosario/fórmulas/bibliografía/insumos/tarjetas son "blandas" (moduleId opcional, sin obligación).
 
@@ -331,22 +331,26 @@ const SECTIONS: Record<DevSectionKey, SectionInfo> = {
 
   repaso: {
     route: "/{asignatura}/repaso (y /repaso como índice global)",
-    purpose: "Repaso de tarjetas con repetición espaciada (variante de SM-2): tarjetas generadas del glosario y de las fórmulas, o creadas a mano.",
+    purpose: "Repaso de tarjetas con repetición espaciada (FSRS, paquete ts-fsrs): tarjetas generadas del glosario y de las fórmulas, o creadas a mano.",
     files: [
       "webapp/src/app/[subject]/repaso/page.tsx (cola de la sesión), webapp/src/app/repaso/page.tsx (índice global)",
       "webapp/src/components/flashcard-review.tsx (sesión de repaso), flashcard-generate-button.tsx, module-filter.tsx",
-      "webapp/src/lib/srs.ts (función pura de intervalos), lib/actions/flashcards.ts",
+      "webapp/src/lib/srs.ts (envoltorio puro sobre ts-fsrs), lib/review-stats.ts + components/review-charts.tsx (gráficas con recharts), lib/actions/flashcards.ts",
     ],
-    data: ["Flashcard: front, back (Markdown), source, sourceId, suspended, dueDate, intervalDays, easeFactor, reps, lapses, lastReviewedAt, moduleId?."],
+    data: [
+      "Flashcard: front, back (Markdown), source, sourceId, suspended, moduleId?, estado FSRS (dueDate, intervalDays, reps, lapses, lastReviewedAt, stability, difficulty, fsrsState, learningSteps).",
+      "FlashcardReviewLog: una fila por respuesta (rating 1-4, estado previo, intervalo, reviewedAt); alimenta las gráficas de /repaso.",
+    ],
     behavior: [
-      "Cola de la sesión = tarjetas vencidas (reps>0, dueDate≤ahora, hasta 60) + tarjetas nuevas (reps=0, hasta 15). Filtro opcional por módulos (?modulos=slug1,slug2).",
-      "Calificación en 4 niveles (otra vez / difícil / bien / fácil): «otra vez» reprograma en ~10 min; el resto calcula intervalo y facilidad.",
+      "Cola de la sesión = tarjetas vencidas (fsrsState>0, dueDate≤ahora, hasta 60) + tarjetas nuevas (fsrsState=0, hasta 15). Filtro opcional por módulos (?modulos=slug1,slug2).",
+      "Calificación en 4 niveles (otra vez / difícil / bien / fácil): FSRS calcula el próximo intervalo con estabilidad y dificultad de cada tarjeta (retención objetivo 90 %, máximo 365 días, sin variación aleatoria). Si vence en menos de 20 min vuelve al final de la misma sesión.",
+      "/repaso muestra tres gráficas (recharts): pronóstico de vencimientos a 14 días, respuestas por día de los últimos 30 días con la retención, y madurez de las tarjetas.",
       "«Generar» crea o actualiza tarjetas desde glosario y fórmulas de forma idempotente (por source+sourceId) y no borra las ya repasadas.",
     ],
     permissions: ["Responder tarjetas: cualquier sesión válida. Generar/crear/editar/suspender/borrar tarjetas: solo «full»."],
     related: ["Glosario y Fórmulas (origen de las tarjetas)", "Preparar parcial (enlace)", "Menú lateral «Repaso» (índice global)"],
     notes: [
-      "El estado SM-2 es una sola fila por tarjeta, compartida por todas las personas (no hay estado de repaso por usuario).",
+      "El estado FSRS es una sola fila por tarjeta, compartida por todas las personas (no hay estado de repaso por usuario).",
       "Los insumos y los apuntes de clase no generan tarjetas; solo glosario y fórmulas.",
     ],
     questions: [

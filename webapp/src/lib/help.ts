@@ -72,7 +72,7 @@ export const HELP: Record<string, string> = {
   "prompt-ia":
     "Arma un texto con el temario de la asignatura para que lo pegues en tu asistente de IA. La app NO se conecta a ninguna IA, no envía nada y no guarda la respuesta: tú la copias y la usas donde quieras.",
   repaso:
-    "Tarjetas con repetición espaciada (SM-2). Se generan del glosario y las fórmulas de la asignatura, o las creas a mano. Al repasar: «Otra vez» la vuelve a mostrar hoy; las demás la programan más adelante según qué tan fácil te resultó.",
+    "Tarjetas con repetición espaciada (FSRS). Se generan del glosario y las fórmulas de la asignatura, o las creas a mano. Al repasar: «Otra vez» la vuelve a mostrar en la sesión; las demás la programan más adelante según qué tan fácil te resultó y cuánto llevas recordándola. Abajo ves el pronóstico de los próximos días y cómo va tu retención.",
 
   // ---- Portada ----
   ahora:

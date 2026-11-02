@@ -593,13 +593,25 @@ model Flashcard {
   sourceId  String?
   suspended Boolean         @default(false)
 
-  // --- Estado SM-2 ---
+  // --- Estado de repaso (FSRS, vía ts-fsrs) ---
   dueDate        DateTime  @default(now())
+  /// Días programados hasta el próximo repaso (scheduled_days de FSRS).
   intervalDays   Int       @default(0)
+  /// Heredado del SM-2 anterior: ya no se usa; se conserva para no perder datos.
   easeFactor     Float     @default(2.5)
   reps           Int       @default(0)
   lapses         Int       @default(0)
   lastReviewedAt DateTime?
+  /// Estabilidad FSRS: días tras los cuales la probabilidad de recordar baja al 90 %.
+  stability      Float     @default(0)
+  /// Dificultad FSRS, de 1 (fácil) a 10 (difícil).
+  difficulty     Float     @default(0)
+  /// 0 nueva · 1 aprendiendo · 2 repaso · 3 reaprendiendo (State de ts-fsrs).
+  fsrsState      Int       @default(0)
+  /// Paso actual dentro de los pasos de (re)aprendizaje de FSRS.
+  learningSteps  Int       @default(0)
+
+  reviewLogs FlashcardReviewLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -607,6 +619,25 @@ model Flashcard {
   @@unique([source, sourceId])
   @@index([subjectId])
   @@index([dueDate])
+}
+
+/// Una respuesta en el repaso (para las gráficas de actividad y retención).
+/// state = estado de la tarjeta ANTES de responder; rating 1 otra vez · 2 difícil · 3 bien · 4 fácil.
+model FlashcardReviewLog {
+  id            String    @id @default(cuid())
+  flashcardId   String
+  flashcard     Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+  subjectId     String
+  rating        Int
+  state         Int
+  scheduledDays Int       @default(0)
+  stability     Float     @default(0)
+  difficulty    Float     @default(0)
+  reviewedAt    DateTime  @default(now())
+
+  @@index([reviewedAt])
+  @@index([subjectId])
+  @@index([flashcardId])
 }
 
 /// Evento personal del calendario, no atado a un parcial (entrega, tutoría,

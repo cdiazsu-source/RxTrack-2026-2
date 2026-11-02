@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getSession, blockedForRead } from "@/lib/session";
 import { revalidateAll } from "@/lib/revalidate";
-import { review, type Grade } from "@/lib/srs";
+import { review, srsFromRow, SRS_SELECT, type Grade } from "@/lib/srs";
 
 /**
  * Crea/actualiza tarjetas de repaso a partir del glosario y las fórmulas de una
@@ -55,26 +55,43 @@ export async function generateFlashcards(subjectId: string) {
   revalidateAll();
 }
 
-/** Registrar una respuesta durante el repaso. Actualiza el estado SM-2. */
+const RATING: Record<Grade, number> = { again: 1, hard: 2, good: 3, easy: 4 };
+
+/** Registrar una respuesta durante el repaso. Actualiza el estado FSRS y deja el registro. */
 export async function reviewFlashcard(id: string, grade: Grade) {
   if (!(await getSession()).authed) return;
-  const card = await prisma.flashcard.findUnique({
-    where: { id },
-    select: { intervalDays: true, easeFactor: true, reps: true, lapses: true },
-  });
+  const card = await prisma.flashcard.findUnique({ where: { id }, select: { subjectId: true, ...SRS_SELECT } });
   if (!card) return;
-  const r = review(card, grade);
-  await prisma.flashcard.update({
-    where: { id },
-    data: {
-      intervalDays: r.intervalDays,
-      easeFactor: r.easeFactor,
-      reps: r.reps,
-      lapses: r.lapses,
-      dueDate: r.dueDate,
-      lastReviewedAt: new Date(),
-    },
-  });
+  const now = new Date();
+  const r = review(srsFromRow(card), grade, now);
+  await prisma.$transaction([
+    prisma.flashcard.update({
+      where: { id },
+      data: {
+        fsrsState: r.fsrsState,
+        stability: r.stability,
+        difficulty: r.difficulty,
+        learningSteps: r.learningSteps,
+        reps: r.reps,
+        lapses: r.lapses,
+        intervalDays: r.intervalDays,
+        dueDate: new Date(r.due),
+        lastReviewedAt: now,
+      },
+    }),
+    prisma.flashcardReviewLog.create({
+      data: {
+        flashcardId: id,
+        subjectId: card.subjectId,
+        rating: RATING[grade],
+        state: r.prevState,
+        scheduledDays: r.intervalDays,
+        stability: r.stability,
+        difficulty: r.difficulty,
+        reviewedAt: now,
+      },
+    }),
+  ]);
   // No revalidamos toda la app en cada tarjeta: el repaso maneja su propio estado.
 }
 

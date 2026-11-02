@@ -202,3 +202,36 @@ export function componentProgress(rows: Pick<MallaRow, "area" | "credits" | "sta
     return { key: c.key, label: c.label, required: c.required, done: sum("APROBADA"), inProgress: sum("EN_CURSO") };
   });
 }
+
+// ───────────────────────── Avance por semestre (gráficas) ─────────────────────────
+
+export type SemesterStat = {
+  semester: number;
+  /** Etiqueta corta del eje: I, II, III… */
+  label: string;
+  vistos: number;
+  enCurso: number;
+  porVer: number;
+  /** Promedio ponderado por créditos de las vistas con nota; null si el semestre no tiene notas. */
+  promedio: number | null;
+};
+
+const ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV"];
+
+export function semesterStats(rows: Pick<MallaRow, "semester" | "status" | "credits" | "grade">[]): SemesterStat[] {
+  const bySemester = new Map<number, typeof rows>();
+  for (const r of rows) bySemester.set(r.semester, [...(bySemester.get(r.semester) ?? []), r]);
+  return [...bySemester.keys()]
+    .sort((a, b) => a - b)
+    .map((semester) => {
+      const t = mallaTotals(bySemester.get(semester) ?? []);
+      return {
+        semester,
+        label: ROMAN[semester] ?? String(semester),
+        vistos: t.credits.APROBADA,
+        enCurso: t.credits.EN_CURSO,
+        porVer: t.credits.PENDIENTE,
+        promedio: t.average != null ? Math.round(t.average * 100) / 100 : null,
+      };
+    });
+}

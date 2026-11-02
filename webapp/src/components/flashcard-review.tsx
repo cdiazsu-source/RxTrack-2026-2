@@ -5,7 +5,7 @@ import Link from "next/link";
 import { RotateCcw } from "lucide-react";
 
 import { reviewFlashcard } from "@/lib/actions/flashcards";
-import { previewInterval, type Grade, type SrsState } from "@/lib/srs";
+import { previewInterval, review, SAME_SESSION_MS, type Grade, type SrsState } from "@/lib/srs";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/progress";
 import { renderCornell } from "@/lib/markdown-lite";
@@ -48,17 +48,19 @@ export function FlashcardReview({ cards, backHref }: { cards: ReviewCard[]; back
     void reviewFlashcard(card.id, g);
     setDoneCount((n) => n + 1);
     setFlipped(false);
-    if (g === "again") {
-      // Se re-encola al final de esta sesión.
+    const now = new Date();
+    const next = review(card.srs, g, now);
+    if (next.due - now.getTime() < SAME_SESSION_MS) {
+      // Vence en pocos minutos (otra vez, o un paso de aprendizaje): vuelve al final de esta sesión.
+      const { due: _due, prevState: _prev, ...srs } = next;
       setQueue((q) => {
         const rest = q.filter((_, i) => i !== idx);
-        return [...rest, card];
+        return [...rest, { ...card, srs }];
       });
-      setIdx((i) => (i >= queue.length - 1 ? 0 : i));
     } else {
       setQueue((q) => q.filter((_, i) => i !== idx));
-      setIdx((i) => (i >= queue.length - 1 ? 0 : i));
     }
+    setIdx((i) => (i >= queue.length - 1 ? 0 : i));
   };
 
   return (

@@ -2,9 +2,11 @@ import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
 import { listSubjects } from "@/lib/subjects";
+import { getReviewStats } from "@/lib/review-stats";
 import { Card } from "@/components/ui/card";
 import { ProgressRing } from "@/components/progress-ring";
 import { HelpHint } from "@/components/help-hint";
+import { ReviewCharts } from "@/components/review-charts";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,7 @@ export default async function RepasoPage() {
   );
 
   const totalDue = stats.reduce((a, b) => a + b.due, 0);
+  const reviewStats = await getReviewStats(now);
 
   return (
     <div className="flex flex-col gap-6">
@@ -58,6 +61,8 @@ export default async function RepasoPage() {
           </Link>
         ))}
       </div>
+
+      <ReviewCharts stats={reviewStats} />
     </div>
   );
 }

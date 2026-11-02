@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
 import { getSubjectBySlug } from "@/lib/subjects";
+import { srsFromRow } from "@/lib/srs";
 import { FlashcardReview, type ReviewCard } from "@/components/flashcard-review";
 import { FlashcardGenerateButton } from "@/components/flashcard-generate-button";
 import { ModuleFilter } from "@/components/module-filter";
@@ -36,12 +37,12 @@ export default async function SubjectRepasoPage({
   const now = new Date();
   const [due, fresh, total] = await Promise.all([
     prisma.flashcard.findMany({
-      where: { subjectId: subject.id, suspended: false, dueDate: { lte: now }, reps: { gt: 0 }, ...moduleWhere },
+      where: { subjectId: subject.id, suspended: false, dueDate: { lte: now }, fsrsState: { gt: 0 }, ...moduleWhere },
       orderBy: { dueDate: "asc" },
       take: MAX_PER_SESSION,
     }),
     prisma.flashcard.findMany({
-      where: { subjectId: subject.id, suspended: false, reps: 0, ...moduleWhere },
+      where: { subjectId: subject.id, suspended: false, fsrsState: 0, ...moduleWhere },
       orderBy: { createdAt: "asc" },
       take: NEW_PER_SESSION,
     }),
@@ -53,7 +54,7 @@ export default async function SubjectRepasoPage({
     id: c.id,
     front: c.front,
     back: c.back,
-    srs: { intervalDays: c.intervalDays, easeFactor: c.easeFactor, reps: c.reps, lapses: c.lapses },
+    srs: srsFromRow(c),
   }));
 
   const filtered = selectedModuleIds.length > 0;
@@ -67,7 +68,7 @@ export default async function SubjectRepasoPage({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
           {total} tarjeta(s) · {due.length} para repasar · {fresh.length} nuevas
-          <HelpHint text="Repaso con repetición espaciada (SM-2). 'Otra vez' la vuelve a mostrar hoy; las demás la programan para más adelante según qué tan fácil fue. El filtro de módulos limita qué tarjetas entran a la sesión." />
+          <HelpHint text="Repaso con repetición espaciada (FSRS). 'Otra vez' la vuelve a mostrar en esta sesión; las demás la programan para más adelante según qué tan fácil fue y cuánto tiempo llevas recordándola. El filtro de módulos limita qué tarjetas entran a la sesión." />
         </p>
         <FlashcardGenerateButton subjectId={subject.id} />
       </div>
