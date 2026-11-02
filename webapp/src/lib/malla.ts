@@ -1,6 +1,7 @@
 /** Malla académica personal (client-safe): estados, cuentas de avance y lectura de la lista pegada. */
 
 import { canUseCourses } from "@/lib/courses";
+import { MALLA_COMPONENTS, MALLA_PREREQ } from "@/lib/malla-plan";
 
 export const MALLA_STATUSES = ["PENDIENTE", "EN_CURSO", "APROBADA"] as const;
 export type MallaStatus = (typeof MALLA_STATUSES)[number];
@@ -120,4 +121,84 @@ export function parseMallaList(text: string): { lines: ParsedMallaLine[]; skippe
     lines.push({ semester, name: name.slice(0, 140), credits, status });
   }
   return { lines, skipped };
+}
+
+// ───────────────────────── Requisitos y disponibilidad ─────────────────────────
+
+/** Para comparar nombres sin importar tildes ni mayúsculas. */
+export const normName = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim();
+
+const REQUIREMENTS = new Map(Object.entries(MALLA_PREREQ).map(([name, req]) => [normName(name), req]));
+
+/** prerrequisito (normalizado) -> asignaturas del plan que lo piden. */
+const DEPENDENTS = new Map<string, string[]>();
+for (const [name, req] of Object.entries(MALLA_PREREQ)) {
+  for (const p of req.prereq ?? []) {
+    const key = normName(p);
+    DEPENDENTS.set(key, [...(DEPENDENTS.get(key) ?? []), name]);
+  }
+}
+
+export type RowRequirements = { prereq: string[]; coreq: string[]; minCredits: number | null };
+
+/** Requisitos de una asignatura del plan; null si no se conocen (optativas, libre elección, materias propias). */
+export function requirementsOf(name: string): RowRequirements | null {
+  const req = REQUIREMENTS.get(normName(name));
+  return req ? { prereq: req.prereq ?? [], coreq: req.coreq ?? [], minCredits: req.minCredits ?? null } : null;
+}
+
+export type MallaGraph = { byName: Map<string, MallaRow>; viewedCredits: number };
+
+export function buildGraph(rows: MallaRow[]): MallaGraph {
+  const byName = new Map<string, MallaRow>();
+  for (const r of rows) if (!byName.has(normName(r.name))) byName.set(normName(r.name), r);
+  const viewedCredits = rows.reduce((sum, r) => sum + (r.status === "APROBADA" ? (r.credits ?? 0) : 0), 0);
+  return { byName, viewedCredits };
+}
+
+/**
+ * Lo que aún falta para poder cursar una asignatura: prerrequisitos sin ver (si ya no está en la malla se
+ * da por cumplido) y, si aplica, los créditos mínimos. null = no se conocen sus requisitos.
+ */
+export function missingFor(row: MallaRow, g: MallaGraph): string[] | null {
+  const req = requirementsOf(row.name);
+  if (!req) return null;
+  const missing = req.prereq.filter((p) => {
+    const r = g.byName.get(normName(p));
+    return r && r.status !== "APROBADA";
+  });
+  if (req.minCredits != null && g.viewedCredits < req.minCredits) {
+    missing.push(`${req.minCredits} créditos vistos (llevas ${g.viewedCredits})`);
+  }
+  return missing;
+}
+
+/** «Disponible»: sigue por ver y ya cumple todos sus prerrequisitos. */
+export const isAvailable = (row: MallaRow, g: MallaGraph) =>
+  row.status === "PENDIENTE" && (missingFor(row, g)?.length ?? 1) === 0;
+
+/** Filas que esta asignatura necesita (prerrequisitos) y filas que desbloquea, presentes en la malla. */
+export function relatedRows(row: MallaRow, g: MallaGraph): { needs: MallaRow[]; unlocks: MallaRow[] } {
+  const pick = (names: string[]) => names.map((n) => g.byName.get(normName(n))).filter((r): r is MallaRow => !!r);
+  return {
+    needs: pick(requirementsOf(row.name)?.prereq ?? []),
+    unlocks: pick(DEPENDENTS.get(normName(row.name)) ?? []),
+  };
+}
+
+// ───────────────────────── Avance por componente ─────────────────────────
+
+export type ComponentProgress = { key: string; label: string; required: number; done: number; inProgress: number };
+
+export function componentProgress(rows: Pick<MallaRow, "area" | "credits" | "status">[]): ComponentProgress[] {
+  return MALLA_COMPONENTS.map((c) => {
+    const mine = rows.filter((r) => r.area != null && c.areas.includes(r.area));
+    const sum = (status: MallaStatus) => mine.filter((r) => r.status === status).reduce((s, r) => s + (r.credits ?? 0), 0);
+    return { key: c.key, label: c.label, required: c.required, done: sum("APROBADA"), inProgress: sum("EN_CURSO") };
+  });
 }

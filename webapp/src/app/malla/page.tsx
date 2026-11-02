@@ -3,7 +3,7 @@ import { Network } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { MALLA_STATUS_LABEL, asMallaStatus, canUseMalla, mallaTotals, type MallaRow } from "@/lib/malla";
+import { MALLA_STATUS_LABEL, asMallaStatus, canUseMalla, componentProgress, mallaTotals, type ComponentProgress, type MallaRow } from "@/lib/malla";
 import { MALLA_GRADE_THRESHOLD, MALLA_PLAN_CREDITS } from "@/lib/malla-plan";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProgressRing } from "@/components/progress-ring";
@@ -81,11 +81,19 @@ export default async function MallaPage() {
 
       {rows.length > 0 && (
         <>
+          <Card>
+            <CardContent className="grid gap-x-8 gap-y-3 pt-5 sm:grid-cols-2 lg:grid-cols-3">
+              {componentProgress(rows).map((c) => (
+                <ComponentBar key={c.key} c={c} />
+              ))}
+            </CardContent>
+          </Card>
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-label="Leyenda">
             <li>○ Por ver</li>
             <li className="text-primary">◔ En curso</li>
             <li className="text-success">✓ Vista</li>
             <li>Créditos: barra verde = vistos, magenta = en curso</li>
+            <li>Toca el nombre de una materia para ver qué necesita y qué desbloquea</li>
           </ul>
           <MallaBoard rows={rows} canEdit />
           <div className="flex flex-wrap items-start gap-3">
@@ -96,6 +104,36 @@ export default async function MallaPage() {
       )}
 
       <MallaImport />
+    </div>
+  );
+}
+
+/** Avance de un componente del plan: créditos vistos (verde) y en curso (magenta) sobre los exigidos. */
+function ComponentBar({ c }: { c: ComponentProgress }) {
+  const shown = Math.min(c.done, c.required);
+  const surplus = c.done - c.required;
+  const nowPct = Math.min(c.inProgress, Math.max(0, c.required - shown));
+  const complete = c.done >= c.required;
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-baseline justify-between gap-2 text-xs">
+        <span className="font-medium">{c.label}</span>
+        <span className={complete ? "font-semibold text-success" : "text-muted-foreground"}>
+          {shown}/{c.required} cr{surplus > 0 && ` (+${surplus})`}
+          {c.inProgress > 0 && !complete && ` · ${c.inProgress} en curso`}
+        </span>
+      </div>
+      <div
+        className="flex h-2 w-full overflow-hidden rounded-full bg-secondary"
+        role="progressbar"
+        aria-label={c.label}
+        aria-valuenow={Math.round((shown / c.required) * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div className="h-full bg-success" style={{ width: `${(shown / c.required) * 100}%` }} />
+        <div className="h-full bg-primary/60" style={{ width: `${(nowPct / c.required) * 100}%` }} />
+      </div>
     </div>
   );
 }

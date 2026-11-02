@@ -119,3 +119,84 @@ export const MALLA_PLAN_CREDITS = MALLA_PLAN.flat().reduce((sum, e) => sum + e.c
 
 /** Créditos de grado que exige el plan para poder cursar el trabajo de grado (80 % de 185). */
 export const MALLA_GRADE_THRESHOLD = 148;
+
+/**
+ * Prerrequisitos y correquisitos del plan (por nombre de asignatura obligatoria). Solo figuran las que
+ * están en la malla sugerida; «Matemáticas básicas» (nivelación) no se lista. Estar aquí significa «se
+ * conocen sus requisitos»: las filas genéricas (optativas, libre elección) no aparecen y no se evalúan.
+ * `minCredits`: créditos vistos que exige el plan (80 % del total para el trabajo de grado).
+ */
+export type MallaRequirement = { prereq?: string[]; coreq?: string[]; minCredits?: number };
+
+export const MALLA_PREREQ: Record<string, MallaRequirement> = {
+  "Principios de química": {},
+  "Laboratorio de técnicas básicas en química": { prereq: ["Principios de química"], coreq: ["Principios de química"] },
+  "Cálculo diferencial": {},
+  "Biología molecular y celular": {},
+  "Introducción a la farmacia": {},
+  "Química orgánica I": {},
+  "Laboratorio de química orgánica I": { prereq: ["Laboratorio de técnicas básicas en química"], coreq: ["Química orgánica I"] },
+  "Principios de análisis químico": { prereq: ["Principios de química"] },
+  "Laboratorio de principios de análisis químico": {
+    prereq: ["Laboratorio de técnicas básicas en química"],
+    coreq: ["Principios de análisis químico"],
+  },
+  "Mecánica y ondas para biociencias": {},
+  "Bioestadística fundamental": {},
+  "Química orgánica II": { prereq: ["Química orgánica I"] },
+  "Química inorgánica farmacéutica": { prereq: ["Principios de química", "Laboratorio de técnicas básicas en química"] },
+  Bioquímica: { prereq: ["Biología molecular y celular"], coreq: ["Química orgánica II"] },
+  "Fisicoquímica I": { prereq: ["Cálculo diferencial", "Principios de análisis químico"] },
+  Fisioanatomía: { prereq: ["Bioquímica"] },
+  "Microbiología general": { prereq: ["Bioquímica"] },
+  "Operaciones unitarias farmacéuticas": { prereq: ["Mecánica y ondas para biociencias", "Fisicoquímica I"] },
+  "Farmacognosia y fitoquímica": { prereq: ["Bioquímica", "Química orgánica II", "Laboratorio de química orgánica I"] },
+  Fisiopatología: { prereq: ["Fisioanatomía"] },
+  "Microbiología farmacéutica": { prereq: ["Microbiología general"] },
+  "Farmacotecnia I": { prereq: ["Química inorgánica farmacéutica", "Química orgánica II", "Operaciones unitarias farmacéuticas"] },
+  "Farmacia química I": { prereq: ["Farmacognosia y fitoquímica"] },
+  "Farmacología general": { prereq: ["Fisiopatología"], coreq: ["Biofarmacia y farmacocinética"] },
+  "Salud pública y farmacia": { prereq: ["Introducción a la farmacia", "Bioestadística fundamental", "Fisiopatología"] },
+  "Farmacotecnia II": { prereq: ["Farmacotecnia I"] },
+  "Análisis instrumental farmacéutico": {
+    prereq: ["Principios de análisis químico", "Laboratorio de principios de análisis químico", "Farmacotecnia I"],
+  },
+  "Biofarmacia y farmacocinética": { prereq: ["Farmacotecnia I", "Fisioanatomía"] },
+  "Farmacia química II": { prereq: ["Farmacia química I"] },
+  "Administración farmacéutica": { coreq: ["Salud pública y farmacia"] },
+  "Farmacología especial": { prereq: ["Farmacología general", "Microbiología general"] },
+  "Gestión de servicios farmacéuticos": { prereq: ["Salud pública y farmacia"] },
+  "Legislación farmacéutica": { prereq: ["Salud pública y farmacia", "Análisis instrumental farmacéutico"] },
+  Toxicología: { prereq: ["Farmacología general"] },
+  "Farmacia industrial": {
+    prereq: ["Análisis instrumental farmacéutico", "Microbiología farmacéutica", "Farmacotecnia II"],
+    coreq: ["Aseguramiento de calidad"],
+  },
+  "Control de calidad farmacéutico": {
+    prereq: ["Análisis instrumental farmacéutico", "Farmacotecnia II", "Microbiología farmacéutica"],
+    coreq: ["Farmacia industrial"],
+  },
+  "Aseguramiento de calidad": { prereq: ["Análisis instrumental farmacéutico", "Administración farmacéutica"] },
+  "Farmacia hospitalaria": {
+    prereq: [
+      "Gestión de servicios farmacéuticos",
+      "Farmacología especial",
+      "Toxicología",
+      "Farmacia industrial",
+      "Legislación farmacéutica",
+      "Aseguramiento de calidad",
+      "Análisis instrumental farmacéutico",
+    ],
+  },
+  "Trabajo de grado": { minCredits: MALLA_GRADE_THRESHOLD },
+};
+
+/** Componentes de formación del plan, con los créditos que exige cada uno (suman 185). */
+export const MALLA_COMPONENTS: { key: string; label: string; areas: string[]; required: number }[] = [
+  { key: "fund-obl", label: "Fundamentación obligatoria", areas: ["Q", "FME", "BG"], required: 38 },
+  { key: "fund-opt", label: "Fundamentación optativa", areas: ["OF"], required: 9 },
+  { key: "disc-obl", label: "Disciplinar obligatoria", areas: ["F", "BM", "AS"], required: 81 },
+  { key: "disc-opt", label: "Disciplinar optativa", areas: ["OD"], required: 12 },
+  { key: "libre", label: "Libre elección", areas: ["LE"], required: 37 },
+  { key: "tg", label: "Trabajo de grado", areas: ["TG"], required: 8 },
+];
