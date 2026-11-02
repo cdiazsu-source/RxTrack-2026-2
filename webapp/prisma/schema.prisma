@@ -764,3 +764,24 @@ model CourseKeep {
 
   @@index([courseId])
 }
+
+/// Malla académica personal de Cesar: una fila por asignatura de la carrera (no solo las del semestre).
+/// `status`: PENDIENTE | EN_CURSO | APROBADA. `subjectSlug` es un enlace blando a `Subject.id` (sin FK).
+model MallaSubject {
+  id          String   @id @default(cuid())
+  semester    Int
+  name        String
+  credits     Int?
+  /// Componente o área (Química, Farmacéutica, Biomédica, Libre elección…), texto libre.
+  area        String?
+  status      String   @default("PENDIENTE")
+  /// Nota final (0–5) cuando está aprobada; alimenta el promedio ponderado por créditos.
+  grade       Float?
+  subjectSlug String?
+  order       Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([semester])
+}

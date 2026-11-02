@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Eye, GraduationCap, Inbox, Layers, LayoutDashboard, LogOut, Pill } from "lucide-react";
+import { CalendarDays, Eye, GraduationCap, Inbox, Layers, LayoutDashboard, LogOut, Network, Pill } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { SubjectScope, ViewProfile } from "@/lib/auth";
@@ -18,7 +18,7 @@ import { subjectIcon } from "@/lib/subject-icons";
 import { BRAND_CREDIT, BRAND_SUBTITLE } from "@/lib/brand";
 
 /** Fecha del último cambio a la app. Actualízala a mano al publicar cambios. */
-const LAST_MODIFIED = "21 oct 2026";
+const LAST_MODIFIED = "2 nov 2026";
 
 /** Contenedor del contenido: reserva el ancho del menú lateral en pantallas grandes. */
 export function MainFrame({ sidebar, children }: { sidebar: boolean; children: React.ReactNode }) {
@@ -357,6 +357,12 @@ export function SiteNav({
               <span className="flex-1">Cursos</span>
             </SideItem>
           )}
+          {canEdit && (
+            <SideItem href="/malla" active={sideActive("/malla")}>
+              <Network className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} aria-hidden />
+              <span className="flex-1">Malla académica</span>
+            </SideItem>
+          )}
         </ul>
 
         <p className="px-3 pb-1 pt-3 text-xs font-semibold text-muted-foreground [@media(min-height:761px)]:pt-4">Asignaturas</p>
@@ -423,6 +429,7 @@ export function SiteNav({
           {link("/repaso", "Repaso", Layers)}
           {link("/inbox", "Bandeja", Inbox, inboxCount)}
           {canEdit && link("/cursos", "Cursos", GraduationCap)}
+          {canEdit && link("/malla", "Malla", Network)}
 
           <div className="ml-auto flex items-center gap-2">
             <span className="hidden whitespace-nowrap text-xs text-muted-foreground md:inline">
