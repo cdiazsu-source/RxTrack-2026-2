@@ -50,7 +50,14 @@ type Account = {
   hidePastExams?: boolean;
   /** Si se define, el saludo propio solo sale en esa asignatura (y en la portada). */
   greetingSubject?: string;
+  /** true = la cuenta puede iniciar sesión pero NO ve nada del sitio: el middleware la manda siempre
+   *  a BLOCKED_PATH («plan superior»). Se comprueba por nombre en cada petición, así que también
+   *  corta las cookies ya emitidas. Para devolver el acceso, basta quitar el campo. */
+  blocked?: boolean;
 };
+
+/** Pantalla única que ve una cuenta bloqueada (ver `blocked` en `Account`). */
+export const BLOCKED_PATH = "/error/402";
 
 /** Asignaturas del semestre (slug de cada una, ver content/index.ts), para cuentas con acceso a todas. */
 const ALL_SUBJECT_SLUGS = ["aif", "ft2", "fg", "af", "spf", "bfc"];
@@ -65,6 +72,8 @@ const ACCOUNTS: Account[] = [
     username: "diana",
     password: process.env.SITE_PASSWORD_READ || "diana2026",
     profile: { name: "Diana", level: "read" },
+    // Sin acceso a nada: solo ve la pantalla de «plan superior». Quitar esta línea para reactivarla.
+    blocked: true,
   },
   {
     // Sin fallback en código: la contraseña vive solo en .env (local, sin
@@ -123,6 +132,11 @@ export function hasCustomGreeting(name: string): boolean {
 export function greetingShownIn(name: string, subjectSlug: string): boolean {
   const a = ACCOUNTS.find((x) => x.profile.name === name);
   return !!a?.greetings && (!a.greetingSubject || a.greetingSubject === subjectSlug);
+}
+
+/** ¿La cuenta está bloqueada (solo ve la pantalla de «plan superior»)? */
+export function isBlocked(name: string | null | undefined): boolean {
+  return !!name && !!ACCOUNTS.find((a) => a.profile.name === name)?.blocked;
 }
 
 /** ¿La cuenta NO debe ver parciales, talleres ni simulacros de semestres anteriores? */
@@ -187,7 +201,8 @@ function describeProfile(p: Profile): string {
 
 /** Perfiles que Cesar puede ver: todas las cuentas salvo las de acceso total sin alcance (la suya). */
 export function listViewProfiles(): ViewProfile[] {
-  return ACCOUNTS.filter((a) => a.profile.level === "read" || a.profile.scope)
+  // Las cuentas bloqueadas no se pueden "ver como": Cesar quedaría atrapado en su pantalla de bloqueo.
+  return ACCOUNTS.filter((a) => !a.blocked && (a.profile.level === "read" || a.profile.scope))
     .map((a) => ({
       key: a.username,
       name: a.profile.name,
@@ -238,6 +253,7 @@ export function checkCredentials(username: string, password: string): Profile | 
 /** A dónde llevar a la persona tras iniciar sesión: la primera asignatura (y
  *  sección, si aplica) de su alcance; la portada si no tiene alcance. */
 export function landingPath(profile: Profile): string {
+  if (isBlocked(profile.name)) return BLOCKED_PATH;
   if (canViewHome(profile.name)) return "/";
   const first = profile.scope?.[0];
   if (!first) return "/";

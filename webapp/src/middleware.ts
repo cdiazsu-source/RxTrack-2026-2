@@ -1,10 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import {
+  BLOCKED_PATH,
   SESSION_COOKIE,
   VIEW_AS_COOKIE,
   canViewHome,
   hiddenSectionsFor,
+  isBlocked,
   landingPath,
   verifyToken,
   viewProfileByKey,
@@ -26,6 +28,23 @@ export async function middleware(req: NextRequest) {
   if (!profile) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
+  // Cuenta bloqueada («plan superior»): solo puede ver BLOCKED_PATH. Se comprueba por nombre en cada
+  // petición (no en el token), así que también corta sesiones ya abiertas, páginas y server actions.
+  if (isBlocked(profile.name)) {
+    const { pathname } = req.nextUrl;
+    if (PUBLIC_FILE.test(pathname)) return NextResponse.next();
+    if (pathname === BLOCKED_PATH) {
+      // Carga completa del documento: estado HTTP 402 real. Las peticiones RSC (navegación suave tras el
+      // login) quedan en 200 para que Next no las trate como un fallo de red.
+      const isRsc = req.headers.get("rsc") === "1" || req.nextUrl.searchParams.has("_rsc");
+      return isRsc ? NextResponse.next() : NextResponse.rewrite(req.nextUrl, { status: 402 });
+    }
+    const url = req.nextUrl.clone();
+    url.pathname = BLOCKED_PATH;
     url.search = "";
     return NextResponse.redirect(url);
   }

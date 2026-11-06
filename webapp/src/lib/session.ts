@@ -7,6 +7,7 @@ import {
   SESSION_COOKIE,
   VIEW_AS_COOKIE,
   canUseDevMode,
+  isBlocked,
   verifyToken,
   viewProfileByKey,
 } from "@/lib/auth";
@@ -60,7 +61,8 @@ export async function canEdit(): Promise<boolean> {
  *  (checklist, enlaces de Drive, sesiones/transcripciones, bitácora)?
  *  Basta con tener sesión válida. */
 export async function canContribute(): Promise<boolean> {
-  return (await getSession()).authed;
+  const s = await getSession();
+  return s.authed && !isBlocked(s.name);
 }
 
 /** Al inicio de cada server action de escritura: si la sesión no puede editar,

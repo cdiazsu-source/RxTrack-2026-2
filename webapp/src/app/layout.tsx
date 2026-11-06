@@ -8,7 +8,7 @@ import { AccessProvider } from "@/components/access-context";
 import { canEdit, canContribute, canUseDeveloperMode, developerModeOn, getSession, realLevel } from "@/lib/session";
 import { listSubjects } from "@/lib/subjects";
 import { prisma } from "@/lib/prisma";
-import { canViewHome, listViewProfiles, trackedUsername } from "@/lib/auth";
+import { canViewHome, isBlocked, listViewProfiles, trackedUsername } from "@/lib/auth";
 import { recordSeen } from "@/lib/activity";
 
 import "./globals.css";
@@ -41,6 +41,16 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Cuenta bloqueada («plan superior»): ni menú, ni asignaturas, ni consultas a la base; solo la pantalla.
+  const first = await getSession();
+  if (first.authed && isBlocked(first.name)) {
+    return (
+      <html lang="es" className={`${ancizarSans.variable} ${ancizarSerif.variable}`}>
+        <body className="min-h-screen bg-background font-sans antialiased">{children}</body>
+      </html>
+    );
+  }
+
   const [editable, contributor, session, realLvl, devAvailable, devOn, subjects, inboxCount] = await Promise.all([
     canEdit(),
     canContribute(),

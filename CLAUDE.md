@@ -73,6 +73,13 @@ Una cuenta por persona, sin base de datos: la lista `ACCOUNTS` vive en
   editar checklist, enlaces de Drive, sesiones/transcripciones y **su propia
   nota de evaluación** (`canContribute()`, ver abajo). El resto queda solo para
   `cesar` (`canEdit()`).
+  **Bloqueada (2026-11-05):** `blocked: true` en su fila de `ACCOUNTS` → inicia sesión pero solo ve
+  `/error/402` (`BLOCKED_PATH`; página en inglés «User limit exceeded… Upgrade to a higher plan», sin logo
+  ni nombre del proyecto, favicon neutro, estado HTTP 402 vía `NextResponse.rewrite`; el mensaje es
+  ficticio, no hay plan real). El middleware lo comprueba **por nombre en cada
+  petición** (`isBlocked()`; corta también cookies ya emitidas, páginas y server actions), el layout raíz
+  no pinta menú ni consulta datos para ella, `canContribute()` devuelve false y `listViewProfiles()` la
+  excluye de «Ver como» (Cesar quedaría atrapado). Para reactivarla: quitar la línea `blocked: true`.
 - `jose` / `SITE_PASSWORD_JOSE` — `level: "full"` **acotado** por
   `scope: { subject: "aif", section: "laboratorio" }`: solo ve y edita
   `/aif/laboratorio`; el `middleware.ts` reenvía cualquier otra ruta ahí.
