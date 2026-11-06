@@ -1,5 +1,6 @@
 import type { ExerciseContent } from "./_schema";
 import { fx } from "./bfc-helpers";
+import { bfcTaller1Exercises } from "./bfc-taller1";
 
 /**
  * BFC — Bloque Farmacocinética, parte A (Módulos 5–7, prof. Yolima Baena):
@@ -529,6 +530,8 @@ Observa que cuando R **se acerca a V_máx** el denominador tiende a cero y C_ss 
           "**Conclusión:** el fármaco Y exige ajustes de dosis con mucho más cuidado; su ABC a 400 mg es 9 veces el de 100 mg con solo 4 veces la dosis.",
         ].join("\n"),
       },
+      // Taller 1 (3 problemas de bolo IV, con ABC por integral y por trapecios) — ver bfc-taller1.ts
+      ...bfcTaller1Exercises,
     ],
   },
 

@@ -3,6 +3,7 @@ import { bfcBiofarmacia } from "./bfc-biofarmacia";
 import { bfcFarmacocineticaA } from "./bfc-farmacocinetica-a";
 import { bfcFarmacocineticaB } from "./bfc-farmacocinetica-b";
 import { bfcBibliographyExtra, bfcFormulasExtra, bfcGlossaryExtra, bfcProjectDescriptions } from "./bfc-extra";
+import { bfcTaller1Description } from "./bfc-taller1";
 
 /** Capítulos y ejercicios resueltos por módulo (archivos bfc-*.ts), por slug de módulo. */
 const MODULE_EXTRAS = { ...bfcBiofarmacia, ...bfcFarmacocineticaA, ...bfcFarmacocineticaB };
@@ -254,6 +255,7 @@ export const bfc: SubjectContent = {
   projects: [
     { title: "Quices de control de lectura de artículos — Biofarmacia", category: "Quiz", description: bfcProjectDescriptions.quices },
     { title: "Talleres de farmacocinética (uno por tema, retroalimentados en clase)", category: "Taller", description: bfcProjectDescriptions.talleres },
+    { title: "Taller 1", category: "Taller", description: bfcTaller1Description },
   ],
 
   bibliography: [
