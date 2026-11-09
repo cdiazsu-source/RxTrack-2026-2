@@ -263,16 +263,18 @@ const SECTIONS: Record<DevSectionKey, SectionInfo> = {
     purpose: "Trabajo de un proyecto: contexto, equipo, enlaces, Modo Enfoque, subtareas y bitácora, con un botón que copia todo el contexto para una IA.",
     files: [
       "webapp/src/app/[subject]/proyectos/[projectId]/page.tsx",
-      "webapp/src/components/focus-mode.tsx (Modo Enfoque), checklist.tsx, notes-log.tsx, project-members.tsx, project-links.tsx, project-context-button.tsx, drive-link-editor.tsx, project-status-select.tsx, section-rail.tsx",
+      "webapp/src/components/focus-mode.tsx (Modo Enfoque), checklist.tsx, notes-log.tsx, project-members.tsx, project-links.tsx, project-exercises.tsx (talleres y ejercicios), project-context-button.tsx, drive-link-editor.tsx, project-status-select.tsx, section-rail.tsx",
       "webapp/src/lib/prompts.ts (projectContextPrompt, focusSplitPrompt), lib/url.ts (parseNoteLinks)",
-      "webapp/src/lib/actions/projects.ts, notes.ts, checklist.ts, members.ts, focus.ts",
+      "webapp/src/lib/actions/projects.ts, notes.ts, checklist.ts, members.ts, focus.ts, project-exercises.ts",
+      "webapp/src/lib/project-exercise-format.ts (formato @@ de intercambio con otra IA y su parser), lib/prompts.ts (projectExercisePrompt)",
     ],
     data: [
-      "Project (description Markdown, focusNote, focusMinutes, driveUrl) → ChecklistItem[], ProjectNote[] (author, authorRole, mentions[], links Json, checklistItemId?), ProjectLink[], ProjectMember[].",
+      "Project (description Markdown, focusNote, focusMinutes, driveUrl) → ChecklistItem[], ProjectNote[] (author, authorRole, mentions[], links Json, checklistItemId?), ProjectLink[], ProjectMember[], ProjectExercise[] (workshop?, title, question, solution Markdown, order).",
     ],
     behavior: [
       "Modo Enfoque: pantalla completa con un paso a la vez, bloques de 2/10/15/25/45 min, pausas, «se me complicó» (dividir en pasos, prompt de IA, dejar para después), estacionamiento de ideas hacia la bandeja y nota «para retomar». El temporizador vive en el navegador (localStorage); en BD solo focusNote y focusMinutes.",
       "La bitácora exige autor y solo acepta integrantes registrados del proyecto; permite @menciones y enlaces con nombre; una nota puede ligarse a una subtarea.",
+      "Talleres y ejercicios: cada uno con enunciado y solución paso a paso (con unidades). «Prompt para IA» le dice a otra IA qué salida dar (marcadores @@TALLER/@@EJERCICIO/@@ENUNCIADO/@@SOLUCION/@@FIN) y «Pegar respuesta de la IA» la importa con vista previa.",
       "«Copiar contexto para IA» arma el estado completo del proyecto (descripción, subtareas con avance, enlaces, dónde me quedé, últimas 10 notas) y deja añadir qué se le pide.",
     ],
     permissions: ["Cambiar estado/borrar proyecto: solo «full». Checklist, bitácora, enlaces, equipo y Modo Enfoque: cualquier sesión válida."],

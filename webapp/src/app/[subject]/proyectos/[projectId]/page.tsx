@@ -19,6 +19,7 @@ import { HelpHint } from "@/components/help-hint";
 import { FocusMode } from "@/components/focus-mode";
 import { ProjectLinks } from "@/components/project-links";
 import { ProjectMembers } from "@/components/project-members";
+import { ProjectExercises } from "@/components/project-exercises";
 import { renderCornell } from "@/lib/markdown-lite";
 import { projectContextPrompt } from "@/lib/prompts";
 import { parseNoteLinks } from "@/lib/url";
@@ -45,6 +46,7 @@ export default async function ProjectDetailPage({
       checklistItems: { orderBy: { order: "asc" } },
       links: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] },
       members: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] },
+      exercises: { orderBy: [{ order: "asc" }, { createdAt: "asc" }] },
       notes: {
         orderBy: { createdAt: "desc" },
         include: { checklistItem: { select: { text: true, done: true } } },
@@ -81,6 +83,7 @@ export default async function ProjectDetailPage({
     links: project.links.map((l) => ({ name: l.name, url: l.url })),
     driveUrl: project.driveUrl,
     focusNote: project.focusNote,
+    exercises: project.exercises.map((e) => ({ workshop: e.workshop, title: e.title })),
     notes: project.notes
       .slice(0, 10)
       .map((n) => ({ author: n.author, createdAt: fmtDate(n.createdAt), body: n.body, links: parseNoteLinks(n.links) })),
@@ -94,6 +97,7 @@ export default async function ProjectDetailPage({
           ...(project.description ? [{ id: "contexto", label: "Contexto del proyecto", icon: "info" as const }] : []),
           { id: "equipo", label: "Equipo del proyecto", icon: "team" },
           { id: "enlaces", label: "Documentos y enlaces", icon: "link" },
+          { id: "ejercicios", label: "Talleres y ejercicios", icon: "lab" },
           { id: "enfoque", label: "Modo Enfoque", icon: "target" },
           { id: "checklist", label: "Subtareas", icon: "checks" },
           { id: "bitacora", label: "Bitácora", icon: "chat" },
@@ -153,6 +157,27 @@ export default async function ProjectDetailPage({
 
       <section id="enlaces" className="scroll-mt-24">
         <ProjectLinks projectId={project.id} links={project.links.map((l) => ({ id: l.id, name: l.name, url: l.url }))} />
+      </section>
+
+      <section id="ejercicios" className="scroll-mt-24">
+        <ProjectExercises
+          projectId={project.id}
+          exercises={project.exercises.map((e) => ({
+            id: e.id,
+            workshop: e.workshop,
+            title: e.title,
+            question: e.question,
+            solution: e.solution,
+            order: e.order,
+          }))}
+          promptContext={{
+            subjectName: subject.name,
+            subjectCode: subject.code,
+            projectTitle: project.title,
+            category: project.category,
+            description: project.description,
+          }}
+        />
       </section>
 
       <section id="enfoque" className="scroll-mt-24">

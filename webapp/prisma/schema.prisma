@@ -312,11 +312,34 @@ model Project {
   notes          ProjectNote[]
   links          ProjectLink[]
   members        ProjectMember[]
+  exercises      ProjectExercise[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([subjectId])
+}
+
+/// Taller o ejercicio de un proyecto, con su resolución paso a paso (Markdown de
+/// renderCornell: qué pasa, interpretación, factor de conversión, conclusión, con
+/// unidades). `workshop` agrupa los ejercicios de un mismo taller; vacío = suelto.
+/// Siempre es dato manual (el seed no lo toca).
+model ProjectExercise {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  /// Nombre del taller al que pertenece ("Taller 2 — Cinética"); null = ejercicio suelto.
+  workshop  String?
+  /// Título corto del ejercicio ("Problema 3 — Vida media").
+  title     String
+  question  String  @db.Text
+  solution  String  @db.Text
+  order     Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
 }
 
 /// Enlace anexado a un proyecto (documento de Google Drive, referencia, etc.).

@@ -357,6 +357,38 @@ function stripMarkdownExtras(s: string): string {
   return stripMarkup(s.replace(/^\s*!\[[^\]]*\]\([^)]*\)\s*$/gm, "")).replace(/\n{3,}/g, "\n\n");
 }
 
+/** Cómo debe resolver una IA un ejercicio (compartido por los prompts de ejercicios). */
+const SOLVE_RULES: string[] = [
+  "CÓMO DEBES RESOLVERLO",
+  "- No supongas conocimientos previos: explica cada paso como si fuera la primera vez que lo veo, con analogías cuando ayuden.",
+  "- Divide la solución en pasos pequeños: «#### Paso N — qué se hace». Una sola idea por paso.",
+  "- En CADA paso, sin excepción y en este orden: **Qué está pasando.** (una o dos frases que describan la situación real del paso: qué sustancia, muestra o dato estamos manejando y qué le ocurre) · **Interpretación.** (qué se calcula, por qué hace falta y cómo leerlo, en palabras simples) · **Factor de conversión:** (cuál se usa y qué unidades se cancelan) · el cálculo, con el resultado en **negrita** · **Conclusión:** (qué significa ese resultado y cómo conecta con el siguiente paso).",
+  "- UNIDADES SIEMPRE: cada número, en cada línea de cada paso (datos, operaciones intermedias, resultados y la respuesta final), debe llevar su unidad correspondiente (g, mL, mol, mEq, mol/L, % p/p, etc.). Nunca escribas un número «pelado». Si una unidad se cancela, escríbela en la operación para que se vea cómo desaparece, y revisa que el resultado quede en la unidad que pide el enunciado.",
+  "- Muestra TODAS las conversiones de unidades de forma explícita (mL→L, mg→g, g→mol, % p/p→g, etc.). Nunca saltes de un número a otro sin mostrar el factor.",
+  "- Si hay una reacción: escríbela balanceada, explica la estequiometría (relación molar entre las sustancias) y di de qué reactivo parte cada cálculo.",
+  "- Si hay concentraciones: parte de M → N → equivalentes con N = M·θ, aunque θ valga 1, y explica qué es θ en esa reacción.",
+  "- Si un reactivo puede estar hidratado o no ser puro, dime con qué masa molar y qué pureza trabajas, y por qué.",
+  "- Si el enunciado no da un dato que haga falta, NO lo inventes en silencio: dilo, propón un valor tabulado y decláralo como supuesto al inicio. Si no se puede resolver sin ese dato, pregúntamelo.",
+  "- Cierra con «#### Respuesta final» (una línea en **negrita** con unidades y cifras significativas razonables) y con «#### Errores comunes» (2 a 4 viñetas con los fallos típicos de este tipo de ejercicio).",
+  "- Escribe en español y usa coma decimal (1,19 g/mL).",
+];
+
+/** Markdown que entiende renderCornell (compartido por los prompts de ejercicios). */
+const MARKDOWN_RULES: string[] = [
+  "Reglas del Markdown permitido:",
+  "- Encabezados: «#### Título» (siempre cuatro #).",
+  "- **negrita** y *cursiva*. NO uses «*» como signo de multiplicación (se confunde con cursiva): usa «×» o «·».",
+  "- Listas: una viñeta por línea con «* » o numeradas «1. ». Sin listas anidadas.",
+  "- Tablas con | pipes |, una fila por línea, sin saltos de línea dentro de una celda y sin el símbolo | dentro del texto de una celda.",
+  "- Subíndices y superíndices dentro de una frase: usa caracteres Unicode (H₂O, KMnO₄, Ca²⁺, mol⁻¹, 10⁻³). NO escribas _{2} ni ^{2} en el texto corrido: solo funcionan dentro de un bloque ```formula.",
+  "- Ecuaciones y fracciones: usa un bloque ```formula (una línea por renglón) con _{sub}, ^{sup} y #{numerador|denominador}. Ejemplo:",
+  "  ```formula",
+  "  C_{1} · V_{1} = C_{2} · V_{2}",
+  "  n = #{m|PM}",
+  "  ```",
+  "- Está PROHIBIDO: LaTeX ($…$, \\frac, \\text), HTML, imágenes y enlaces.",
+];
+
 /**
  * Prompt para que una IA RESUELVA un ejercicio del módulo y devuelva el enunciado y
  * la solución ya en el Markdown de la app (renderCornell), listos para pegar en
@@ -383,38 +415,79 @@ export function exerciseSolutionPrompt(opts: {
     bloque("Términos del glosario del módulo (respeta esta terminología)", opts.glossary),
     bloque("Fórmulas del módulo (úsalas por su nombre cuando apliquen)", opts.formulas),
     "",
-    "CÓMO DEBES RESOLVERLO",
-    "- No supongas conocimientos previos: explica cada paso como si fuera la primera vez que lo veo, con analogías cuando ayuden.",
-    "- Divide la solución en pasos pequeños: «#### Paso N — qué se hace». Una sola idea por paso.",
-    "- En CADA paso, sin excepción y en este orden: **Qué está pasando.** (una o dos frases que describan la situación real del paso: qué sustancia, muestra o dato estamos manejando y qué le ocurre) · **Interpretación.** (qué se calcula, por qué hace falta y cómo leerlo, en palabras simples) · **Factor de conversión:** (cuál se usa y qué unidades se cancelan) · el cálculo, con el resultado en **negrita** · **Conclusión:** (qué significa ese resultado y cómo conecta con el siguiente paso).",
-    "- UNIDADES SIEMPRE: cada número, en cada línea de cada paso (datos, operaciones intermedias, resultados y la respuesta final), debe llevar su unidad correspondiente (g, mL, mol, mEq, mol/L, % p/p, etc.). Nunca escribas un número «pelado». Si una unidad se cancela, escríbela en la operación para que se vea cómo desaparece, y revisa que el resultado quede en la unidad que pide el enunciado.",
-    "- Muestra TODAS las conversiones de unidades de forma explícita (mL→L, mg→g, g→mol, % p/p→g, etc.). Nunca saltes de un número a otro sin mostrar el factor.",
-    "- Si hay una reacción: escríbela balanceada, explica la estequiometría (relación molar entre las sustancias) y di de qué reactivo parte cada cálculo.",
-    "- Si hay concentraciones: parte de M → N → equivalentes con N = M·θ, aunque θ valga 1, y explica qué es θ en esa reacción.",
-    "- Si un reactivo puede estar hidratado o no ser puro, dime con qué masa molar y qué pureza trabajas, y por qué.",
-    "- Si el enunciado no da un dato que haga falta, NO lo inventes en silencio: dilo, propón un valor tabulado y decláralo como supuesto al inicio. Si no se puede resolver sin ese dato, pregúntamelo.",
-    "- Cierra con «#### Respuesta final» (una línea en **negrita** con unidades y cifras significativas razonables) y con «#### Errores comunes» (2 a 4 viñetas con los fallos típicos de este tipo de ejercicio).",
-    "- Escribe en español y usa coma decimal (1,19 g/mL).",
+    ...SOLVE_RULES,
     "",
     "FORMATO DE SALIDA (obligatorio — mi app solo entiende este Markdown)",
     `Entrega EXACTAMENTE dos bloques de código, uno para el enunciado y otro para la solución, cada uno cercado con CUATRO acentos graves (${F}markdown … ${F}) para que pueda copiarlos sin que se pierda el formato. Antes o después de los bloques no escribas nada más.`,
     "1) Primer bloque = ENUNCIADO: el problema tal cual (una sola pregunta), con **negrita** en los datos clave. Si añadiste supuestos, ponlos al final en una línea que empiece por «*Dato que hay que asumir* (el enunciado no lo da): …».",
     "2) Segundo bloque = SOLUCIÓN paso a paso.",
-    "Reglas del Markdown permitido:",
-    "- Encabezados: «#### Título» (siempre cuatro #).",
-    "- **negrita** y *cursiva*. NO uses «*» como signo de multiplicación (se confunde con cursiva): usa «×» o «·».",
-    "- Listas: una viñeta por línea con «* » o numeradas «1. ». Sin listas anidadas.",
-    "- Tablas con | pipes |, una fila por línea, sin saltos de línea dentro de una celda y sin el símbolo | dentro del texto de una celda.",
-    "- Subíndices y superíndices dentro de una frase: usa caracteres Unicode (H₂O, KMnO₄, Ca²⁺, mol⁻¹, 10⁻³). NO escribas _{2} ni ^{2} en el texto corrido: solo funcionan dentro de un bloque ```formula.",
-    "- Ecuaciones y fracciones: usa un bloque ```formula (una línea por renglón) con _{sub}, ^{sup} y #{numerador|denominador}. Ejemplo:",
-    "  ```formula",
-    "  C_{1} · V_{1} = C_{2} · V_{2}",
-    "  n = #{m|PM}",
-    "  ```",
-    "- Está PROHIBIDO: LaTeX ($…$, \\frac, \\text), HTML, imágenes y enlaces.",
+    ...MARKDOWN_RULES,
     "",
     "──────── ENUNCIADO DEL EJERCICIO ────────",
     opts.question?.trim() || "[pega aquí el enunciado del ejercicio]",
+    "",
+  ]
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+/**
+ * Prompt para una IA EXTERNA en la que ya se está trabajando un proyecto (o que recibe talleres
+ * o ejercicios del proyecto). Le dice qué salida entregar: los ejercicios resueltos paso a paso,
+ * con unidades, en el formato de intercambio de `lib/project-exercise-format.ts`. La persona lo
+ * pega de vuelta en la app («Pegar respuesta de la IA») o en el chat de desarrollo.
+ */
+export function projectExercisePrompt(opts: {
+  subjectName: string;
+  subjectCode: string;
+  projectTitle: string;
+  category?: string | null;
+  description?: string | null;
+  /** Nombre del taller al que pertenecen los ejercicios, si ya se sabe. */
+  workshop?: string;
+  /** Enunciados pegados por la persona (vacío = «usa lo que ya trabajamos en esta conversación»). */
+  statements?: string;
+}): string {
+  const F = "````"; // cerco externo de 4: el interior lleva bloques ```formula
+  const ws = opts.workshop?.trim();
+  const desc = opts.description?.trim();
+
+  return [
+    `Eres un profesor experto en ${opts.subjectName} (${opts.subjectCode}; pregrado de Química Farmacéutica, Universidad Nacional de Colombia). ` +
+      `Estoy trabajando el proyecto «${opts.projectTitle}»${opts.category ? ` (${opts.category})` : ""} y necesito que me entregues los TALLERES o EJERCICIOS ` +
+      `del proyecto resueltos y explicados, en un formato exacto que pueda pegar tal cual en mi app de estudio.`,
+    desc ? `\nContexto del proyecto (resumen): ${stripMarkup(desc).replace(/\s*\n\s*/g, " ").slice(0, 1200)}` : "",
+    "",
+    "QUÉ EJERCICIOS ENTREGAR",
+    "- Si en esta conversación ya trabajamos o resolvimos talleres/ejercicios, usa ESOS (mantén los enunciados y datos que ya usamos; si hay una corrección pendiente, aplícala).",
+    "- Si abajo pego enunciados nuevos, resuelve esos.",
+    "- Un taller con varios problemas = un ejercicio por problema, todos bajo el mismo @@TALLER. No mezcles dos preguntas en un ejercicio.",
+    "",
+    ...SOLVE_RULES,
+    "",
+    "FORMATO DE SALIDA (obligatorio — mi app solo entiende esto)",
+    `Responde con UN SOLO bloque de código cercado con CUATRO acentos graves (${F}text … ${F}) para que pueda copiarlo completo sin que se pierda el formato. Antes o después del bloque no escribas nada más (si necesitas preguntarme un dato, hazlo ANTES del bloque y no entregues el bloque hasta que te responda).`,
+    "Dentro del bloque, cada marcador va SOLO en su propia línea, escrito exactamente así:",
+    "- «@@TALLER: nombre del taller» (opcional; vale para todos los ejercicios que siguen hasta el próximo @@TALLER. Omítelo si son ejercicios sueltos).",
+    "- «@@EJERCICIO: título corto» (p. ej. «Problema 3 — Vida media»; abre cada ejercicio).",
+    "- «@@ENUNCIADO» y debajo el problema tal cual (una sola pregunta), con **negrita** en los datos clave y sus unidades. Si añadiste supuestos, ponlos al final en una línea que empiece por «*Dato que hay que asumir* (el enunciado no lo da): …».",
+    "- «@@SOLUCION» y debajo la solución paso a paso, con las reglas de arriba (Qué está pasando · Interpretación · Factor de conversión · cálculo con unidades · Conclusión).",
+    "- «@@FIN» cierra cada ejercicio.",
+    "Ejemplo de la estructura (el contenido real debe ser tuyo, completo y con unidades en cada número):",
+    "  @@TALLER: Taller 1 — Estequiometría",
+    "  @@EJERCICIO: Problema 1 — Masa de NaCl",
+    "  @@ENUNCIADO",
+    "  ¿Cuántos **g** de NaCl hay en **250 mL** de una solución **0,15 mol/L**?",
+    "  @@SOLUCION",
+    "  #### Paso 1 — Pasar el volumen a litros",
+    "  **Qué está pasando.** …",
+    "  @@FIN",
+    "",
+    ...MARKDOWN_RULES,
+    "- Dentro de @@ENUNCIADO y @@SOLUCION NO uses líneas que empiecen por «@@» (salvo los marcadores) ni cercos de cuatro acentos graves.",
+    "",
+    "──────── " + (ws ? `TALLER: ${ws} — ` : "") + "ENUNCIADOS (si los pego) ────────",
+    opts.statements?.trim() || "[sin enunciados nuevos: usa los talleres/ejercicios que ya trabajamos en esta conversación]",
     "",
   ]
     .join("\n")
@@ -725,6 +798,8 @@ export function projectContextPrompt(opts: {
   links: { name: string; url: string }[];
   driveUrl: string | null;
   focusNote: string | null;
+  /** Talleres y ejercicios ya registrados (solo títulos). */
+  exercises?: { workshop: string | null; title: string }[];
   notes: { author: string; createdAt: string; body: string; links?: { name: string; url: string }[] }[];
   today: string;
   ask?: string;
@@ -773,6 +848,13 @@ export function projectContextPrompt(opts: {
     "",
     opts.team?.length
       ? ["──────── EQUIPO DEL PROYECTO ────────", ...opts.team.map((m) => `- ${m.name}${m.role ? ` (${m.role})` : ""}`), ""].join("\n")
+      : null,
+    opts.exercises?.length
+      ? [
+          "──────── TALLERES Y EJERCICIOS YA REGISTRADOS (solo títulos) ────────",
+          ...opts.exercises.map((e) => `- ${e.workshop ? `${e.workshop} · ` : ""}${e.title}`),
+          "",
+        ].join("\n")
       : null,
     "──────── DOCUMENTOS Y ENLACES ────────",
     linkLines,
