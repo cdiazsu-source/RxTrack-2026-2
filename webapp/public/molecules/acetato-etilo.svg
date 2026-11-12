@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 150" width="220" height="150" role="img" aria-label="Estructura del acetato de etilo">
+  <rect width="220" height="150" fill="#ffffff"/>
+  <g stroke="#000000" stroke-width="3" stroke-linecap="round" fill="none">
+    <polyline points="15,105 50,85 85,105"/>
+    <line x1="47" y1="84" x2="47" y2="48"/>
+    <line x1="53" y1="84" x2="53" y2="48"/>
+    <polyline points="85,105 100,114"/>
+    <polyline points="122,114 137,105 172,85 207,105"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#000000" text-anchor="middle">
+    <text x="50" y="40">O</text>
+    <text x="111" y="122">O</text>
+  </g>
+</svg>

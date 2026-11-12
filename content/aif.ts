@@ -1,5 +1,6 @@
 import type { SubjectContent } from "./_schema";
 import { aifLabModuloII, aifLabPracticesModuloII } from "./aif-modulo2";
+import { aifLabModuloIII, aifLabPracticesModuloIII } from "./aif-modulo3";
 
 /**
  * Análisis Instrumental Farmacéutico (UNAL) — programa oficial DEFINITIVO
@@ -756,6 +757,13 @@ export const aif: SubjectContent = {
     { term: "Idoneidad del sistema (system suitability)", moduleSlug: "cromatografia-fundamentos", definition: "Pruebas (repetibilidad de área, factor de cola, platos teóricos, resolución) que verifican que el sistema cromatográfico es **apto antes** de analizar muestras." },
     { term: "Resolución cromatográfica (Rs)", moduleSlug: "cromatografia-fundamentos", definition: "Grado de separación entre dos picos vecinos; combina **retención, selectividad y eficiencia**. Rs ≥ 1,5 = separación a línea base." },
     { term: "Índices de retención de Kováts", moduleSlug: "hplc-gc", definition: "Escala que sitúa el tiempo de retención de un analito en GC entre los de dos n-alcanos de referencia; permite **comparar retenciones entre equipos y columnas**." },
+    { term: "Factor de retención (k′)", moduleSlug: "cromatografia-fundamentos", definition: "k′ = (t_R − t₀) ÷ t₀. Cuántas veces más tiempo pasa el analito en la fase estacionaria que en la móvil. Adimensional; t₀ es el tiempo muerto (compuesto no retenido)." },
+    { term: "Selectividad (α)", moduleSlug: "cromatografia-fundamentos", definition: "Razón de los factores de retención de dos picos, α = k′₂ ÷ k′₁. Si α = 1 no se pueden separar; a mayor α, más fácil la separación." },
+    { term: "Factor de asimetría (T, USP)", moduleSlug: "cromatografia-fundamentos", definition: "T = W₀,₀₅ ÷ 2f, con el ancho del pico al 5 % de su altura. T = 1 es un pico simétrico; T > 2 suele ser inaceptable (cola)." },
+    { term: "Relación de split", moduleSlug: "cromatografia-fundamentos", definition: "En el inyector de GC, razón entre el flujo que se **desecha** y el que entra a la columna (S). Llega a la columna una fracción 1 ÷ (1 + S) de la muestra: a mayor split, picos más finos pero señales más pequeñas." },
+    { term: "Tiempo de retención relativo (R_tr)", moduleSlug: "hplc-gc", definition: "Cociente entre el t_R del analito y el del estándar interno. Es adimensional y se mantiene casi constante aunque cambien flujo o temperatura: sirve para **identificar** un pico." },
+    { term: "Normalización de áreas", moduleSlug: "hplc-gc", definition: "Porcentaje de cada pico = área ÷ suma de todas las áreas × 100. Solo refleja la composición real si todos los compuestos tienen la misma respuesta en el detector; no es una concentración." },
+    { term: "Detector de ionización de llama (FID)", moduleSlug: "hplc-gc", definition: "Detector de GC en el que el analito se quema en una llama de H₂/aire y genera una corriente proporcional a los átomos de carbono que arden. Muy usado para orgánicos; destruye la muestra." },
     { term: "Técnicas acopladas (hifenadas)", moduleSlug: "tecnicas-acopladas-ms", definition: "Unión de una técnica de separación con una de detección espectroscópica en línea (**GC-MS**, **LC-MS**): separa y a la vez identifica cada componente." },
     { term: "Ionización por impacto electrónico", moduleSlug: "tecnicas-acopladas-ms", definition: "En espectrometría de masas, bombardeo de la molécula con electrones de 70 eV; produce el **ion molecular** y un patrón de fragmentación reproducible." },
     { term: "Punto de equivalencia vs. punto final", moduleSlug: "conceptos-previos", definition: "El **punto de equivalencia** es el momento teórico exacto en que los equivalentes de valorante igualan a los del analito — nunca se observa directamente, se calcula. El **punto final** es lo que sí detectas en el laboratorio (cambio de color, salto de potencial): es tu mejor estimación práctica del punto de equivalencia." },
@@ -1129,6 +1137,8 @@ export const aif: SubjectContent = {
     },
     // Laboratorio del Módulo II (subgrupo J5): ver content/aif-modulo2.ts
     aifLabModuloII,
+    // Laboratorio del Módulo III (cromatografía): ver content/aif-modulo3.ts
+    aifLabModuloIII,
   ],
 
   labPractices: [
@@ -2848,5 +2858,8 @@ export const aif: SubjectContent = {
 
     // ── Módulo II (subgrupo J5) ──
     ...aifLabPracticesModuloII,
+
+    // ── Módulo III (cromatografía) ──
+    ...aifLabPracticesModuloIII,
   ],
 };
